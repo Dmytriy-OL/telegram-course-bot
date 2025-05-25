@@ -1,0 +1,13 @@
+# Віртуальне середовище
+.venv/
+ENV/
+env/
+
+#Файл з даними
+app/database/db.sqlite3
+
+__pycache__/
+
+# Іде редакторів
+.idea/
+.vscode/
