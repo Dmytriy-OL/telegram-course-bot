@@ -158,7 +158,7 @@ async def course_signups(callback: CallbackQuery, state: FSMContext):
     text_result = ""
     for i, lesson in enumerate(lessons, start=1):
         lesson_type = "🧑‍🏫 *Очно*" if lesson.type_lesson == LessonType.OFFLINE else "💻 *Онлайн*"
-        lesson_places = f"{lesson.places} "if lesson.places >= 1 else "✅ Група повна "
+        lesson_places = f"{lesson.places} 🟦"if lesson.places >= 1 else "✅ Група повна "
         text_result += (
             f"*Заняття #{i}*\n"
             f"*Назва заняття:* `{lesson.title}`\n"

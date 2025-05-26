@@ -13,21 +13,19 @@ async def add_admin(tg_id: int, name: str, surname: str, login: str, main_admin:
         await session.commit()
 
 
-async def view_admins(tg_id: int = None):
+async def get_role(tg_id: int) -> str:
     async with SessionLocal() as session:
-        if tg_id is not None:
-            result = await session.execute(select(Administrator).where(Administrator.tg_id == tg_id))
-            admin = result.scalar_one_or_none()
-            return True if admin else False
-        else:
-            result = await session.execute(select(Administrator))
-            all_admins = result.scalars().all()
-            if all_admins:
-                for admin in all_admins:
-                    print(f"Ім'я: {admin.login} | ID: {admin.tg_id}")
-            else:
-                print("Немає адмінів")
-            return all_admins
+        result = await session.execute(
+            select(Administrator).where(Administrator.tg_id == tg_id)
+        )
+        teacher = result.scalar_one_or_none()
+
+        if teacher:
+            return "admin" if teacher.main_admin == 1 else "teacher"
+
+        return "user"
+
+
 
 
 async def view_users(unknown: bool = False):
@@ -241,6 +239,6 @@ async def main():
         print(f"👤 {enrollment.user.name} {enrollment.user.surname } записаний на курс: {enrollment.lesson.title} — {enrollment.lesson.datetime}")
 
 if __name__ == '__main__':
-        asyncio.run(main())
-        # asyncio.run(add_admin(974638427, "Саша", "Олійник", "@dimon20012", False))
+        # asyncio.run(main())
+        asyncio.run(add_admin(974638427, "Саша", "Олійник", "@dimon20012", False))
         # asyncio.run(view_admins())

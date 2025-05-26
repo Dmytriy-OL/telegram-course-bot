@@ -1,7 +1,7 @@
 # Віртуальне середовище
 .venv/
 ENV/
-env/
+.env/
 
 #Файл з даними
 app/database/db.sqlite3
