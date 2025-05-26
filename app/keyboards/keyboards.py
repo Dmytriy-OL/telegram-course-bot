@@ -37,7 +37,7 @@ def get_teachers_command():
     return keyboard
 
 
-def main_admin_command():
+def get_admin_main_menu():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🛡️ Адміни", callback_data="admin_admins")],
