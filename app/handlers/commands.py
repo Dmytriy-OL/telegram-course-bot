@@ -60,7 +60,7 @@ async def admin_command(message: Message):
     unknown = message.from_user.id
     admin = await get_role(unknown)
 
-    if admin in ("admin", "teacher"):
+    if admin == "admin":
         await message.answer("🔧 *Панель адміністратора*", parse_mode="Markdown", reply_markup=get_admin_main_menu())
     else:
         await message.answer("🚫 У вас немає прав доступу.")
