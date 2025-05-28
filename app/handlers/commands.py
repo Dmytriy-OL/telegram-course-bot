@@ -7,7 +7,7 @@ from aiogram.types import Message, FSInputFile
 from app.database.crud import get_images_with_main, view_user, delete_image_from_db, set_user, main_view
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from app.keyboards.keyboards import get_inline_keyboard, get_admin_main_menu, get_teachers_command
+from app.keyboards.keyboards import get_inline_keyboard, get_admin_menu, get_teachers_command
 from app.database.admin_crud import get_role
 
 router = Router()
@@ -61,7 +61,7 @@ async def admin_command(message: Message):
     admin = await get_role(unknown)
 
     if admin == "admin":
-        await message.answer("🔧 *Панель адміністратора*", parse_mode="Markdown", reply_markup=get_admin_main_menu())
+        await message.answer("🔧 *Панель адміністратора*", parse_mode="Markdown", reply_markup=get_admin_menu())
     else:
         await message.answer("🚫 У вас немає прав доступу.")
 
