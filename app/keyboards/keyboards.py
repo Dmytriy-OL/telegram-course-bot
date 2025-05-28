@@ -31,7 +31,6 @@ def get_teachers_command():
         inline_keyboard=[
             [InlineKeyboardButton(text="👨‍🏫 Для викладачів", callback_data="teachers")],
             [InlineKeyboardButton(text="👨🏻‍💻 Панель користувача", callback_data="go_to_main_menu")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="pass")],
         ]
     )
     return keyboard
