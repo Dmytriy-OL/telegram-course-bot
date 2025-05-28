@@ -1,7 +1,6 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
     InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from app.database.admin_crud import get_enrollments_for_two_weeks,active_courses_for_two_weeks
@@ -20,7 +19,7 @@ async def teachers(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="📚 Активні курси", callback_data="active_courses")],
             [InlineKeyboardButton(text="✏️ Редагувати заняття", callback_data="edit_lessons")],
             [InlineKeyboardButton(text="🔗 Додати посилання на заняття", callback_data="lesson_link")],
-            [InlineKeyboardButton(text="🔙 Повернутись назад", callback_data="admin_menu")]
+            [InlineKeyboardButton(text="🔙 Повернутись назад", callback_data="teacher_menu")]
         ]
     )
     await callback.message.answer(
@@ -94,3 +93,11 @@ async def course_signups(callback: CallbackQuery, state: FSMContext):
                                   reply_markup=back_button_builder().as_markup())
 
 
+
+@router.callback_query(F.data == "teacher_menu")
+async def admin_menu(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.answer(
+        text="Оберіть дію з меню адміністратора:",
+        reply_markup=get_teachers_command()
+    )
