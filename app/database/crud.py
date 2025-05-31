@@ -2,7 +2,7 @@ import asyncio
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
-from app.database.models import SessionLocal, User, Image, Caption, Lesson, LessonType, Enrollment
+from app.database.models import SessionLocal, User, Image, Caption, Lesson, LessonType, Enrollment, Administrator
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.sql.expression import or_, and_
 # from app.image_uploads import BASE_DIR
@@ -103,24 +103,31 @@ async def add_user(name: str = "Дімас", surname: str = 'Олійник', lo
         return user.id
 
 
-async def create_lesson(title: str, teacher: str, year: int, month: int, day: int, hour: int, minute: int,
+async def create_lesson(title: str, year: int, month: int, day: int, hour: int, minute: int,
                         type_lesson: LessonType,
-                        places: int, freely: bool = True):
+                        places: int, teacher_id_tg: int, freely: bool = True):
+    """Функція яка створює нове заняття"""
     async with SessionLocal() as session:
+        result = await session.execute(select(Administrator).where(Administrator.tg_id == teacher_id_tg))
+        administrator = result.scalars().first()
+
+        if not administrator:
+            raise ValueError("❌ Адміністратор з таким telegram_id не знайдений у базі.")
+
         lesson_datetime = datetime(year, month, day, hour, minute)
         lesson = Lesson(
             title=title,
-            instructor=teacher,
             datetime=lesson_datetime,
             type_lesson=type_lesson,
             freely=freely,
-            places=places
+            places=places,
+            teacher_id=administrator.id
         )
         session.add(lesson)
-        await session.commit()  # Фіксуємо зміни в базі
+        await session.commit()
         print("📌 Заняття додано в базу!")
-        await session.refresh(lesson)  # Оновлюємо об'єкт з БД
-        return lesson  # Повертаємо створений об'єкт
+        await session.refresh(lesson)
+        return lesson
 
 
 async def view_lesson():
@@ -236,13 +243,12 @@ async def cancel_record_db(lesson_id: int):
         return None
 
 
-
 async def main():
     # await create_lesson("Для студентів", "Олексіївна А.В", 2025, 3, 23, 18, 30, LessonType.ONLINE, True, )
-    await create_lesson("Дорослі", "Олексіївна А.В", 2025, 5, 15, 18, 30, LessonType.ONLINE, 1, True)
+    await create_lesson("Для немовлят", 2004, 6, 2, 13, 30, LessonType.ONLINE, 2, 1, True)
 
     print("___________________")
-    await view_lesson()
+    # await view_lesson()
 
     # await add_caption("Чоловічі курси", "✅ - Ефективне навчання для всіх рівнів підготовки.", True)
     # await delete_captions("Дитячі курси")
@@ -252,14 +258,14 @@ async def main():
 
 
 if __name__ == '__main__':
-    pass
+    # pass
     # print("\033[93m⚠️ Операцію скасовано\033[0m")
     # print("\033[91mПомилка!\033[0m")
     # print("\033[92m✅ Успіх!\033[0m")
     # asyncio.run(cancel_record(1))
     # asyncio.run(lesson_records_display(974638427))
     # asyncio.run(find_activities_by_date(2025, 3, 23))
-    # asyncio.run(main())
+    asyncio.run(main())
     # asyncio.run(view_image("Courges.jpg"))
     # asyncio.run(add_user())
     # asyncio.run(main())

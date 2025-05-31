@@ -40,15 +40,16 @@ class Lesson(Base):
     __tablename__ = "lessons"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(100), nullable=False)  # Назва курсу/заняття
-    instructor = Column(String(50), nullable=False)
+    title = Column(String(100), nullable=False)
     datetime = Column(DateTime, nullable=False, default=datetime.utcnow)  # Дата і час заняття
     type_lesson = Column(Enum(LessonType), nullable=False)  # Тип заняття (онлайн/офлайн)
-    freely = Column(Boolean, default=True)  # Чи вільне місце для запису
+    freely = Column(Boolean, default=True)
     places = Column(Integer, default=1)
 
-    # Зв'язок "урок - записані користувачі"
+    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=False)
+
     enrollments = relationship("Enrollment", back_populates="lesson")
+    administrator = relationship("Administrator", back_populates="lessons")
 
 
 class Enrollment(Base):
@@ -58,7 +59,6 @@ class Enrollment(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.tg_id"), nullable=False)
     lesson_id = Column(Integer, ForeignKey("lessons.id"), nullable=False)
-    # full_name=Column(String(100), nullable=False)
     user = relationship("User", back_populates="enrollments")
     lesson = relationship("Lesson", back_populates="enrollments")
 
@@ -73,6 +73,7 @@ class Administrator(Base):
     login = Column(String(100), unique=True, nullable=False)
     main_admin = Column(Boolean, default=False)
 
+    lessons = relationship("Lesson", back_populates="administrator")
 
 class Image(Base):
     __tablename__ = "images"
