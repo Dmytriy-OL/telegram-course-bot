@@ -7,7 +7,7 @@ from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardBut
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
 from app.database.crud import create_lesson, set_user
 from app.database.models import LessonType
-from app.handlers.utils import delete_previous_message
+
 router = Router()
 
 
@@ -42,35 +42,35 @@ async def teachers(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "add_lesson")
 async def add_lesson(callback: CallbackQuery, state: FSMContext):
-    if callback.message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await callback.message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
-    await callback.message.answer("Введіть тему заннятя:")
+    """Починає процес створення заняття та запитує тему або скасування операції."""
+    await callback.message.answer(
+        "📝 *Введіть тему заняття:*\n"
+        "Для скасувати — натисніть /cancel.",
+        parse_mode="Markdown")
     await state.set_state(LessonFactory.waiting_for_title)
 
 
 @router.message(LessonFactory.waiting_for_title)
 async def get_lesson_title(message: Message, state: FSMContext):
-    if message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
+    """Процес створення заняття та запитує дату заняття або скасування операції."""
     await state.update_data(title=message.text.strip())
-    await message.answer("📅 Введіть дату заняття у форматі РРРР-ММ-ДД:")
+    await message.answer(
+        "📅 *Введіть дату заняття у форматі РРРР-ММ-ДД:*\n"
+        "Для скасувати — натисніть /cancel.",
+        parse_mode="Markdown")
     await state.set_state(LessonFactory.waiting_for_date)
 
 
 @router.message(LessonFactory.waiting_for_date)
 async def get_lesson_date(message: Message, state: FSMContext):
-    if message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
+    """Процес створення заняття та запитує час заняття або скасування операції."""
     try:
         year, month, day = map(int, message.text.split("-"))
         await state.update_data(year=year, month=month, day=day)
-        await message.answer("⏰ Введіть час заняття у форматі ГГ:ХХ:")
+        await message.answer(
+            "⏰ *Введіть час заняття у форматі ГГ:ХХ:*\n"
+            "Для скасувати — натисніть /cancel.",
+            parse_mode="Markdown")
         await state.set_state(LessonFactory.waiting_for_time)
     except ValueError:
         await message.answer("⚠ Невірний формат! Введіть дату у форматі РРРР-ММ-ДД або /cancel для скасування.")
@@ -78,22 +78,22 @@ async def get_lesson_date(message: Message, state: FSMContext):
 
 @router.message(LessonFactory.waiting_for_time)
 async def get_lesson_time(message: Message, state: FSMContext):
-    if message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
+    """Процес створення заняття та запитує час заняття або скасування операції."""
     try:
         hour, minute = map(int, message.text.split(":"))
         await state.update_data(hour=hour, minute=minute)
 
-        # Вибір типу заняття
         keyboard = ReplyKeyboardMarkup(
             keyboard=[
                 [KeyboardButton(text="🖥 Онлайн"), KeyboardButton(text="🏫 Офлайн")]
             ],
             resize_keyboard=True,
         )
-        await message.answer("📌 Виберіть тип заняття:", reply_markup=keyboard)
+        await message.answer(
+            "📌 *Виберіть тип заняття:*\n",
+            "Для скасувати — натисніть /cancel.",
+            parse_mode="Markdown",
+            reply_markup=keyboard)
         await state.set_state(LessonFactory.waiting_for_type)
     except ValueError:
         await message.answer("⚠ Невірний формат! Введіть час у форматі ГГ:ХХ або /cancel для скасування.")
@@ -101,30 +101,30 @@ async def get_lesson_time(message: Message, state: FSMContext):
 
 @router.message(LessonFactory.waiting_for_type)
 async def get_lesson_type(message: Message, state: FSMContext):
-    if message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
+    """Процес створення заняття Enam:з вибором типа заняття та запит введіть кількість місць або скасування операції."""
     type_text = message.text.strip().lower()
     if "онлайн" in type_text:
         lesson_type = LessonType.ONLINE
     elif "офлайн" in type_text:
         lesson_type = LessonType.OFFLINE
     else:
-        await message.answer("⚠ Невірний вибір! Виберіть '🖥 Онлайн' або '🏫 Офлайн'.")
+        await message.answer("⚠ Невірний вибір! Виберіть '🖥 Онлайн' або '🏫 Офлайн'.", )
         return
 
     await state.update_data(type_lesson=lesson_type)
-    await message.answer("👥 Введіть кількість місць:", reply_markup=ReplyKeyboardRemove())
+    await message.answer(
+        "👥  *Введіть кількість місць::*\n",
+        "Для скасувати — натисніть /cancel.",
+        parse_mode="Markdown",
+        reply_markup=ReplyKeyboardRemove())
+
     await state.set_state(LessonFactory.waiting_for_places)
 
 
 @router.message(LessonFactory.waiting_for_places)
 async def get_lesson_places(message: Message, state: FSMContext):
-    if message.text.strip().casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
-        return
+    """Обробляє введення кількості місць для заняття та виводить підсумок з можливістю підтвердження,
+     повторного заповнення або скасування."""
     try:
         places = int(message.text.strip())
         await state.update_data(places=places)
