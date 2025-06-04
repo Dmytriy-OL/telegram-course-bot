@@ -7,7 +7,7 @@ from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardBut
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
 from app.database.crud import create_lesson, set_user
 from app.database.models import LessonType
-
+from app.handlers.utils import delete_previous_message
 router = Router()
 
 
@@ -135,7 +135,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
             f"Назва заняття: {lesson_data['title']}\n"
             f"Дата: {lesson_data['day']:02d}.{lesson_data['month']:02d}.{lesson_data['year']}\n"
             f"Час: {lesson_data['hour']:02d}:{lesson_data['minute']:02d}\n"
-            f"Тип: {'онлайн'if lesson_data['type_lesson'] == LessonType.ONLINE else 'офлайн'}\n"
+            f"Тип: {'онлайн' if lesson_data['type_lesson'] == LessonType.ONLINE else 'офлайн'}\n"
             f"Кількість місць: {lesson_data['places']}"
         )
         keyboard = InlineKeyboardMarkup(
@@ -143,7 +143,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
                 InlineKeyboardButton(text="✅ Все вірно", callback_data="confirm_lesson")
             ], [
                 InlineKeyboardButton(text="🔄 Заповнити знову", callback_data="retry_lesson")
-            ],[
+            ], [
                 InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel_lesson")
             ]]
         )
@@ -156,6 +156,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
 async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
     """Функція, яка заносить заняття до бази даних та повідомлює про успішне створення."""
     lesson_data = await state.get_data()
+    await callback.message.delete()
 
     await create_lesson(
         title=lesson_data["title"],
@@ -175,6 +176,7 @@ async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
         ]
     )
     await callback.message.answer("✅ Заняття успішно створене!", reply_markup=keyboard)
+
 
 @router.callback_query(F.data == "course_signups")  # !!!
 async def course_signups(callback: CallbackQuery, state: FSMContext):
