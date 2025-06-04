@@ -7,8 +7,11 @@ from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardBut
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
 from app.database.crud import create_lesson, set_user
 from app.database.models import LessonType
+from aiogram_calendar import SimpleCalendar, simple_calendar,SimpleCalendarCallback,DialogCalendarCallback,CalendarLabels,dialog_calendar,DialogCalendar,common,get_user_locale,schemas,tests
 
 router = Router()
+
+calendar = SimpleCalendar()
 
 
 class LessonFactory(StatesGroup):
@@ -46,34 +49,36 @@ async def add_lesson(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         "📝 *Введіть тему заняття:*\n"
         "Для скасувати — натисніть /cancel.",
-        parse_mode="Markdown")
+        parse_mode="Markdown"
+    )
     await state.set_state(LessonFactory.waiting_for_title)
 
 
 @router.message(LessonFactory.waiting_for_title)
 async def get_lesson_title(message: Message, state: FSMContext):
-    """Процес створення заняття та запитує дату заняття або скасування операції."""
+    """Процес створення заняття, запитує дату заняття через inline calendar або скасування операції."""
     await state.update_data(title=message.text.strip())
     await message.answer(
-        "📅 *Введіть дату заняття у форматі РРРР-ММ-ДД:*\n"
+        "📅 *Виберіть дату заняття за допомогою календаря:*\n"
         "Для скасувати — натисніть /cancel.",
-        parse_mode="Markdown")
+        parse_mode="Markdown",
+        reply_markup=await calendar.start_calendar()
+    )
     await state.set_state(LessonFactory.waiting_for_date)
 
 
-@router.message(LessonFactory.waiting_for_date)
-async def get_lesson_date(message: Message, state: FSMContext):
-    """Процес створення заняття та запитує час заняття або скасування операції."""
-    try:
-        year, month, day = map(int, message.text.split("-"))
-        await state.update_data(year=year, month=month, day=day)
-        await message.answer(
-            "⏰ *Введіть час заняття у форматі ГГ:ХХ:*\n"
-            "Для скасувати — натисніть /cancel.",
-            parse_mode="Markdown")
+@router.callback_query(SimpleCalendarCallback.filter(), LessonFactory.waiting_for_date)
+async def process_date_selection(callback: CallbackQuery, callback_data: SimpleCalendarCallback, state: FSMContext):
+    """Обробка inline calendar та введення часу заняття"""
+    selected, date = await calendar.process_selection(callback, callback_data)
+    if selected:
+        await state.update_data(date=date)
+        await callback.message.edit_text(
+            f"✅ Дату обрано: {date.strftime('%d.%m.%Y')}\n"
+            f"🕒 Тепер введіть час заняття (наприклад: 18:00):\n1"
+            "Для скасувати — натисніть /cancel."
+        )
         await state.set_state(LessonFactory.waiting_for_time)
-    except ValueError:
-        await message.answer("⚠ Невірний формат! Введіть дату у форматі РРРР-ММ-ДД або /cancel для скасування.")
 
 
 @router.message(LessonFactory.waiting_for_time)
@@ -90,10 +95,11 @@ async def get_lesson_time(message: Message, state: FSMContext):
             resize_keyboard=True,
         )
         await message.answer(
-            "📌 *Виберіть тип заняття:*\n",
+            "📌 *Виберіть тип заняття:*\n"
             "Для скасувати — натисніть /cancel.",
             parse_mode="Markdown",
-            reply_markup=keyboard)
+            reply_markup=keyboard
+        )
         await state.set_state(LessonFactory.waiting_for_type)
     except ValueError:
         await message.answer("⚠ Невірний формат! Введіть час у форматі ГГ:ХХ або /cancel для скасування.")
@@ -113,7 +119,7 @@ async def get_lesson_type(message: Message, state: FSMContext):
 
     await state.update_data(type_lesson=lesson_type)
     await message.answer(
-        "👥  *Введіть кількість місць::*\n",
+        "👥  *Введіть кількість місць:*\n"
         "Для скасувати — натисніть /cancel.",
         parse_mode="Markdown",
         reply_markup=ReplyKeyboardRemove())
@@ -130,13 +136,14 @@ async def get_lesson_places(message: Message, state: FSMContext):
         await state.update_data(places=places)
 
         lesson_data = await state.get_data()
+        date = lesson_data.get('date')
 
         text_result = (
-            f"Назва заняття: {lesson_data['title']}\n"
-            f"Дата: {lesson_data['day']:02d}.{lesson_data['month']:02d}.{lesson_data['year']}\n"
-            f"Час: {lesson_data['hour']:02d}:{lesson_data['minute']:02d}\n"
-            f"Тип: {'онлайн' if lesson_data['type_lesson'] == LessonType.ONLINE else 'офлайн'}\n"
-            f"Кількість місць: {lesson_data['places']}"
+            f"Назва заняття:{lesson_data['title']}\n"
+            f"Дата: {date.day:02d}.{date.month:02d}.{date.year}\n"
+            f"Час: {lesson_data.get('hour', 0):02d}:{lesson_data.get('minute', 0):02d}\n"
+            f"Тип: {'онлайн' if lesson_data.get('type_lesson') == LessonType.ONLINE else 'офлайн'}\n"
+            f"Кількість місць: {lesson_data.get('places', 'не вказано')}"
         )
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[[
@@ -156,13 +163,14 @@ async def get_lesson_places(message: Message, state: FSMContext):
 async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
     """Функція, яка заносить заняття до бази даних та повідомлює про успішне створення."""
     lesson_data = await state.get_data()
+    date = lesson_data.get('date')
     await callback.message.delete()
 
     await create_lesson(
         title=lesson_data["title"],
-        year=lesson_data["year"],
-        month=lesson_data["month"],
-        day=lesson_data["day"],
+        year=date.year,
+        month=date.month,
+        day=date.day,
         hour=lesson_data["hour"],
         minute=lesson_data["minute"],
         type_lesson=lesson_data["type_lesson"],
