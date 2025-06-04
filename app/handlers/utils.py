@@ -3,6 +3,8 @@ from app.database.crud import get_images_with_main
 from app.images import BASE_DIR
 # from app.image_uploads import BASE_DIR
 from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
+
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import os
@@ -25,6 +27,12 @@ async def display_images(message: Message, text: str = 'Передай текс�
         await message.answer(text)
     else:
         await message.answer("❌ Зображення не знайдено.")
+
+
+async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
+    """Видаляє попереднє повідомлення та очищує state."""
+    await state.clear()
+    await callback.message.delete()
 
 
 

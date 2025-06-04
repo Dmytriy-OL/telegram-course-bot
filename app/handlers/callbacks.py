@@ -8,6 +8,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from app.keyboards.keyboards import back_button_markup
 from app.handlers.commands import cmd_start
+from app.handlers.utils import delete_previous_message
 
 # Створюємо роутер
 router = Router()
@@ -270,5 +271,4 @@ async def cancel_record(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "delete_previous_message")
 async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
     """Видаляє попереднє повідомлення."""
-    await state.clear()
-    await callback.message.delete()
+    await delete_previous_message(callback, state)
