@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -7,7 +9,8 @@ from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardBut
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
 from app.database.crud import create_lesson, set_user
 from app.database.models import LessonType
-from aiogram_calendar import SimpleCalendar, simple_calendar,SimpleCalendarCallback,DialogCalendarCallback,CalendarLabels,dialog_calendar,DialogCalendar,common,get_user_locale,schemas,tests
+from aiogram_calendar import SimpleCalendar, simple_calendar, SimpleCalendarCallback, DialogCalendarCallback, \
+    CalendarLabels, dialog_calendar, DialogCalendar, common, get_user_locale, schemas, tests
 
 router = Router()
 
@@ -60,6 +63,8 @@ async def get_lesson_title(message: Message, state: FSMContext):
     await state.update_data(title=message.text.strip())
     await message.answer(
         "📅 *Виберіть дату заняття за допомогою календаря:*\n"
+        "✍️ *Або введіть дату вручну у форматі:* `РРРР.ММ.ДД`\n"
+        "_Наприклад:_ `2025.06.12`\n\n"
         "Для скасувати — натисніть /cancel.",
         parse_mode="Markdown",
         reply_markup=await calendar.start_calendar()
@@ -79,6 +84,22 @@ async def process_date_selection(callback: CallbackQuery, callback_data: SimpleC
             "Для скасувати — натисніть /cancel."
         )
         await state.set_state(LessonFactory.waiting_for_time)
+
+
+@router.message(LessonFactory.waiting_for_date)
+async def manually_entered_date(message: Message, state: FSMContext):
+    """Ручне введення дати заняття у форматі рік.місяць.день (YYYY.MM.DD)"""
+    try:
+        date = datetime.strptime(message.text.strip(), "%Y.%m.%d")
+        await state.update_data(date=date)
+        await message.answer(
+            f"✅ Дата обрана: {date.strftime('%d.%m.%Y')}\n"
+            f"🕒 Тепер введіть час заняття (наприклад: 18:00)\n"
+            "❌ Для скасування натисніть /cancel."
+        )
+        await state.set_state(LessonFactory.waiting_for_time)
+    except ValueError:
+        await message.answer("⚠ Невірний формат! Введіть дату у форматі: `2025.06.12`")
 
 
 @router.message(LessonFactory.waiting_for_time)
