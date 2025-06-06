@@ -2,12 +2,15 @@ from aiogram.types import Message, FSInputFile
 from app.database.crud import get_images_with_main
 from app.images import BASE_DIR
 # from app.image_uploads import BASE_DIR
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
-
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import os
+from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback
+
+calendar = SimpleCalendar()
+
 
 async def display_images(message: Message, text: str = 'Передай текст', send_photos: bool = False):
     images, image = await get_images_with_main()
@@ -35,14 +38,6 @@ async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
 
 
+async def open_calendar():
+    return await calendar.start_calendar()
 
-
-
-
-# @router.callback_query(F.data == "button1")
-# async def process_button1(callback: types.CallbackQuery):
-#     await callback.message.answer("⏳ Обробляємо ваш запис...")
-#     await asyncio.sleep(1)
-#     await callback.message.answer("✅ Ви успішно записані! 🎉")
-
-    # await callback.message.answer("🗓 Виберіть день, на який хочете записатися:", reply_markup=get_days_keyboard())
