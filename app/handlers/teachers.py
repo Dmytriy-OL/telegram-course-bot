@@ -3,23 +3,23 @@ from datetime import datetime
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from app.keyboards.keyboards import back_button_builder, get_teachers_command
-from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
     InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+from aiogram_calendar import SimpleCalendarCallback
+
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
-from app.database.crud import create_lesson, set_user
+from app.database.crud import create_lesson
 from app.database.models import LessonType
-from aiogram_calendar import SimpleCalendar, simple_calendar, SimpleCalendarCallback, DialogCalendarCallback, \
-    CalendarLabels, dialog_calendar, DialogCalendar, common, get_user_locale, schemas, tests
+from app.handlers.utils import open_calendar, calendar
+from app.keyboards.keyboards import back_button_builder, get_teachers_command
 
 router = Router()
-
-calendar = SimpleCalendar()
 
 
 class LessonFactory(StatesGroup):
     waiting_for_title = State()
     waiting_for_date = State()
+    waiting_for_manual_date = State()
     waiting_for_time = State()
     waiting_for_type = State()
     waiting_for_places = State()
@@ -59,36 +59,52 @@ async def add_lesson(callback: CallbackQuery, state: FSMContext):
 
 @router.message(LessonFactory.waiting_for_title)
 async def get_lesson_title(message: Message, state: FSMContext):
-    """Процес створення заняття, запитує дату заняття через inline calendar або скасування операції."""
+    """Обробляє назву заняття та пропонує вибір (календар або ручне введення)."""
     await state.update_data(title=message.text.strip())
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Ввести дату вручну", callback_data="manual_date")],
+            [InlineKeyboardButton(text="Вибрати дату через календар", callback_data="open_calendar")]
+        ]
+    )
     await message.answer(
         "📅 *Виберіть дату заняття за допомогою календаря:*\n"
         "✍️ *Або введіть дату вручну у форматі:* `РРРР.ММ.ДД`\n"
-        "_Наприклад:_ `2025.06.12`\n\n"
         "Для скасувати — натисніть /cancel.",
         parse_mode="Markdown",
-        reply_markup=await calendar.start_calendar()
+        reply_markup=keyboard
     )
     await state.set_state(LessonFactory.waiting_for_date)
 
 
 @router.callback_query(SimpleCalendarCallback.filter(), LessonFactory.waiting_for_date)
 async def process_date_selection(callback: CallbackQuery, callback_data: SimpleCalendarCallback, state: FSMContext):
-    """Обробка inline calendar та введення часу заняття"""
+    """Обробляє вибір дати через inline-календар і запитує час заняття."""
     selected, date = await calendar.process_selection(callback, callback_data)
     if selected:
         await state.update_data(date=date)
         await callback.message.edit_text(
             f"✅ Дату обрано: {date.strftime('%d.%m.%Y')}\n"
-            f"🕒 Тепер введіть час заняття (наприклад: 18:00):\n1"
+            f"🕒 Тепер введіть час заняття (наприклад: 18:00):\n"
             "Для скасувати — натисніть /cancel."
         )
         await state.set_state(LessonFactory.waiting_for_time)
 
 
-@router.message(LessonFactory.waiting_for_date)
-async def manually_entered_date(message: Message, state: FSMContext):
-    """Ручне введення дати заняття у форматі рік.місяць.день (YYYY.MM.DD)"""
+@router.callback_query(F.data == "manual_date", LessonFactory.waiting_for_date)
+async def prompt_manual_date(callback: CallbackQuery, state: FSMContext):
+    """Інформує користувача про формат ручного введення дати заняття."""
+    await callback.message.answer(
+        "✍️ Введіть дату вручну у форматі: `РРРР.ММ.ДД`\n"
+        "_Наприклад:_ `2025.06.12`",
+        parse_mode="Markdown"
+    )
+    await state.set_state(LessonFactory.waiting_for_manual_date)
+
+
+@router.message(LessonFactory.waiting_for_manual_date)
+async def handle_manual_date(message: Message, state: FSMContext):
+    """Обробляє ручне введення дати у форматі РРРР.ММ.ДД та пропонує календар при помилці формату."""
     try:
         date = datetime.strptime(message.text.strip(), "%Y.%m.%d")
         await state.update_data(date=date)
@@ -99,7 +115,17 @@ async def manually_entered_date(message: Message, state: FSMContext):
         )
         await state.set_state(LessonFactory.waiting_for_time)
     except ValueError:
-        await message.answer("⚠ Невірний формат! Введіть дату у форматі: `2025.06.12`")
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="Скористуватися календарем", callback_data="open_calendar")]
+            ]
+        )
+        await message.answer(
+            "⚠ Невірний формат! Введіть дату у форматі: `2025.06.12`\n"
+            "Або скористайтеся інлайн календарем, натиснувши кнопку нижче 👇",
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
 
 
 @router.message(LessonFactory.waiting_for_time)
@@ -205,6 +231,17 @@ async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
         ]
     )
     await callback.message.answer("✅ Заняття успішно створене!", reply_markup=keyboard)
+
+
+@router.callback_query(F.data == "open_calendar", LessonFactory.waiting_for_manual_date)
+async def open_calendar_handler(callback: CallbackQuery, state: FSMContext):
+    """Відправляє інлайн-календар для вибору дати заняття."""
+    keyboard = await open_calendar()
+    await callback.message.edit_text(
+        "📅 Оберіть дату через календар 👇",
+        reply_markup=keyboard
+    )
+    await state.set_state(LessonFactory.waiting_for_date)
 
 
 @router.callback_query(F.data == "course_signups")  # !!!
