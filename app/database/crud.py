@@ -186,18 +186,13 @@ async def set_user(tg_id: int, login: str, name: str = None, surname: str = None
 async def lesson_records_display(tg_id: int):
     async with SessionLocal() as session:
         result = await session.execute(
-            select(Enrollment).where(Enrollment.user_id == tg_id).options(joinedload(Enrollment.lesson),
-                                                                          joinedload(Enrollment.user))
+            select(Enrollment)
+            .where(Enrollment.user_id == tg_id)
+            .options(
+                joinedload(Enrollment.lesson).joinedload(Lesson.administrator)
+            )
         )
         records = result.scalars().all()
-
-        if records:
-            for entry in records:
-                lesson = entry.lesson  # Доступ до повної інформації про заняття
-                user = entry.user
-                print(f"Запис: {lesson.title}\nДата: {lesson.datetime}записаний {user.name} {user.surname}")
-        else:
-            print("У вас немає записів")
         return records
 
 

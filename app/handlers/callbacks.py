@@ -220,13 +220,14 @@ async def my_bookings(callback: CallbackQuery, state: FSMContext):
 
     for record in records:
         lesson = record.lesson
-        user = record.user
+        teacher = lesson.administrator
+        full_name = record.full_name
         text_result = (
             "🎓 *Ваші активні записи на заняття:*\n\n"
             f"📌 *Курс:* {lesson.title}\n"
-            f"👨‍🏫 *Викладач:* {lesson.instructor}\n"
+            f"👨‍🏫 *Викладач:* {teacher.name} {teacher.surname}\n"
             f"📅 *Дата та час:* {lesson.datetime.strftime('%Y-%m-%d %H:%M')}\n\n"
-            f"🧑‍🎓 *Студент:* {user.name or 'Невідомо'} {user.surname or 'Невідомо'}\n"
+            f"🧑‍🎓 *Студент:* {full_name or 'Невідомо'}\n"
             "--------------------------------------\n"
             "🔔 *Якщо не зможете відвідати заняття, будь ласка, скасуйте запис.*\n"
             "❌ Натисніть кнопку нижче, щоб скасувати запис.\n"
