@@ -5,14 +5,14 @@ from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
 
 def back_button_builder(text: str = '🔙 Назад') -> InlineKeyboardBuilder:
     keyboard = InlineKeyboardBuilder()
-    keyboard.add(InlineKeyboardButton(text=text, callback_data="delete_previous_message"))
+    keyboard.add(InlineKeyboardButton(text=text, callback_data="remove_prev_message"))
     return keyboard
 
 
 def back_button_markup():
     """Функція для створення клавіатури з кнопкою 'Назад'."""
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message")]]
+        inline_keyboard=[[InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]]
     )
 
 

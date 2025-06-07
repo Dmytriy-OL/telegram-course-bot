@@ -34,13 +34,13 @@ def generate_week_keyboard(offset=0):
         callback_data = f"select_day_{i}_{date.day}_{date.month}_{date.year}"
         keyboard.add(InlineKeyboardButton(text=day_text, callback_data=callback_data))
 
-    keyboard.add(InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message"))
+    keyboard.add(InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message"))
     return keyboard.adjust(1).as_markup()
 
 
 @router.callback_query(F.data.startswith("select_day_"))
 async def select_day(callback: CallbackQuery):
-    """Обробляє вибір дня та виводить його назву."""
+    """Виводить заняття"""
     days = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"]
 
     _, _, day_index, day, month, year = callback.data.split("_")
@@ -51,28 +51,33 @@ async def select_day(callback: CallbackQuery):
 
     if lessons:
         for lesson in lessons:
+            teacher = lesson.administrator
+            teacher_fullname = f"{teacher.name} {teacher.surname}" if teacher else "Невідомо"
             lesson_text = (
                 f"📅 *Ви вибрали:* *{selected_day}, {day}.{month}.{year}*\n\n"
                 f"📖 *{lesson.title}*\n"
                 f"🕒 *Час:* {lesson.datetime.strftime('%H:%M')}\n"
                 f"📌 *Тип заняття:* {lesson.type_lesson}\n"
-                f"👤 *Викладач:* {lesson.instructor}\n"
+                f"👤 *Викладач:* {teacher_fullname}\n"
                 f"🎫 *Доступно місць:* {lesson.places}\n\n"
             )
 
             # Якщо місця немає
             if not lesson.freely:
-                lesson_text += '🔴 *Місця на заняття більше не доступні.Дочекайтеся, поки хтось відмовиться або адміністратор додасть місце.* 🧐\n_Слідкуйте за оновленнями!_ 🔔'
+                lesson_text += (
+                    '🔴 *Місця на заняття більше не доступні.Дочекайтеся, '
+                    'поки хтось відмовиться або адміністратор додасть місце.* '
+                    '🧐\n_Слідкуйте за оновленнями!_ 🔔'
+                )
                 await callback.message.answer(lesson_text, parse_mode="Markdown", reply_markup=back_button_markup())
                 continue  # Переходимо до наступного заняття
 
-            # Якщо місця є, пропонуємо кнопку запису
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[[
                     InlineKeyboardButton(text="✅ Записатися",
                                          callback_data=f"recording_day_{lesson.id}_{lesson.places}")
                 ], [
-                    InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message")
+                    InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")
                 ]]
             )
             await callback.message.answer(lesson_text, parse_mode="Markdown", reply_markup=keyboard)
@@ -95,7 +100,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(text_example, parse_mode="Markdown")
         await state.set_state(Form.waiting_full_name)
     else:
-        await callback.message.answer("Запіси недоступні немає мість:", callback_data=delete_previous_message)
+        await callback.message.answer("Записи недоступні немає мість:", callback_data=remove_prev_message)
 
 
 @router.message(Form.waiting_full_name)
@@ -112,7 +117,7 @@ async def process_first_name(message: Message, state: FSMContext):
         )
         await message.answer(text_result, parse_mode="HTML")
 
-        await state.update_data(first_name=first_name, last_name=last_name)  # Зберігаємо дані
+        await state.update_data(first_name=first_name, last_name=last_name, full_name=full_name)  # Зберігаємо дані
         await state.set_state(Form.waiting_confirmation)
     else:
         await message.answer("❌ Будь ласка, введіть ім'я та прізвище через пробіл.")
@@ -142,7 +147,7 @@ async def cancel_save(message: Message, state: FSMContext):
     await message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "go_to_main_menu")#!!!!
+@router.callback_query(F.data == "go_to_main_menu")  # !!!!
 async def go_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("/start")
     await callback.message.answer("🏠 *Ви повернулися в головне меню!*", parse_mode="Markdown")
@@ -155,12 +160,13 @@ async def confirm_registration(message: Message, state: FSMContext):
     first_name = user_data.get("first_name")
     last_name = user_data.get("last_name")
     lesson_id = user_data.get("lesson_id")
+    full_name = user_data.get("full_name")
 
-    if not first_name or not last_name:  # Якщо немає збережених даних
-        await message.answer("❌ Ви ще не ввели коректні дані. Введіть ім'я та прізвище.")
+    if not first_name or not last_name:  # Якщо користувач просто так натисне не в стані
+        await message.answer("❌ Ви не перебуваєте в процесі запису.")
         return
-    await set_user(message.from_user.id, message.from_user.username, None, first_name, last_name)
-    await enroll_student_to_lesson(lesson_id, message.from_user.id)
+    await set_user(message.from_user.id, message.from_user.username, first_name, last_name)
+    await enroll_student_to_lesson(lesson_id, message.from_user.id, full_name)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(text="📅 Виконати ще один запис", callback_data="enroll_course")
@@ -198,7 +204,7 @@ async def enroll_course(callback: CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔥 Записатися на цей тиждень 🔥", callback_data="select_this_week")],
         [InlineKeyboardButton(text="😃 Записатися на наступний тиждень 😃", callback_data="select_next_week")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message")]
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]
     ])
     await callback.message.answer("📍 Оберіть тиждень:", reply_markup=keyboard)
 
@@ -214,13 +220,14 @@ async def my_bookings(callback: CallbackQuery, state: FSMContext):
 
     for record in records:
         lesson = record.lesson
-        user = record.user
+        teacher = lesson.administrator
+        full_name = record.full_name
         text_result = (
             "🎓 *Ваші активні записи на заняття:*\n\n"
             f"📌 *Курс:* {lesson.title}\n"
-            f"👨‍🏫 *Викладач:* {lesson.instructor}\n"
+            f"👨‍🏫 *Викладач:* {teacher.name} {teacher.surname}\n"
             f"📅 *Дата та час:* {lesson.datetime.strftime('%Y-%m-%d %H:%M')}\n\n"
-            f"🧑‍🎓 *Студент:* {user.name or 'Невідомо'} {user.surname or 'Невідомо'}\n"
+            f"🧑‍🎓 *Студент:* {full_name or 'Невідомо'}\n"
             "--------------------------------------\n"
             "🔔 *Якщо не зможете відвідати заняття, будь ласка, скасуйте запис.*\n"
             "❌ Натисніть кнопку нижче, щоб скасувати запис.\n"
@@ -228,7 +235,7 @@ async def my_bookings(callback: CallbackQuery, state: FSMContext):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text="❌ Скасувати запис", callback_data=f"cancel_confirmed_{record.id}")],
-                [InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message")]])
+                [InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]])
         await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
 
 
@@ -242,7 +249,7 @@ async def ask_cancel_confirmation(callback: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="Так", callback_data=f"cancel_lesson")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="delete_previous_message")]])
+            [InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]])
     await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
 
 
@@ -268,7 +275,7 @@ async def cancel_record(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
 
-@router.callback_query(F.data == "delete_previous_message")
-async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
+@router.callback_query(F.data == "remove_prev_message")
+async def remove_prev_message(callback: CallbackQuery, state: FSMContext):
     """Видаляє попереднє повідомлення."""
     await delete_previous_message(callback, state)

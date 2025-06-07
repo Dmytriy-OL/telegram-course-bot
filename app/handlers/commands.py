@@ -15,7 +15,7 @@ router = Router()
 @router.message(CommandStart())
 async def cmd_start_message(message: Message):
     """Обробляє команду старту від користувача."""
-    await set_user(message.from_user.id, message.from_user.username, None, None, None)
+    await set_user(message.from_user.id, message.from_user.username, None, None)
     await cmd_start(message)
 
 

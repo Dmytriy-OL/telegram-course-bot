@@ -1,6 +1,6 @@
 import asyncio
 from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.database.models import SessionLocal, User, Image, Caption, Lesson, LessonType, Enrollment, Administrator
 from aiogram.fsm.context import FSMContext
@@ -150,7 +150,8 @@ async def find_activities_by_date(year: int, month: int, day: int):
         end_date = datetime(year, month, day, 23, 59, 59)
         print(f"Шукаємо заняття від {start_date} до {end_date}")
         result = await session.execute(
-            select(Lesson).where(and_(Lesson.datetime >= start_date, Lesson.datetime <= end_date)))
+            select(Lesson).options(selectinload(Lesson.administrator)).where(and_(Lesson.datetime >= start_date,
+                                                                                  Lesson.datetime <= end_date)))
         lessons = result.scalars().all()
         if lessons:
             for lesson in lessons:
@@ -162,22 +163,20 @@ async def find_activities_by_date(year: int, month: int, day: int):
             return []
 
 
-async def set_user(tg_id: int, login: str, number: str, name: str = None, surname: str = None):
+async def set_user(tg_id: int, login: str, name: str = None, surname: str = None):
     async with SessionLocal() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
         if not user:
-            user = User(tg_id=tg_id, name=name, surname=surname, login=login, number=number)
+            user = User(tg_id=tg_id, name=name, surname=surname, login=login)
             session.add(user)
         else:
             if name is None or surname is None:
                 user.login = login
-                user.number = number
             else:
                 user.name = name
                 user.surname = surname
                 user.login = login
-                user.number = number
 
         await session.commit()
         await session.refresh(user)
@@ -187,24 +186,19 @@ async def set_user(tg_id: int, login: str, number: str, name: str = None, surnam
 async def lesson_records_display(tg_id: int):
     async with SessionLocal() as session:
         result = await session.execute(
-            select(Enrollment).where(Enrollment.user_id == tg_id).options(joinedload(Enrollment.lesson),
-                                                                          joinedload(Enrollment.user))
+            select(Enrollment)
+            .where(Enrollment.user_id == tg_id)
+            .options(
+                joinedload(Enrollment.lesson).joinedload(Lesson.administrator)
+            )
         )
         records = result.scalars().all()
-
-        if records:
-            for entry in records:
-                lesson = entry.lesson  # Доступ до повної інформації про заняття
-                user = entry.user
-                print(f"Запис: {lesson.title}\nДата: {lesson.datetime}записаний {user.name} {user.surname}")
-        else:
-            print("У вас немає записів")
         return records
 
 
-async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int):
+async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int, full_name: str):
     async with SessionLocal() as session:
-        enrollment = Enrollment(user_id=user_tg_id, lesson_id=lesson_id)
+        enrollment = Enrollment(user_id=user_tg_id, lesson_id=lesson_id, full_name=full_name)
         result = await session.execute(select(Lesson).where(Lesson.id == lesson_id))
         lesson = result.scalar_one_or_none()
         if lesson:
@@ -218,8 +212,6 @@ async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int):
         session.add(enrollment)
 
         await session.commit()
-        # await session.refresh(lesson)
-        # return "Запис успішно здійснений!"
 
 
 async def cancel_record_db(lesson_id: int):
