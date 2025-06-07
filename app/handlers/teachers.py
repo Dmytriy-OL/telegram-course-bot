@@ -170,7 +170,7 @@ async def get_lesson_type(message: Message, state: FSMContext):
     elif "офлайн" in type_text:
         lesson_type = LessonType.OFFLINE
     else:
-        await message.answer("⚠ Невірний вибір! Виберіть '🖥 Онлайн' або '🏫 Офлайн'.", )
+        await message.answer("⚠ Невірний вибір! Виберіть \n'🖥 Онлайн' або '🏫 Офлайн'.", )
         return
 
     await state.update_data(type_lesson=lesson_type)
@@ -205,7 +205,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
             inline_keyboard=[[
                 InlineKeyboardButton(text="✅ Все вірно", callback_data="confirm_lesson")
             ], [
-                InlineKeyboardButton(text="🔄 Заповнити знову", callback_data="retry_lesson")
+                InlineKeyboardButton(text="🔄 Заповнити знову", callback_data="add_lesson")
             ], [
                 InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel_lesson")
             ]]
