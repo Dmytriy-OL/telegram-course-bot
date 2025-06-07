@@ -5,6 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
     InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+from aiogram.filters import StateFilter
+
 from aiogram_calendar import SimpleCalendarCallback
 
 from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
@@ -233,7 +235,8 @@ async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("✅ Заняття успішно створене!", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "open_calendar", LessonFactory.waiting_for_manual_date)
+@router.callback_query(F.data == "open_calendar",
+                       StateFilter(LessonFactory.waiting_for_manual_date, LessonFactory.waiting_for_date))
 async def open_calendar_handler(callback: CallbackQuery, state: FSMContext):
     """Відправляє інлайн-календар для вибору дати заняття."""
     keyboard = await open_calendar()

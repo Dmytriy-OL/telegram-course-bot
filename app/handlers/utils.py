@@ -38,6 +38,6 @@ async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
 
 
-async def open_calendar():
+async def open_calendar() -> InlineKeyboardMarkup:
+    """Відкриває inline-календар"""
     return await calendar.start_calendar()
-
