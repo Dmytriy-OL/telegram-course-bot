@@ -140,6 +140,8 @@ async def get_lesson_time(message: Message, state: FSMContext):
     """Процес створення заняття та запитує час заняття або скасування операції."""
     try:
         hour, minute = map(int, message.text.split(":"))
+        if not (0 <= hour <= 24 and 0 <= minute <= 60):
+            raise ValueError("Невірний формат")
         await state.update_data(hour=hour, minute=minute)
 
         keyboard = ReplyKeyboardMarkup(
