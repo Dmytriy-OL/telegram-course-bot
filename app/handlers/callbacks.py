@@ -117,7 +117,7 @@ async def process_first_name(message: Message, state: FSMContext):
         )
         await message.answer(text_result, parse_mode="HTML")
 
-        await state.update_data(first_name=first_name, last_name=last_name)  # Зберігаємо дані
+        await state.update_data(first_name=first_name, last_name=last_name, full_name=full_name)  # Зберігаємо дані
         await state.set_state(Form.waiting_confirmation)
     else:
         await message.answer("❌ Будь ласка, введіть ім'я та прізвище через пробіл.")
@@ -160,12 +160,13 @@ async def confirm_registration(message: Message, state: FSMContext):
     first_name = user_data.get("first_name")
     last_name = user_data.get("last_name")
     lesson_id = user_data.get("lesson_id")
+    full_name = user_data.get("full_name")
 
-    if not first_name or not last_name:  # Якщо немає збережених даних
-        await message.answer("❌ Ви ще не ввели коректні дані. Введіть ім'я та прізвище.")
+    if not first_name or not last_name:  # Якщо користувач просто так натисне не в стані
+        await message.answer("❌ Ви не перебуваєте в процесі запису.")
         return
-    await set_user(message.from_user.id, message.from_user.username, None, first_name, last_name)
-    await enroll_student_to_lesson(lesson_id, message.from_user.id)
+    await set_user(message.from_user.id, message.from_user.username, first_name, last_name)
+    await enroll_student_to_lesson(lesson_id, message.from_user.id, full_name)
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(text="📅 Виконати ще один запис", callback_data="enroll_course")

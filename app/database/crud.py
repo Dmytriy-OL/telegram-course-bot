@@ -163,22 +163,20 @@ async def find_activities_by_date(year: int, month: int, day: int):
             return []
 
 
-async def set_user(tg_id: int, login: str, number: str, name: str = None, surname: str = None):
+async def set_user(tg_id: int, login: str, name: str = None, surname: str = None):
     async with SessionLocal() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
         if not user:
-            user = User(tg_id=tg_id, name=name, surname=surname, login=login, number=number)
+            user = User(tg_id=tg_id, name=name, surname=surname, login=login)
             session.add(user)
         else:
             if name is None or surname is None:
                 user.login = login
-                user.number = number
             else:
                 user.name = name
                 user.surname = surname
                 user.login = login
-                user.number = number
 
         await session.commit()
         await session.refresh(user)
@@ -203,9 +201,9 @@ async def lesson_records_display(tg_id: int):
         return records
 
 
-async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int):
+async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int, full_name: str):
     async with SessionLocal() as session:
-        enrollment = Enrollment(user_id=user_tg_id, lesson_id=lesson_id)
+        enrollment = Enrollment(user_id=user_tg_id, lesson_id=lesson_id, full_name=full_name)
         result = await session.execute(select(Lesson).where(Lesson.id == lesson_id))
         lesson = result.scalar_one_or_none()
         if lesson:
@@ -219,8 +217,6 @@ async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int):
         session.add(enrollment)
 
         await session.commit()
-        # await session.refresh(lesson)
-        # return "Запис успішно здійснений!"
 
 
 async def cancel_record_db(lesson_id: int):
