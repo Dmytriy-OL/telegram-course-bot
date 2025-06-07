@@ -218,6 +218,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
 @router.callback_query(F.data == "confirm_lesson")
 async def confirm_lesson(callback: CallbackQuery, state: FSMContext):
     """Функція, яка заносить заняття до бази даних та повідомлює про успішне створення."""
+    await callback.answer()  # уникаємо зависання
     lesson_data = await state.get_data()
     date = lesson_data.get('date')
     await callback.message.delete()
