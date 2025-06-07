@@ -207,7 +207,7 @@ async def get_lesson_places(message: Message, state: FSMContext):
             ], [
                 InlineKeyboardButton(text="🔄 Заповнити знову", callback_data="add_lesson")
             ], [
-                InlineKeyboardButton(text="❌ Скасувати", callback_data="cancel_lesson")
+                InlineKeyboardButton(text="❌ Скасувати", callback_data="lesson_creation_cancel")
             ]]
         )
         await message.answer(text_result, reply_markup=keyboard)
@@ -252,6 +252,20 @@ async def open_calendar_handler(callback: CallbackQuery, state: FSMContext):
         reply_markup=keyboard
     )
     await state.set_state(LessonFactory.waiting_for_date)
+
+
+@router.callback_query(F.data == "lesson_creation_cancel")
+async def cancel_lesson(callback: CallbackQuery, state: FSMContext):
+    """Скасовує погодження заняття"""
+    await callback.answer()  # уникаємо зависання
+    await callback.message.delete()
+    await state.clear()
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="⬅️ Повернутися до панелі вчителя", callback_data="teacher_menu")]
+        ]
+    )
+    await callback.message.answer("❌ Створення заняття скасовано", reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "course_signups")  # !!!
