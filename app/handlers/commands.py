@@ -1,9 +1,8 @@
 import os
-# from app.image_uploads import BASE_DIR
 from app.images import BASE_DIR
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, ReplyKeyboardRemove
 from app.database.crud import get_images_with_main, view_user, delete_image_from_db, set_user, main_view
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
@@ -72,6 +71,16 @@ async def teacher_command(message: Message):
     teacher = await get_role(unknown)
 
     if teacher in ("admin", "teacher"):
-        await message.answer("🔧 *Панель адміністратора*", parse_mode="Markdown", reply_markup=get_teachers_command())
+        await message.answer("🔧 *Панель викладача*", parse_mode="Markdown", reply_markup=get_teachers_command())
     else:
         await message.answer("🚫 У вас немає прав доступу.")
+
+
+@router.message(F.text.casefold() == "/cancel")
+async def cancel_any_operation(message: Message, state: FSMContext):
+    """Скасовує операцію на будь-якому етапі"""
+    teacher = await get_role(message.from_user.id)
+    if teacher in ("admin", "teacher"):
+        await state.clear()
+        await message.answer("❌ Операцію скасовано.", reply_markup=ReplyKeyboardRemove())
+        await message.answer("🔧 *Панель викладача*", parse_mode="Markdown", reply_markup=get_teachers_command())
