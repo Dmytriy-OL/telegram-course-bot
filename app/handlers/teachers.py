@@ -109,6 +109,11 @@ async def handle_manual_date(message: Message, state: FSMContext):
     """Обробляє ручне введення дати у форматі РРРР.ММ.ДД та пропонує календар при помилці формату."""
     try:
         date = datetime.strptime(message.text.strip(), "%Y.%m.%d")
+
+        current_year = datetime.now().year
+        if not (current_year <= date.year <= current_year + 1):
+            raise ValueError("Рік повинен бути поточним або наступним")
+
         await state.update_data(date=date)
         await message.answer(
             f"✅ Дата обрана: {date.strftime('%d.%m.%Y')}\n"
