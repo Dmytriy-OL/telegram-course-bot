@@ -75,12 +75,14 @@ class Administrator(Base):
 
     lessons = relationship("Lesson", back_populates="administrator")
 
+
 class Image(Base):
     __tablename__ = "images"
 
     id = Column(Integer, primary_key=True)
     filename = Column(String(50), unique=True, nullable=False)
     main_image = Column(Boolean, default=False)
+
 
 class Caption(Base):
     __tablename__ = "caption"

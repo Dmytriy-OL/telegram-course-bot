@@ -1,6 +1,6 @@
 import asyncio
 from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.database.models import SessionLocal, User, Image, Caption, Lesson, LessonType, Enrollment, Administrator
 from aiogram.fsm.context import FSMContext
@@ -150,7 +150,8 @@ async def find_activities_by_date(year: int, month: int, day: int):
         end_date = datetime(year, month, day, 23, 59, 59)
         print(f"Шукаємо заняття від {start_date} до {end_date}")
         result = await session.execute(
-            select(Lesson).where(and_(Lesson.datetime >= start_date, Lesson.datetime <= end_date)))
+            select(Lesson).options(selectinload(Lesson.administrator)).where(and_(Lesson.datetime >= start_date,
+                                                                                  Lesson.datetime <= end_date)))
         lessons = result.scalars().all()
         if lessons:
             for lesson in lessons:

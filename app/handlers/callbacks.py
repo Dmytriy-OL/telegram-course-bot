@@ -40,7 +40,7 @@ def generate_week_keyboard(offset=0):
 
 @router.callback_query(F.data.startswith("select_day_"))
 async def select_day(callback: CallbackQuery):
-    """Обробляє вибір дня та виводить його назву."""
+    """Виводить заняття"""
     days = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"]
 
     _, _, day_index, day, month, year = callback.data.split("_")
@@ -51,22 +51,27 @@ async def select_day(callback: CallbackQuery):
 
     if lessons:
         for lesson in lessons:
+            teacher = lesson.administrator
+            teacher_fullname = f"{teacher.name} {teacher.surname}" if teacher else "Невідомо"
             lesson_text = (
                 f"📅 *Ви вибрали:* *{selected_day}, {day}.{month}.{year}*\n\n"
                 f"📖 *{lesson.title}*\n"
                 f"🕒 *Час:* {lesson.datetime.strftime('%H:%M')}\n"
                 f"📌 *Тип заняття:* {lesson.type_lesson}\n"
-                f"👤 *Викладач:* {lesson.instructor}\n"
+                f"👤 *Викладач:* {teacher_fullname}\n"
                 f"🎫 *Доступно місць:* {lesson.places}\n\n"
             )
 
             # Якщо місця немає
             if not lesson.freely:
-                lesson_text += '🔴 *Місця на заняття більше не доступні.Дочекайтеся, поки хтось відмовиться або адміністратор додасть місце.* 🧐\n_Слідкуйте за оновленнями!_ 🔔'
+                lesson_text += (
+                    '🔴 *Місця на заняття більше не доступні.Дочекайтеся, '
+                    'поки хтось відмовиться або адміністратор додасть місце.* '
+                    '🧐\n_Слідкуйте за оновленнями!_ 🔔'
+                )
                 await callback.message.answer(lesson_text, parse_mode="Markdown", reply_markup=back_button_markup())
                 continue  # Переходимо до наступного заняття
 
-            # Якщо місця є, пропонуємо кнопку запису
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[[
                     InlineKeyboardButton(text="✅ Записатися",
@@ -142,7 +147,7 @@ async def cancel_save(message: Message, state: FSMContext):
     await message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "go_to_main_menu")#!!!!
+@router.callback_query(F.data == "go_to_main_menu")  # !!!!
 async def go_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("/start")
     await callback.message.answer("🏠 *Ви повернулися в головне меню!*", parse_mode="Markdown")
