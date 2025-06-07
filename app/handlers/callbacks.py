@@ -142,7 +142,7 @@ async def cancel_save(message: Message, state: FSMContext):
     await message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "go_to_main_menu")
+@router.callback_query(F.data == "go_to_main_menu")#!!!!
 async def go_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("/start")
     await callback.message.answer("🏠 *Ви повернулися в головне меню!*", parse_mode="Markdown")

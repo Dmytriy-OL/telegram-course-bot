@@ -26,8 +26,6 @@ async def get_role(tg_id: int) -> str:
         return "user"
 
 
-
-
 async def view_users(unknown: bool = False):
     async with SessionLocal() as session:
         if unknown:
@@ -212,7 +210,9 @@ async def get_enrollments_for_two_weeks():
         )
 
         enrollments = result.scalars().all()
+
         return enrollments
+
 
 async def active_courses_for_two_weeks():
     async with SessionLocal() as session:
@@ -236,9 +236,12 @@ async def active_courses_for_two_weeks():
 async def main():
     enrollments = await get_enrollments_for_two_weeks()
     for enrollment in enrollments:
-        print(f"👤 {enrollment.user.name} {enrollment.user.surname } записаний на курс: {enrollment.lesson.title} — {enrollment.lesson.datetime}")
+        print(
+            f"👤 {enrollment.user.name} {enrollment.user.surname} записаний на курс: {enrollment.lesson.title} — {enrollment.lesson.datetime}")
+
 
 if __name__ == '__main__':
-        # asyncio.run(main())
-        asyncio.run(add_admin(974638427, "Саша", "Олійник", "@dimon20012", False))
-        # asyncio.run(view_admins())
+    # asyncio.run(main())
+    # print(asyncio.run(get_role(974638427)))
+    asyncio.run(add_admin(974638427, "Саша", "Олійник", "dimon20012", False))
+    # asyncio.run(view_admins())
