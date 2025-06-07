@@ -31,7 +31,6 @@ class User(Base):
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
     login = Column(String(100), unique=True, nullable=False)
-    number = Column(String(15), unique=True, nullable=True)
 
     enrollments = relationship("Enrollment", back_populates="user")
 
@@ -59,6 +58,7 @@ class Enrollment(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.tg_id"), nullable=False)
     lesson_id = Column(Integer, ForeignKey("lessons.id"), nullable=False)
+    full_name = Column(String(100), nullable=False)
     user = relationship("User", back_populates="enrollments")
     lesson = relationship("Lesson", back_populates="enrollments")
 
