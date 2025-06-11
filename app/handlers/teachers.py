@@ -299,23 +299,36 @@ async def course_signups(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "active_courses")
-async def course_signups(callback: CallbackQuery, state: FSMContext):
+async def course_signups(callback: CallbackQuery):
     lessons = await active_courses_for_two_weeks()
+
     if not lessons:
-        await callback.message.answer("❌ Курсів на цей та наступний тиждень не знайдено.")
+        await callback.message.answer("❌У вас курсів на цей та наступний тиждень не знайдено.")
         return
 
     text_result = ""
     for i, lesson in enumerate(lessons, start=1):
         lesson_type = "🧑‍🏫 *Очно*" if lesson.type_lesson == LessonType.OFFLINE else "💻 *Онлайн*"
+        lesson_datetime = lesson.datetime.strftime('%d.%m.%Y о %H:%M')
         lesson_places = f"{lesson.places} 🟦" if lesson.places >= 1 else "✅ Група повна "
+
+        enrolled_users = lesson.enrollments
+        enrolled_count = len(enrolled_users)
+        total_places = lesson.places + enrolled_count
+
+        user_list = "\n".join([
+            f"{ent.full_name} : @{ent.user.login}" for ent in enrolled_users
+        ]) or "—"
+
         text_result += (
-            f"*Заняття #{i}*\n"
-            f"*Назва заняття:* `{lesson.title}`\n"
-            f"*Викладач:* `{lesson.instructor}`\n"
-            f"*Кількість місць:* `{lesson_places}`\n"
-            f"*Дата та час:* `{lesson.datetime.strftime('%d.%m.%Y %H:%M')}`\n"
-            f"*Формат:* {lesson_type}\n"
+            f"📚 *Заняття #{i}*\n"
+            f"🏷️ *Тема:* `{lesson.title}`\n"
+            f"📅 *Дата:* `{lesson_datetime}`\n"
+            f"🏛️ *Формат:* {lesson_type}\n"
+            f"🎫 *Вільних місць:* {lesson_places}\n"
+            f"📌 *Всього місць:* {total_places}\n"
+            f"👥 *Записалося:* {enrolled_count} студентів\n"
+            f"📃 *Учні:*\n{user_list}\n"
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
         )
 

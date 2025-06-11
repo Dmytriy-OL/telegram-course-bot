@@ -1,6 +1,7 @@
 import asyncio
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
+
 from datetime import datetime, timedelta
 
 from app.database.models import SessionLocal, User, Image, Caption, Lesson, LessonType, Enrollment, Administrator
@@ -226,10 +227,12 @@ async def active_courses_for_two_weeks():
             select(Lesson)
             .where(Lesson.datetime >= this_monday)
             .where(Lesson.datetime <= next_sunday)
-            # .where(Lesson.places >= 1)
+            .options(joinedload(Lesson.administrator),
+                     joinedload(Lesson.enrollments).joinedload(Enrollment.user)
+                     )
         )
 
-        lessons = result.scalars().all()
+        lessons = result.unique().scalars().all()
         return lessons
 
 
@@ -243,5 +246,5 @@ async def main():
 if __name__ == '__main__':
     # asyncio.run(main())
     # print(asyncio.run(get_role(974638427)))
-    asyncio.run(add_admin(974638427, "Саша", "Олійник", "dimon20012", False))
+    asyncio.run(add_admin(974638427, "Дімасік", "Олейнік", "dimon20012", True))
     # asyncio.run(view_admins())
