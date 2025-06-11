@@ -9,7 +9,8 @@ from aiogram.filters import StateFilter
 
 from aiogram_calendar import SimpleCalendarCallback
 
-from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
+from app.database.admin_crud import (get_enrollments_for_two_weeks, active_courses_for_two_weeks,
+                                     get_teacher_by_telegram_id)
 from app.database.crud import create_lesson
 from app.database.models import LessonType
 from app.handlers.utils import open_calendar, calendar
@@ -33,8 +34,7 @@ async def teachers(callback: CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🆕 Додати заняття", callback_data="add_lesson")],
-            [InlineKeyboardButton(text="📥 Записи на курси", callback_data="course_signups")],
-            [InlineKeyboardButton(text="📚 Активні курси", callback_data="active_courses")],
+            [InlineKeyboardButton(text="📥 Заняття та записи", callback_data="lessons_and_signups")],
             [InlineKeyboardButton(text="✏️ Редагувати заняття", callback_data="edit_lessons")],
             [InlineKeyboardButton(text="🔗 Додати посилання на заняття", callback_data="lesson_link")],
             [InlineKeyboardButton(text="🔙 Повернутись назад", callback_data="teacher_menu")]
@@ -269,41 +269,15 @@ async def cancel_lesson(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Створення заняття скасовано", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "course_signups")  # !!!
-async def course_signups(callback: CallbackQuery, state: FSMContext):
-    """Переглядаємо записи учнів на заняття"""
-    enrollments = await get_enrollments_for_two_weeks()
-    if not enrollments:
-        await callback.message.answer("❌ Записів учнів за цей та наступний тиждень не знайдено.")
-        return
-
-    text_result = ""
-    for i, enrollment in enumerate(enrollments, start=1):
-        lesson = enrollment.lesson
-        user = enrollment.user
-        lesson_type = "🧑‍🏫 *Очно*" if lesson.type_lesson == LessonType.OFFLINE else "💻 *Онлайн*"
-        text_result += (
-            f"*Учень #{i}*\n"
-            f"*Назва заняття:* `{lesson.title}`\n"
-            f"*Телеграм:* `{user.login}`\n"
-            f"*Ім’я та прізвище:* `{user.name or 'Невідомо'} {user.surname or ''}`\n"
-            f"*Дата та час:* `{lesson.datetime.strftime('%d.%m.%Y %H:%M')}`\n"
-            f"*Формат:* {lesson_type}\n"
-            f"*Викладач:* `{lesson.instructor}`\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        )
-
-    await callback.message.answer(text="📋 *Записи учнів на цей та наступний тиждень:*\n\n" + text_result,
-                                  parse_mode="Markdown",
-                                  reply_markup=back_button_builder().as_markup())
-
-
-@router.callback_query(F.data == "active_courses")
+@router.callback_query(F.data == "lessons_and_signups")
 async def course_signups(callback: CallbackQuery):
-    lessons = await active_courses_for_two_weeks()
-
+    """Хендлер для викладачів, який виводить список запланованих занять на поточний та наступний тиждень
+разом із переліком студентів, які записалися на кожне з них."""
+    tg_id = callback.from_user.id
+    teacher = await get_teacher_by_telegram_id(tg_id)
+    lessons = await active_courses_for_two_weeks(teacher.id)
     if not lessons:
-        await callback.message.answer("❌У вас курсів на цей та наступний тиждень не знайдено.")
+        await callback.message.answer("ℹ️ На цей та наступний тиждень у вас немає запланованих занять.")
         return
 
     text_result = ""

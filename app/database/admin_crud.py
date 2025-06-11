@@ -215,18 +215,24 @@ async def get_enrollments_for_two_weeks():
         return enrollments
 
 
-async def active_courses_for_two_weeks():
+async def get_teacher_by_telegram_id(teacher_tg_id: int):
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(Administrator).where(Administrator.tg_id == teacher_tg_id))
+        return result.scalar_one_or_none()
+
+
+async def active_courses_for_two_weeks(teacher_id: int):
     async with SessionLocal() as session:
         today = datetime.today()
         weekday = today.weekday()  # 0 = Monday
-
         this_monday = today - timedelta(days=weekday)
         next_sunday = this_monday + timedelta(days=13)
-
         result = await session.execute(
             select(Lesson)
             .where(Lesson.datetime >= this_monday)
             .where(Lesson.datetime <= next_sunday)
+            .where(Lesson.teacher_id == teacher_id)
             .options(joinedload(Lesson.administrator),
                      joinedload(Lesson.enrollments).joinedload(Enrollment.user)
                      )
