@@ -13,7 +13,7 @@ from app.database.admin_crud import (get_enrollments_for_two_weeks, active_cours
                                      get_teacher_by_telegram_id)
 from app.database.crud import create_lesson
 from app.database.models import LessonType
-from app.handlers.utils import open_calendar, calendar
+from app.handlers.utils import open_calendar, calendar,delete_previous_message
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
 
 router = Router()
@@ -306,9 +306,17 @@ async def course_signups(callback: CallbackQuery):
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
         )
 
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="back_to_teacher_menu")],
+            [InlineKeyboardButton(text="❌ Видалити студента", callback_data="remove_student")],
+            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="refresh_student_list")]
+        ]
+    )
+
     await callback.message.answer(text="📋 *Активні курси на цей та наступний тиждень:*\n\n" + text_result,
                                   parse_mode="Markdown",
-                                  reply_markup=back_button_builder().as_markup())
+                                  reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "teacher_menu")
@@ -318,3 +326,8 @@ async def admin_menu(callback: CallbackQuery, state: FSMContext):
         text="Оберіть дію з меню адміністратора:",
         reply_markup=get_teachers_command()
     )
+
+
+@router.callback_query(F.data == "back_to_teacher_menu")
+async def delete_message_handler(callback: CallbackQuery, state: FSMContext):
+    await delete_previous_message(callback, state)
