@@ -222,24 +222,33 @@ async def get_teacher_by_telegram_id(teacher_tg_id: int):
         return result.scalar_one_or_none()
 
 
-async def active_courses_for_two_weeks(teacher_id: int):
+async def get_lessons_for_teacher_and_optional_student(teacher_id: int, student_id: int | None = None):
     async with SessionLocal() as session:
         today = datetime.today()
-        weekday = today.weekday()  # 0 = Monday
-        this_monday = today - timedelta(days=weekday)
+        this_monday = today - timedelta(days=today.weekday())
         next_sunday = this_monday + timedelta(days=13)
-        result = await session.execute(
+
+        stmt = (
             select(Lesson)
-            .where(Lesson.datetime >= this_monday)
-            .where(Lesson.datetime <= next_sunday)
-            .where(Lesson.teacher_id == teacher_id)
-            .options(joinedload(Lesson.administrator),
-                     joinedload(Lesson.enrollments).joinedload(Enrollment.user)
-                     )
+            .join(Enrollment) if student_id is not None else select(Lesson)
         )
 
-        lessons = result.unique().scalars().all()
-        return lessons
+        stmt = stmt.where(
+            Lesson.datetime >= this_monday,
+            Lesson.datetime <= next_sunday,
+            Lesson.teacher_id == teacher_id
+        )
+
+        if student_id is not None:
+            stmt = stmt.where(Enrollment.user_id == student_id)
+
+        stmt = stmt.options(
+            joinedload(Lesson.administrator),
+            joinedload(Lesson.enrollments).joinedload(Enrollment.user)
+        )
+
+        result = await session.execute(stmt)
+        return result.unique().scalars().all()
 
 
 async def main():
