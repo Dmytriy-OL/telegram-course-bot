@@ -13,7 +13,7 @@ from app.database.admin_crud import (get_enrollments_for_two_weeks, active_cours
                                      get_teacher_by_telegram_id)
 from app.database.crud import create_lesson
 from app.database.models import LessonType
-from app.handlers.utils import open_calendar, calendar,delete_previous_message
+from app.handlers.utils import open_calendar, calendar, delete_previous_message
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
 
 router = Router()
@@ -308,9 +308,9 @@ async def course_signups(callback: CallbackQuery):
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="back_to_teacher_menu")],
             [InlineKeyboardButton(text="❌ Видалити студента", callback_data="remove_student")],
-            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="refresh_student_list")]
+            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="refresh_student_list")],
+            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="back_to_teacher_menu")]
         ]
     )
 
@@ -331,3 +331,55 @@ async def admin_menu(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "back_to_teacher_menu")
 async def delete_message_handler(callback: CallbackQuery, state: FSMContext):
     await delete_previous_message(callback, state)
+
+
+@router.callback_query(F.data == "remove_student")
+async def remove_student(callback: CallbackQuery):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Вилучити з усіх занять", callback_data="remove_from_all_lessons")],
+            [InlineKeyboardButton(text="Вилучити з певного заняття", callback_data="select_lesson_to_remove")],
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_teacher_menu")]
+        ]
+    )
+    await callback.message.answer(text="📋 *Що ви хочете зробити зі студентом?*\n\n",
+                                  parse_mode="Markdown",
+                                  reply_markup=keyboard)
+
+
+@router.callback_query(F.data == "remove_from_all_lessons")
+async def remove_from_all_lessons(callback: CallbackQuery):
+    tg_id = callback.from_user.id
+    teacher = await get_teacher_by_telegram_id(tg_id)
+    lessons = await active_courses_for_two_weeks(teacher.id)
+
+    student_buttons = []
+    unique_students = {}
+
+    for i, lesson in enumerate(lessons, start=1):
+        enrolled_users = lesson.enrollments
+        for ent in enrolled_users:
+            name = ent.full_name
+            username = f"@{ent.user.login}"
+            if name not in unique_students:
+                unique_students[name] = username
+                student_buttons.append([
+                    InlineKeyboardButton(
+                        text=f"❌ {name}",
+                        callback_data=f"remove_student:{lesson.id}:{ent.user.id}"
+                    )
+                ])
+
+    text_result = "🔻 Натисніть на кнопку з імʼям студента, щоб видалити його із заняття:\n"
+    for name, username in unique_students.items():
+        text_result += f"{name} :\n {username}\n"
+
+    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="teacher_menu")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
+
+    await callback.message.answer(
+        text=text_result,
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
+
