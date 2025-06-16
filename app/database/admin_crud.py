@@ -225,8 +225,8 @@ async def get_teacher_by_telegram_id(teacher_tg_id: int):
 async def get_lessons_for_teacher_and_optional_student(teacher_id: int, student_id: int | None = None):
     async with SessionLocal() as session:
         today = datetime.today()
-        this_monday = today - timedelta(days=today.weekday())
-        next_sunday = this_monday + timedelta(days=13)
+        this_monday = datetime.combine(today - timedelta(days=today.weekday()), datetime.min.time())
+        next_sunday = this_monday + timedelta(days=13, hours=23, minutes=59, seconds=59)
 
         stmt = (
             select(Lesson)
@@ -240,7 +240,7 @@ async def get_lessons_for_teacher_and_optional_student(teacher_id: int, student_
         )
 
         if student_id is not None:
-            stmt = stmt.where(Enrollment.user_id == student_id)
+            stmt = stmt.where(Enrollment.user_tg_id == student_id)
 
         stmt = stmt.options(
             joinedload(Lesson.administrator),
@@ -251,6 +251,28 @@ async def get_lessons_for_teacher_and_optional_student(teacher_id: int, student_
         return result.unique().scalars().all()
 
 
+async def remove_student_from_class(lessons_id: int, student_id: int | None = None):
+    async with SessionLocal() as session:
+        stmt = (
+            select(Lesson)
+            .where(Lesson.id == lessons_id)
+            .options(joinedload(Lesson.enrollments))
+        )
+        result = await session.execute(stmt)
+
+        lesson = result.unique().scalar_one_or_none()
+
+        if lesson:
+            for ent in lesson.enrollments:
+                if ent.user_tg_id == student_id:
+                    lesson.places += 1
+                    print(f"Заннятя:{lesson.title}-{lesson.places}")
+                    print(f"❌ Видаляю: {ent.full_name} ({ent.user_tg_id}) з '{lesson.title}'")
+                    await session.delete(ent)
+
+            await session.commit()
+
+
 async def main():
     enrollments = await get_enrollments_for_two_weeks()
     for enrollment in enrollments:
@@ -259,7 +281,8 @@ async def main():
 
 
 if __name__ == '__main__':
-    # asyncio.run(main())
+    # asyncio.run(get_lessons_for_student_and_teacher(974638427,1))
+    asyncio.run(main())
     # print(asyncio.run(get_role(974638427)))
-    asyncio.run(add_admin(974638427, "Дімасік", "Олейнік", "dimon20012", True))
+    # asyncio.run(add_admin(974638427, "Муровець", "Максим", "dimon20012", True))
     # asyncio.run(view_admins())

@@ -10,7 +10,7 @@ from aiogram.filters import StateFilter
 from aiogram_calendar import SimpleCalendarCallback
 
 from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_for_teacher_and_optional_student,
-                                     get_teacher_by_telegram_id)
+                                     get_teacher_by_telegram_id,remove_student_from_class)
 from app.database.crud import create_lesson, cancel_record_db
 from app.database.models import LessonType
 from app.handlers.utils import open_calendar, calendar, delete_previous_message
@@ -363,20 +363,20 @@ async def remove_from_all_lessons(callback: CallbackQuery):
         for ent in lesson.enrollments:
             user_id = ent.user.id
             full_name = ent.full_name
+            user_tg_id = ent.user_tg_id
             username = f"@{ent.user.login}"
 
             text_result += f"{full_name} :\n {username}\n"
 
             if user_id not in unique_user_ids:
-                print(user_id)
                 unique_user_ids.add(user_id)
-                unique_user_data[user_id] = username
+                unique_user_data[user_id] = (username, user_tg_id)
 
-    for user_id, username in unique_user_data.items():
+    for user_id, (username, user_tg_id) in unique_user_data.items():
         student_buttons.append([
             InlineKeyboardButton(
                 text=f"{username}",
-                callback_data=f"remove_student:{user_id}"
+                callback_data=f"remove_student:{user_tg_id}"
             )
         ])
 
@@ -389,3 +389,17 @@ async def remove_from_all_lessons(callback: CallbackQuery):
         reply_markup=keyboard
     )
 
+
+@router.callback_query(F.data.startswith("remove_student:"))
+async def remove_student(callback: CallbackQuery):
+    student_tg_id = int(callback.data.split(":")[-1])
+
+    tg_id = callback.from_user.id
+    teacher = await get_teacher_by_telegram_id(tg_id)
+    lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+    for lesson in lessons:
+        enrolled_users = lesson.enrollments
+        for ent in enrolled_users:
+            if ent.user_tg_id == student_tg_id:
+                sample = await remove_student_from_class(ent.lesson_id,ent.user_tg_id)
+                # print(f"{lesson.title} - {ent.user_tg_id}- {ent.lesson_id}")
