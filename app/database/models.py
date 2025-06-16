@@ -56,7 +56,7 @@ class Enrollment(Base):
     __tablename__ = "enrollments"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.tg_id"), nullable=False)
+    user_tg_id = Column(Integer, ForeignKey("users.tg_id"), nullable=False)
     lesson_id = Column(Integer, ForeignKey("lessons.id"), nullable=False)
     full_name = Column(String(100), nullable=False)
     user = relationship("User", back_populates="enrollments")
