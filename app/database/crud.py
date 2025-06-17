@@ -187,7 +187,7 @@ async def lesson_records_display(tg_id: int):
     async with SessionLocal() as session:
         result = await session.execute(
             select(Enrollment)
-            .where(Enrollment.user_id == tg_id)
+            .where(Enrollment.user_tg_id == tg_id)
             .options(
                 joinedload(Enrollment.lesson).joinedload(Lesson.administrator)
             )
@@ -198,7 +198,7 @@ async def lesson_records_display(tg_id: int):
 
 async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int, full_name: str):
     async with SessionLocal() as session:
-        enrollment = Enrollment(user_id=user_tg_id, lesson_id=lesson_id, full_name=full_name)
+        enrollment = Enrollment(user_tg_id=user_tg_id, lesson_id=lesson_id, full_name=full_name)
         result = await session.execute(select(Lesson).where(Lesson.id == lesson_id))
         lesson = result.scalar_one_or_none()
         if lesson:

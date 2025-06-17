@@ -9,10 +9,11 @@ from aiogram.filters import StateFilter
 
 from aiogram_calendar import SimpleCalendarCallback
 
-from app.database.admin_crud import get_enrollments_for_two_weeks, active_courses_for_two_weeks
-from app.database.crud import create_lesson
+from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_for_teacher_and_optional_student,
+                                     get_teacher_by_telegram_id, remove_student_from_class)
+from app.database.crud import create_lesson, cancel_record_db
 from app.database.models import LessonType
-from app.handlers.utils import open_calendar, calendar
+from app.handlers.utils import open_calendar, calendar, delete_previous_message,show_teacher_lessons
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
 
 router = Router()
@@ -30,11 +31,13 @@ class LessonFactory(StatesGroup):
 @router.callback_query(F.data == "teachers")
 async def teachers(callback: CallbackQuery, state: FSMContext):
     await state.clear()
+    await callback.answer()
+    await callback.message.delete()
+
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🆕 Додати заняття", callback_data="add_lesson")],
-            [InlineKeyboardButton(text="📥 Записи на курси", callback_data="course_signups")],
-            [InlineKeyboardButton(text="📚 Активні курси", callback_data="active_courses")],
+            [InlineKeyboardButton(text="📥 Заняття та записи", callback_data="lessons_and_signups")],
             [InlineKeyboardButton(text="✏️ Редагувати заняття", callback_data="edit_lessons")],
             [InlineKeyboardButton(text="🔗 Додати посилання на заняття", callback_data="lesson_link")],
             [InlineKeyboardButton(text="🔙 Повернутись назад", callback_data="teacher_menu")]
@@ -269,59 +272,54 @@ async def cancel_lesson(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Створення заняття скасовано", reply_markup=keyboard)
 
 
-@router.callback_query(F.data == "course_signups")  # !!!
-async def course_signups(callback: CallbackQuery, state: FSMContext):
-    """Переглядаємо записи учнів на заняття"""
-    enrollments = await get_enrollments_for_two_weeks()
-    if not enrollments:
-        await callback.message.answer("❌ Записів учнів за цей та наступний тиждень не знайдено.")
-        return
-
-    text_result = ""
-    for i, enrollment in enumerate(enrollments, start=1):
-        lesson = enrollment.lesson
-        user = enrollment.user
-        lesson_type = "🧑‍🏫 *Очно*" if lesson.type_lesson == LessonType.OFFLINE else "💻 *Онлайн*"
-        text_result += (
-            f"*Учень #{i}*\n"
-            f"*Назва заняття:* `{lesson.title}`\n"
-            f"*Телеграм:* `{user.login}`\n"
-            f"*Ім’я та прізвище:* `{user.name or 'Невідомо'} {user.surname or ''}`\n"
-            f"*Дата та час:* `{lesson.datetime.strftime('%d.%m.%Y %H:%M')}`\n"
-            f"*Формат:* {lesson_type}\n"
-            f"*Викладач:* `{lesson.instructor}`\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        )
-
-    await callback.message.answer(text="📋 *Записи учнів на цей та наступний тиждень:*\n\n" + text_result,
-                                  parse_mode="Markdown",
-                                  reply_markup=back_button_builder().as_markup())
-
-
-@router.callback_query(F.data == "active_courses")
-async def course_signups(callback: CallbackQuery, state: FSMContext):
-    lessons = await active_courses_for_two_weeks()
+@router.callback_query(F.data == "lessons_and_signups")
+async def course_signups(callback: CallbackQuery):
+    """Хендлер для викладачів, який виводить список запланованих занять на поточний та наступний тиждень
+разом із переліком студентів, які записалися на кожне з них."""
+    await callback.answer()
+    await callback.message.delete()
+    teacher, lessons = await show_teacher_lessons(callback)
     if not lessons:
-        await callback.message.answer("❌ Курсів на цей та наступний тиждень не знайдено.")
+        await callback.message.answer("ℹ️ На цей та наступний тиждень у вас немає запланованих занять.")
         return
 
     text_result = ""
     for i, lesson in enumerate(lessons, start=1):
         lesson_type = "🧑‍🏫 *Очно*" if lesson.type_lesson == LessonType.OFFLINE else "💻 *Онлайн*"
+        lesson_datetime = lesson.datetime.strftime('%d.%m.%Y о %H:%M')
         lesson_places = f"{lesson.places} 🟦" if lesson.places >= 1 else "✅ Група повна "
+
+        enrolled_users = lesson.enrollments
+        enrolled_count = len(enrolled_users)
+        total_places = lesson.places + enrolled_count
+
+        user_list = "\n".join([
+            f"{ent.full_name} : @{ent.user.login}" for ent in enrolled_users
+        ]) or "—"
+
         text_result += (
-            f"*Заняття #{i}*\n"
-            f"*Назва заняття:* `{lesson.title}`\n"
-            f"*Викладач:* `{lesson.instructor}`\n"
-            f"*Кількість місць:* `{lesson_places}`\n"
-            f"*Дата та час:* `{lesson.datetime.strftime('%d.%m.%Y %H:%M')}`\n"
-            f"*Формат:* {lesson_type}\n"
+            f"📚 *Заняття #{i}*\n"
+            f"🏷️ *Тема:* `{lesson.title}`\n"
+            f"📅 *Дата:* `{lesson_datetime}`\n"
+            f"🏛️ *Формат:* {lesson_type}\n"
+            f"🎫 *Вільних місць:* {lesson_places}\n"
+            f"📌 *Всього місць:* {total_places}\n"
+            f"👥 *Записалося:* {enrolled_count} студентів\n"
+            f"📃 *Учні:*\n{user_list}\n"
             f"━━━━━━━━━━━━━━━━━━━━━━\n"
         )
 
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="❌ Видалити студента", callback_data="remove_student")],
+            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="lessons_and_signups")],
+            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="teachers")]
+        ]
+    )
+
     await callback.message.answer(text="📋 *Активні курси на цей та наступний тиждень:*\n\n" + text_result,
                                   parse_mode="Markdown",
-                                  reply_markup=back_button_builder().as_markup())
+                                  reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "teacher_menu")
@@ -330,4 +328,90 @@ async def admin_menu(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text="Оберіть дію з меню адміністратора:",
         reply_markup=get_teachers_command()
+    )
+
+
+@router.callback_query(F.data == "back_to_teacher_menu")
+async def delete_message_handler(callback: CallbackQuery, state: FSMContext):
+    await delete_previous_message(callback, state)
+
+
+@router.callback_query(F.data == "remove_student")
+async def remove_student(callback: CallbackQuery):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Вилучити з усіх занять", callback_data="remove_from_all_lessons")],
+            [InlineKeyboardButton(text="Вилучити з певного заняття", callback_data="select_lesson_to_remove")],
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_teacher_menu")]
+        ]
+    )
+    await callback.message.answer(text="📋 *Що ви хочете зробити зі студентом?*\n\n",
+                                  parse_mode="Markdown",
+                                  reply_markup=keyboard)
+
+
+@router.callback_query(F.data == "remove_from_all_lessons")
+async def remove_from_all_lessons(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.delete()
+
+    teacher, lessons = await show_teacher_lessons(callback)
+
+    text_result = "🔻 Натисніть на кнопку з імʼям студента, щоб видалити його із заняття:\n"
+
+    student_buttons = []
+    unique_user_ids = set()
+    unique_user_data = {}
+
+    for lesson in lessons:
+        for ent in lesson.enrollments:
+            user_id = ent.user.id
+            full_name = ent.full_name
+            user_tg_id = ent.user_tg_id
+            username = f"@{ent.user.login}"
+
+            text_result += f"{full_name} :\n {username}\n"
+
+            if user_id not in unique_user_ids:
+                unique_user_ids.add(user_id)
+                unique_user_data[user_id] = (username, user_tg_id)
+
+    for user_id, (username, user_tg_id) in unique_user_data.items():
+        student_buttons.append([
+            InlineKeyboardButton(
+                text=f"{username}",
+                callback_data=f"remove_student:{user_tg_id}"
+            )
+        ])
+
+    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="lessons_and_signups")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
+
+    await callback.message.answer(
+        text=text_result,
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
+
+
+@router.callback_query(F.data.startswith("remove_student:"))
+async def remove_student(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.delete()
+    student_tg_id = int(callback.data.split(":")[-1])
+
+    teacher, lessons = await show_teacher_lessons(callback)
+
+    button_menu = [[InlineKeyboardButton(text="🔙 Назад", callback_data="teachers")]]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=button_menu)
+
+    for lesson in lessons:
+        enrolled_users = lesson.enrollments
+        for ent in enrolled_users:
+            await remove_student_from_class(ent.lesson_id, student_tg_id)
+
+    await callback.message.answer(
+        text='✅ Користувача успішно видалено з усіх занять.',
+        parse_mode="Markdown",
+        reply_markup=keyboard
     )

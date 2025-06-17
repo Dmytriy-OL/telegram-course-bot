@@ -8,6 +8,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import os
 from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback
+from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_for_teacher_and_optional_student,
+                                     get_teacher_by_telegram_id, remove_student_from_class)
 
 calendar = SimpleCalendar()
 
@@ -41,3 +43,10 @@ async def delete_previous_message(callback: CallbackQuery, state: FSMContext):
 async def open_calendar() -> InlineKeyboardMarkup:
     """Відкриває inline-календар"""
     return await calendar.start_calendar()
+
+
+async def show_teacher_lessons(callback: CallbackQuery):
+    tg_id = callback.from_user.id
+    teacher = await get_teacher_by_telegram_id(tg_id)
+    lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+    return teacher, lessons

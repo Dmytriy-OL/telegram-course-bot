@@ -8,7 +8,7 @@ from app.database.crud import delete_image_from_db, view_user, create_lesson
 from app.handlers.utils import display_images
 from app.database.models import Lesson, LessonType
 from app.database.admin_crud import  view_users, add_caption, get_all_captions, main_captions_switch, \
-    delete_captions, view_image, main_image_switch, get_enrollments_for_two_weeks,active_courses_for_two_weeks
+    delete_captions, view_image, main_image_switch, get_enrollments_for_two_weeks,get_lessons_for_teacher_and_optional_student
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
 from app.handlers.callbacks import delete_previous_message
 from app.database.upload_image import save_image_to_disk_and_db, delete_image_to_disk_and_db
