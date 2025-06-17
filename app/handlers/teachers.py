@@ -13,7 +13,7 @@ from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_
                                      get_teacher_by_telegram_id, remove_student_from_class)
 from app.database.crud import create_lesson, cancel_record_db
 from app.database.models import LessonType
-from app.handlers.utils import open_calendar, calendar, delete_previous_message
+from app.handlers.utils import open_calendar, calendar, delete_previous_message,show_teacher_lessons
 from app.keyboards.keyboards import back_button_builder, get_teachers_command
 
 router = Router()
@@ -31,6 +31,9 @@ class LessonFactory(StatesGroup):
 @router.callback_query(F.data == "teachers")
 async def teachers(callback: CallbackQuery, state: FSMContext):
     await state.clear()
+    await callback.answer()
+    await callback.message.delete()
+
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🆕 Додати заняття", callback_data="add_lesson")],
@@ -273,9 +276,9 @@ async def cancel_lesson(callback: CallbackQuery, state: FSMContext):
 async def course_signups(callback: CallbackQuery):
     """Хендлер для викладачів, який виводить список запланованих занять на поточний та наступний тиждень
 разом із переліком студентів, які записалися на кожне з них."""
-    tg_id = callback.from_user.id
-    teacher = await get_teacher_by_telegram_id(tg_id)
-    lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+    await callback.answer()
+    await callback.message.delete()
+    teacher, lessons = await show_teacher_lessons(callback)
     if not lessons:
         await callback.message.answer("ℹ️ На цей та наступний тиждень у вас немає запланованих занять.")
         return
@@ -309,8 +312,8 @@ async def course_signups(callback: CallbackQuery):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="❌ Видалити студента", callback_data="remove_student")],
-            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="refresh_student_list")],
-            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="back_to_teacher_menu")]
+            [InlineKeyboardButton(text="🔄 Оновити список", callback_data="lessons_and_signups")],
+            [InlineKeyboardButton(text="⬅️ До меню викладача 👩‍🏫", callback_data="teachers")]
         ]
     )
 
@@ -352,9 +355,7 @@ async def remove_from_all_lessons(callback: CallbackQuery):
     await callback.answer()
     await callback.message.delete()
 
-    tg_id = callback.from_user.id
-    teacher = await get_teacher_by_telegram_id(tg_id)
-    lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+    teacher, lessons = await show_teacher_lessons(callback)
 
     text_result = "🔻 Натисніть на кнопку з імʼям студента, щоб видалити його із заняття:\n"
 
@@ -383,7 +384,7 @@ async def remove_from_all_lessons(callback: CallbackQuery):
             )
         ])
 
-    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="remove_student")])
+    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="lessons_and_signups")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
 
     await callback.message.answer(
@@ -399,11 +400,9 @@ async def remove_student(callback: CallbackQuery):
     await callback.message.delete()
     student_tg_id = int(callback.data.split(":")[-1])
 
-    tg_id = callback.from_user.id
-    teacher = await get_teacher_by_telegram_id(tg_id)
-    lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+    teacher, lessons = await show_teacher_lessons(callback)
 
-    button_menu = [[InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_teacher_menu")]]
+    button_menu = [[InlineKeyboardButton(text="🔙 Назад", callback_data="teachers")]]
     keyboard = InlineKeyboardMarkup(inline_keyboard=button_menu)
 
     for lesson in lessons:

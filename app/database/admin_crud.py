@@ -272,6 +272,10 @@ async def remove_student_from_class(lessons_id: int, student_id: int | None = No
 
             await session.commit()
 
+async def refresh_classes_list():
+    async with SessionLocal() as session:
+        result = session.execute(select(Enrollment))
+        pass
 
 async def main():
     enrollments = await get_enrollments_for_two_weeks()
