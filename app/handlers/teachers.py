@@ -10,7 +10,7 @@ from aiogram.filters import StateFilter
 from aiogram_calendar import SimpleCalendarCallback
 
 from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_for_teacher_and_optional_student,
-                                     get_teacher_by_telegram_id,remove_student_from_class)
+                                     get_teacher_by_telegram_id, remove_student_from_class)
 from app.database.crud import create_lesson, cancel_record_db
 from app.database.models import LessonType
 from app.handlers.utils import open_calendar, calendar, delete_previous_message
@@ -349,6 +349,9 @@ async def remove_student(callback: CallbackQuery):
 
 @router.callback_query(F.data == "remove_from_all_lessons")
 async def remove_from_all_lessons(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.delete()
+
     tg_id = callback.from_user.id
     teacher = await get_teacher_by_telegram_id(tg_id)
     lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
@@ -380,7 +383,7 @@ async def remove_from_all_lessons(callback: CallbackQuery):
             )
         ])
 
-    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="teacher_menu")])
+    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="remove_student")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
 
     await callback.message.answer(
@@ -392,14 +395,24 @@ async def remove_from_all_lessons(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("remove_student:"))
 async def remove_student(callback: CallbackQuery):
+    await callback.answer()
+    await callback.message.delete()
     student_tg_id = int(callback.data.split(":")[-1])
 
     tg_id = callback.from_user.id
     teacher = await get_teacher_by_telegram_id(tg_id)
     lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
+
+    button_menu = [[InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_teacher_menu")]]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=button_menu)
+
     for lesson in lessons:
         enrolled_users = lesson.enrollments
         for ent in enrolled_users:
-            if ent.user_tg_id == student_tg_id:
-                sample = await remove_student_from_class(ent.lesson_id,ent.user_tg_id)
-                # print(f"{lesson.title} - {ent.user_tg_id}- {ent.lesson_id}")
+            await remove_student_from_class(ent.lesson_id, student_tg_id)
+
+    await callback.message.answer(
+        text='✅ Користувача успішно видалено з усіх занять.',
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
