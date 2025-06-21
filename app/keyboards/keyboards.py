@@ -26,14 +26,7 @@ def get_inline_keyboard():
     return keyboard
 
 
-def get_teachers_command():
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="👨‍🏫 Для викладачів", callback_data="teachers")],
-            [InlineKeyboardButton(text="👨🏻‍💻 Панель користувача", callback_data="go_to_main_menu")],
-        ]
-    )
-    return keyboard
+
 
 
 def get_admin_menu():

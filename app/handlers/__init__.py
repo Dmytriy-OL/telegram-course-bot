@@ -8,7 +8,6 @@ from .teachers import router as teachers_router
 # Створюємо загальний маршрутизатор
 router = Router()
 
-
 # Додаємо маршрутизатори команд та callback'ів до об'єднаного маршрутизатора
 router.include_router(commands_router)
 router.include_router(callbacks_router)
