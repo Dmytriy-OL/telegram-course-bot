@@ -26,9 +26,6 @@ def get_inline_keyboard():
     return keyboard
 
 
-
-
-
 def get_admin_menu():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[

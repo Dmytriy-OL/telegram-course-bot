@@ -23,7 +23,7 @@ def get_teachers_command():
     return keyboard
 
 
-def confirm_lesson_keyboard():
+def confirm_lesson_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="✅ Все вірно", callback_data="confirm_lesson")],
@@ -33,7 +33,7 @@ def confirm_lesson_keyboard():
     )
 
 
-def return_teacher_menu():
+def return_teacher_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="⬅️ Повернутися до панелі вчителя", callback_data="teacher_menu")]
@@ -41,7 +41,7 @@ def return_teacher_menu():
     )
 
 
-def remove_student_menu():
+def remove_student_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="Вилучити з усіх занять", callback_data="remove_from_all_lessons")],
@@ -51,7 +51,7 @@ def remove_student_menu():
     )
 
 
-def get_lesson_signups_keyboard():
+def get_lesson_signups_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="❌ Видалити студента", callback_data="remove_student")],

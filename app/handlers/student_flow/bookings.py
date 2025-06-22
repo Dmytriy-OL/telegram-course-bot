@@ -1,8 +1,9 @@
 from aiogram import F, Router
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from app.database.crud import lesson_records_display, cancel_record_db
+from app.keyboards.students import get_booking_keyboard, cancel_confirmation_keyboard, get_cancel_success_keyboard
 
 router = Router()
 
@@ -30,11 +31,7 @@ async def my_bookings(callback: CallbackQuery, state: FSMContext):
             "🔔 *Якщо не зможете відвідати заняття, будь ласка, скасуйте запис.*\n"
             "❌ Натисніть кнопку нижче, щоб скасувати запис.\n"
         )
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="❌ Скасувати запис", callback_data=f"cancel_confirmed_{record.id}")],
-                [InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]])
-        await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
+        await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=get_booking_keyboard(record.id))
 
 
 @router.callback_query(F.data.startswith("cancel_confirmed_"))
@@ -44,11 +41,7 @@ async def ask_cancel_confirmation(callback: CallbackQuery, state: FSMContext):
     text_result = (
         "*Ви впевнені що хочете відмінити запис*\n\n"
     )
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="Так", callback_data=f"cancel_lesson")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")]])
-    await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
+    await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=cancel_confirmation_keyboard())
 
 
 @router.callback_query(F.data == "cancel_lesson")
@@ -63,11 +56,7 @@ async def cancel_record(callback: CallbackQuery, state: FSMContext):
             f"📌 *Курс:* {lesson.title}\n"
             f"📅 *Дата та час:* {lesson.datetime.strftime('%Y-%m-%d %H:%M')}\n\n"
         )
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🏠 Головне меню", callback_data=f"go_to_main_menu")],
-                [InlineKeyboardButton(text="🔄 Обновити записи", callback_data="my_bookings")]])
-        await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
+        await callback.message.answer(text_result, parse_mode="Markdown", reply_markup=get_cancel_success_keyboard())
     else:
-        await callback.answer("Цей запис вже видалений❌")
+        await callback.message.answer("Цей запис вже видалений❌")
     await state.clear()

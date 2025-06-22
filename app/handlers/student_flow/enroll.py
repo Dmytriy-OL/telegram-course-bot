@@ -1,11 +1,11 @@
 from aiogram import F, Router
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
 from app.database.crud import enroll_student_to_lesson, set_user
 from app.handlers.utils import delete_previous_message
-
+from app.keyboards.students import get_successful_enrollment_keyboard,get_cancel_operation_keyboard
 
 router = Router()
 
@@ -55,7 +55,7 @@ async def process_first_name(message: Message, state: FSMContext):
 @router.message(Form.waiting_confirmation, F.text.lower() == "/again")
 async def restart_registration(message: Message, state: FSMContext):
     await message.answer("🔄 Введіть ваше прізвище та ім'я ще раз:")
-    await state.set_state(Form.waiting_full_name)  # Повертаємо стан назад
+    await state.set_state(Form.waiting_full_name)
 
 
 @router.message(Form.waiting_confirmation, F.text.lower() == "/ok")
@@ -69,18 +69,11 @@ async def confirm_registration(message: Message, state: FSMContext):
     if not first_name or not last_name:  # Якщо користувач просто так натисне не в стані
         await message.answer("❌ Ви не перебуваєте в процесі запису.")
         return
+
     await set_user(message.from_user.id, message.from_user.username, first_name, last_name)
     await enroll_student_to_lesson(lesson_id, message.from_user.id, full_name)
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[
-            InlineKeyboardButton(text="📅 Виконати ще один запис", callback_data="enroll_course")
-        ], [
-            InlineKeyboardButton(text="🏠 Головне меню", callback_data="go_to_main_menu")
-        ]]
-    )
-
     await message.answer(f"✅ {last_name} {first_name}, ви успішно записані на заняття!", parse_mode="Markdown",
-                         reply_markup=keyboard)
+                         reply_markup=get_successful_enrollment_keyboard())
     await state.clear()
 
 
@@ -97,15 +90,7 @@ async def cancel_save(message: Message, state: FSMContext):
         "✨ _Можливо, на вас чекає щось ще цікавіше!_ 😉"
     )
 
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[
-            InlineKeyboardButton(text="📅 Обрати інше заняття", callback_data="enroll_course")
-        ], [
-            InlineKeyboardButton(text="🏠 Головне меню", callback_data="go_to_main_menu")
-        ]]
-    )
-
-    await message.answer(text_result, parse_mode="Markdown", reply_markup=keyboard)
+    await message.answer(text_result, parse_mode="Markdown", reply_markup=get_cancel_operation_keyboard())
 
 
 @router.callback_query(F.data == "remove_prev_message")

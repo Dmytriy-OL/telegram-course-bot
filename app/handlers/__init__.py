@@ -3,7 +3,7 @@ from aiogram import Router
 # Імпортуємо маршрутизатори з файлів
 from .commands import router as commands_router
 from .admin import router as admin_router
-from .callbacks import router as callbacks_router
+from .student_flow import router as callbacks_router
 from .teachers import router as teachers_router
 # Створюємо загальний маршрутизатор
 router = Router()

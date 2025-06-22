@@ -1,11 +1,10 @@
 from aiogram import F, Router
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import CallbackQuery
 
-from datetime import datetime, timedelta
 from app.database.crud import find_activities_by_date
 from app.keyboards.keyboards import back_button_markup
-
+from app.keyboards.students import get_lesson_day_actions_keyboard
+from app.keyboards.generators import generate_week_keyboard
 router = Router()
 
 
@@ -43,36 +42,11 @@ async def select_day(callback: CallbackQuery):
                 await callback.message.answer(lesson_text, parse_mode="Markdown", reply_markup=back_button_markup())
                 continue  # Переходимо до наступного заняття
 
-            keyboard = InlineKeyboardMarkup(
-                inline_keyboard=[[
-                    InlineKeyboardButton(text="✅ Записатися",
-                                         callback_data=f"recording_day_{lesson.id}_{lesson.places}")
-                ], [
-                    InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message")
-                ]]
-            )
-            await callback.message.answer(lesson_text, parse_mode="Markdown", reply_markup=keyboard)
+            await callback.message.answer(lesson_text, parse_mode="Markdown",
+                                          reply_markup=get_lesson_day_actions_keyboard(lesson.id, lesson.places))
     else:
         await callback.message.answer("❌ *Занять на цей день немає або їх ще не додали.*", parse_mode="Markdown",
                                       reply_markup=back_button_markup())
-
-
-def generate_week_keyboard(offset=0):
-    """Генерує клавіатуру для вибору дня тижня з урахуванням зміщення (offset)."""
-    keyboard = InlineKeyboardBuilder()
-    days = ["Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"]
-
-    today = datetime.today()
-    current_weekday = today.weekday()
-
-    for i in range(7):
-        date = today + timedelta(days=(i - current_weekday + offset))
-        day_text = f"{days[i]} {date.day}.{date.month}.{date.year}"
-        callback_data = f"select_day_{i}_{date.day}_{date.month}_{date.year}"
-        keyboard.add(InlineKeyboardButton(text=day_text, callback_data=callback_data))
-
-    keyboard.add(InlineKeyboardButton(text="🔙 Назад", callback_data="remove_prev_message"))
-    return keyboard.adjust(1).as_markup()
 
 
 @router.callback_query(F.data == "select_this_week")
