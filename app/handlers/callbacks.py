@@ -154,7 +154,7 @@ async def go_to_main_menu(callback: CallbackQuery):
     await cmd_start(callback.message)
 
 
-@router.message(F.text.lower() == "/ok")
+@router.message(Form.waiting_confirmation, F.text.lower() == "/ok")
 async def confirm_registration(message: Message, state: FSMContext):
     user_data = await state.get_data()
     first_name = user_data.get("first_name")
@@ -180,7 +180,7 @@ async def confirm_registration(message: Message, state: FSMContext):
     await state.clear()
 
 
-@router.message(F.text.lower() == "/again")
+@router.message(Form.waiting_confirmation, F.text.lower() == "/again")
 async def restart_registration(message: Message, state: FSMContext):
     await message.answer("🔄 Введіть ваше прізвище та ім'я ще раз:")
     await state.set_state(Form.waiting_full_name)  # Повертаємо стан назад

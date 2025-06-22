@@ -1,13 +1,12 @@
+import os
 from aiogram.types import Message, FSInputFile
-from app.database.crud import get_images_with_main
-from app.images import BASE_DIR
-# from app.image_uploads import BASE_DIR
 from aiogram.types import CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-import os
+
 from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback
+from app.database.crud import get_images_with_main
+from app.images import BASE_DIR
 from app.database.admin_crud import (get_enrollments_for_two_weeks, get_lessons_for_teacher_and_optional_student,
                                      get_teacher_by_telegram_id, remove_student_from_class)
 
