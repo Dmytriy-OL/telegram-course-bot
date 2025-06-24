@@ -1,13 +1,60 @@
-# Віртуальне середовище
-.venv/
+#Файл з даними
+**/db.sqlite3
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Віртуальні середовищ
+venv/
+env/
 ENV/
+.venv/
 .env/
 
-#Файл з даними
-app/database/db.sqlite3
+# Логи та тимчасові файли
+*.log
+*.tmp
+*.temp
+*.bak
 
-__pycache__/
-
-# Іде редакторів
-.idea/
+# Файли налаштувань IDE
 .vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Файли системи
+.DS_Store
+Thumbs.db
+
+# Файли бази даних SQLite
+*.sqlite3
+
+# Кеші pytest
+.pytest_cache/
+
+# Файли coverage (покриття тестів)
+.coverage
+htmlcov/
+
+# Файли Pipenv
+Pipfile.lock
+
+# Файли dist, build, egg
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Файли конфігурації PyCharm
+*.iml
+out/
+
+# Файли з налаштуваннями Jupyter
+.ipynb_checkpoints
+
+# Docker
+docker-compose.override.yml
+
