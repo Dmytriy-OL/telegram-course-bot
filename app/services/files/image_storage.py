@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
-from app.database.models import Image, SessionLocal
+from app.database.core.models import Image, SessionLocal
 import asyncio
 import os
 import shutil  # Додаємо shutil для копіювання файлів
@@ -26,9 +26,6 @@ async def delete_image_to_disk_and_db(filename: str):
         os.remove(file_path)
 
     await delete_image(filename)
-
-
-
 
 
 async def add_image(session: AsyncSession, filename: str, mimetype: str):

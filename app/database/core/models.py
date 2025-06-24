@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase, relationship, declarat
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, LargeBinary, Text, Enum
 from datetime import datetime
 from dotenv import load_dotenv
-from app.database import SQLALCHEMY_URL
+from app.database.core.config import SQLALCHEMY_URL
 from enum import Enum as PyEnum
 import os
 

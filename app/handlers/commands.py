@@ -1,13 +1,16 @@
 import os
-from app.images import BASE_DIR
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, ReplyKeyboardRemove
-from app.database.crud import get_images_with_main, view_user, delete_image_from_db, set_user, main_view
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from app.keyboards.keyboards import get_inline_keyboard, get_admin_menu, get_teachers_command
-from app.database.admin_crud import get_role
+
+from app.images import BASE_DIR
+from app.database.crud.users import set_user
+from app.database.crud.images import main_view
+from app.database.crud.admin import get_role
+from app.keyboards.keyboards import get_admin_menu
+from app.keyboards.teachers import get_teachers_command
+from app.keyboards.students import get_student_main_menu
 
 router = Router()
 
@@ -37,7 +40,7 @@ async def cmd_start(message: Message):
     # Якщо немає зображення або воно не має імені файлу → надсилаємо тільки текст
     if not last_image or not last_image.filename:
         await message.answer("❌ Зображень немає в базі даних.")
-        await message.answer(caption_text, parse_mode="HTML", reply_markup=get_inline_keyboard())
+        await message.answer(caption_text, parse_mode="HTML", reply_markup=get_student_main_menu())
         return
     last_image.filename += ".jpg"
     photo_path = os.path.join(BASE_DIR, last_image.filename)
@@ -46,12 +49,15 @@ async def cmd_start(message: Message):
     if not os.path.exists(photo_path):
         last_image.filename += ".jpg"
         await message.answer("❌ Файл зображення не знайдено.")  # Спочатку повідомлення про помилку
-        await message.answer(caption_text, parse_mode="HTML", reply_markup=get_inline_keyboard())
+        await message.answer(caption_text, parse_mode="HTML", reply_markup=get_student_main_menu())
         return
 
     # Відправка фото з підписом
     photo = FSInputFile(photo_path)
-    await message.answer_photo(photo=photo, caption=caption_text, parse_mode="HTML", reply_markup=get_inline_keyboard())
+    await message.answer_photo(
+        photo=photo, caption=caption_text,
+        parse_mode="HTML", reply_markup=get_student_main_menu()
+        )
 
 
 @router.message(Command("admin"))

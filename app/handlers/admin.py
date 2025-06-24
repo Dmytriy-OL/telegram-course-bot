@@ -1,18 +1,11 @@
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import StateFilter
 from aiogram import Router, F
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, FSInputFile, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, \
-    InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
-from app.database.crud import delete_image_from_db, view_user, create_lesson
-from app.handlers.utils import display_images
-from app.database.models import Lesson, LessonType
-from app.database.admin_crud import  view_users, add_caption, get_all_captions, main_captions_switch, \
-    delete_captions, view_image, main_image_switch, get_enrollments_for_two_weeks,get_lessons_for_teacher_and_optional_student
-from app.keyboards.keyboards import back_button_builder, get_teachers_command
-from app.handlers.callbacks import delete_previous_message
-from app.database.upload_image import save_image_to_disk_and_db, delete_image_to_disk_and_db
-from app.images import BASE_DIR
+# from app.database.crud.images import delete_image_from_db, view_user
+# from app.handlers.utils import display_images
+# from app.database.admin_crud import view_image
 
 router = Router()
 
@@ -100,27 +93,27 @@ async def admin_stats(callback: CallbackQuery, state: FSMContext):
 
 
 
-@router.callback_query(F.data == "select_main_image")
-async def select_main_image(callback: CallbackQuery, state: FSMContext):
-    images = await view_image()
-    if not images:
-        await callback.message.answer("❌ Зображень не знайдено.")
-        return
-    text_result = ""
-    for i, image in enumerate(images, start=1):
-        text_result += (
-            f"📄 *Зображення #{i}*\n"
-            f"🔖 *Назва зображення:* `{image.filename}`\n"
-            f"{'⭐️ ГОЛОВНЕ ЗОБРАЖЕННЯ ⭐️' if image.main_image else '▪️Не головне'}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        )
-    await callback.message.answer(text="🗂 *Ось усі назви зображень::*\n\n" + text_result, parse_mode="Markdown")
-    text = (
-        "📋  *Введіть назву малюнка, якого хочете зробити головним:*\n\n"
-        f"🔹 Для скасування натисніть /cancel"
-    )
-    await callback.message.answer(text, parse_mode="Markdown")
-    await state.set_state(ImageProcessor.waiting_for_main_title)
+# @router.callback_query(F.data == "select_main_image")
+# async def select_main_image(callback: CallbackQuery, state: FSMContext):
+#     images = await view_image()
+#     if not images:
+#         await callback.message.answer("❌ Зображень не знайдено.")
+#         return
+#     text_result = ""
+#     for i, image in enumerate(images, start=1):
+#         text_result += (
+#             f"📄 *Зображення #{i}*\n"
+#             f"🔖 *Назва зображення:* `{image.filename}`\n"
+#             f"{'⭐️ ГОЛОВНЕ ЗОБРАЖЕННЯ ⭐️' if image.main_image else '▪️Не головне'}\n"
+#             f"━━━━━━━━━━━━━━━━━━━━━━\n"
+#         )
+#     await callback.message.answer(text="🗂 *Ось усі назви зображень::*\n\n" + text_result, parse_mode="Markdown")
+#     text = (
+#         "📋  *Введіть назву малюнка, якого хочете зробити головним:*\n\n"
+#         f"🔹 Для скасування натисніть /cancel"
+#     )
+#     await callback.message.answer(text, parse_mode="Markdown")
+#     await state.set_state(ImageProcessor.waiting_for_main_title)
 
 
 # @router.message(ImageProcessor.waiting_for_main_title)
@@ -149,28 +142,28 @@ async def select_main_image(callback: CallbackQuery, state: FSMContext):
 #     await state.clear()
 
 
-@router.callback_query(F.data == "delete_image")
-async def delete_image(callback: CallbackQuery, state: FSMContext):
-    images = await view_image()
-    if not images:
-        await callback.message.answer("❌ Зображень не знайдено.")
-        return
-    await state.update_data(images=images)
-    text_result = ""
-    for i, image in enumerate(images, start=1):
-        text_result += (
-            f"📄 *Зображення #{i}*\n"
-            f"🔖 *Назва зображення:* `{image.filename}`\n"
-            f"{'⭐️ ГОЛОВНЕ ЗОБРАЖЕННЯ ⭐️' if image.main_image else '▪️Не головне'}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        )
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="🔙 Повернутись до адмін меню", callback_data="edit_main_image")],
-            [InlineKeyboardButton(text="🗑️ Видалити зображення:", callback_data="filename_delete")],
-        ])
-    await callback.message.answer(text="🗂 *Ось усі назви зображень::*\n\n" + text_result, parse_mode="Markdown",
-                                  reply_markup=keyboard)
+# @router.callback_query(F.data == "delete_image")
+# async def delete_image(callback: CallbackQuery, state: FSMContext):
+#     images = await view_image()
+#     if not images:
+#         await callback.message.answer("❌ Зображень не знайдено.")
+#         return
+#     await state.update_data(images=images)
+#     text_result = ""
+#     for i, image in enumerate(images, start=1):
+#         text_result += (
+#             f"📄 *Зображення #{i}*\n"
+#             f"🔖 *Назва зображення:* `{image.filename}`\n"
+#             f"{'⭐️ ГОЛОВНЕ ЗОБРАЖЕННЯ ⭐️' if image.main_image else '▪️Не головне'}\n"
+#             f"━━━━━━━━━━━━━━━━━━━━━━\n"
+#         )
+#     keyboard = InlineKeyboardMarkup(
+#         inline_keyboard=[
+#             [InlineKeyboardButton(text="🔙 Повернутись до адмін меню", callback_data="edit_main_image")],
+#             [InlineKeyboardButton(text="🗑️ Видалити зображення:", callback_data="filename_delete")],
+#         ])
+#     await callback.message.answer(text="🗂 *Ось усі назви зображень::*\n\n" + text_result, parse_mode="Markdown",
+#                                   reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "filename_delete")
@@ -301,28 +294,28 @@ async def add_main_text(callback: CallbackQuery, state: FSMContext):
 #     await message.answer("🔧 Панель адміністратора", reply_markup=get_admin_command())
 
 
-@router.callback_query(F.data == "view_all_texts")
-async def view_all_texts(callback: CallbackQuery):
-    """Відображення всіх збережених текстів адміністратору"""
-    captions = await get_all_captions()
-    all_caption_text = ""
-    if captions:
-        for i, caption in enumerate(captions, start=1):
-            all_caption_text += (
-                f"📄 *Текст #{i}*\n"
-                f"🔖 *Заголовок:* `{caption.title}`\n"
-                f"📝 *Опис:* `{caption.caption}`\n"
-                f"{'⭐️ ГОЛОВНИЙ ТЕКСТ ⭐️' if caption.main else '▪️Не головний'}\n"
-                f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            )
-        await callback.message.answer(text="🗂 *Ось усі наявні тексти:*\n\n" + all_caption_text, parse_mode="Markdown",
-                                      reply_markup=back_button_builder().as_markup())
-
-    else:
-        await callback.message.answer(
-            "📭 Поки що жодного тексту не додано.",
-            reply_markup=back_button_builder().as_markup()
-        )
+# @router.callback_query(F.data == "view_all_texts")
+# async def view_all_texts(callback: CallbackQuery):
+#     """Відображення всіх збережених текстів адміністратору"""
+#     captions = await get_all_captions()
+#     all_caption_text = ""
+#     if captions:
+#         for i, caption in enumerate(captions, start=1):
+#             all_caption_text += (
+#                 f"📄 *Текст #{i}*\n"
+#                 f"🔖 *Заголовок:* `{caption.title}`\n"
+#                 f"📝 *Опис:* `{caption.caption}`\n"
+#                 f"{'⭐️ ГОЛОВНИЙ ТЕКСТ ⭐️' if caption.main else '▪️Не головний'}\n"
+#                 f"━━━━━━━━━━━━━━━━━━━━━━\n"
+#             )
+#         await callback.message.answer(text="🗂 *Ось усі наявні тексти:*\n\n" + all_caption_text, parse_mode="Markdown",
+#                                       reply_markup=back_button_builder().as_markup())
+#
+#     else:
+#         await callback.message.answer(
+#             "📭 Поки що жодного тексту не додано.",
+#             reply_markup=back_button_builder().as_markup()
+#         )
 
 
 @router.callback_query(F.data == "select_main_text")
@@ -389,57 +382,57 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
 #             ])
 #         await message.answer("❌ Заголовок не знайдено.", reply_markup=keyboard)
 
-
-@router.message(F.text == "Перегляд зображеннь")
-async def view_images_with_main(message: Message):
-    await display_images(message, "Ось всі доступні зображення:", True)
-
-
-@router.message(F.text == "Вибір головного зображення")
-async def selecting_main_image(message: Message):
-    await display_images(message, "Напишіть назву зображення, яке хочете зробити головним.")
-
-
-@router.message(F.text == "Видалення зображення")
-async def selecting_main_image(message: Message, state: FSMContext):
-    await display_images(message, "✏ Напишіть назву зображення, яке хочете видалити.")
-    await message.answer(f"🔹 Для скасування натисніть /cancel")
-    await state.set_state(DeleteImageState.waiting_for_filename)
-
-
-@router.message(DeleteImageState.waiting_for_filename)
-async def delete_image(message: Message, state: FSMContext):
-    """Обробка введеної назви зображення для видалення"""
-    filename = message.text.strip()  # Отримуємо введене ім'я
-    if filename.casefold() == "/cancel":
-        await state.clear()
-        await message.answer("❌ Операцію скасовано.")
-        return
-    success, msg = await delete_image_from_db(filename)
-
-    if success:
-        await message.answer(f"🗑️ {msg}")
-    else:
-        await message.answer(f"❌ {msg}")
-
-    await state.clear()  # Скидаємо стан
-
-
-@router.message(F.text == "Користувачі з БД")
-async def greet(message: Message):
-    """Виводить користувачів з бази даннних."""
-    await message.answer("Ок, зараз відправлю...")
-    users = await view_user()
-    if users:
-        text = "📋 *Список користувачів:*\n\n"
-        text += "\n".join([
-            f"🔹 *{i + 1}.* *Ім'я:* `{user.name}`\n   *Прізвище:* `{user.surname}`\n   *Нік:* `{user.login}`"
-            for i, user in enumerate(users)
-        ])
-        await message.answer(text, parse_mode="Markdown")
-    else:
-        await message.answer("❌ Немає користувачів у базі.")
-
+#
+# @router.message(F.text == "Перегляд зображеннь")
+# async def view_images_with_main(message: Message):
+#     await display_images(message, "Ось всі доступні зображення:", True)
+#
+#
+# @router.message(F.text == "Вибір головного зображення")
+# async def selecting_main_image(message: Message):
+#     await display_images(message, "Напишіть назву зображення, яке хочете зробити головним.")
+#
+#
+# @router.message(F.text == "Видалення зображення")
+# async def selecting_main_image(message: Message, state: FSMContext):
+#     await display_images(message, "✏ Напишіть назву зображення, яке хочете видалити.")
+#     await message.answer(f"🔹 Для скасування натисніть /cancel")
+#     await state.set_state(DeleteImageState.waiting_for_filename)
+#
+#
+# @router.message(DeleteImageState.waiting_for_filename)
+# async def delete_image(message: Message, state: FSMContext):
+#     """Обробка введеної назви зображення для видалення"""
+#     filename = message.text.strip()  # Отримуємо введене ім'я
+#     if filename.casefold() == "/cancel":
+#         await state.clear()
+#         await message.answer("❌ Операцію скасовано.")
+#         return
+#     success, msg = await delete_image_from_db(filename)
+#
+#     if success:
+#         await message.answer(f"🗑️ {msg}")
+#     else:
+#         await message.answer(f"❌ {msg}")
+#
+#     await state.clear()  # Скидаємо стан
+#
+#
+# @router.message(F.text == "Користувачі з БД")
+# async def greet(message: Message):
+#     """Виводить користувачів з бази даннних."""
+#     await message.answer("Ок, зараз відправлю...")
+#     users = await view_user()
+#     if users:
+#         text = "📋 *Список користувачів:*\n\n"
+#         text += "\n".join([
+#             f"🔹 *{i + 1}.* *Ім'я:* `{user.name}`\n   *Прізвище:* `{user.surname}`\n   *Нік:* `{user.login}`"
+#             for i, user in enumerate(users)
+#         ])
+#         await message.answer(text, parse_mode="Markdown")
+#     else:
+#         await message.answer("❌ Немає користувачів у базі.")
+#
 
 
 
@@ -475,38 +468,38 @@ async def greet(message: Message):
 #                                   reply_markup=back_button_builder().as_markup())
 
 
-@router.callback_query(F.data.in_({"user_count", "total_stats_user", "incomplete_signups"}))
-async def go_to_main_menu(callback: CallbackQuery):
-    users = await view_users()
-
-    if not users:
-        await callback.message.answer("🚫 Користувачів немає")
-        return
-
-    if callback.data == "total_stats_user":
-        await callback.message.answer(f"👥 Загальна кількість користувачів,яка запускала бота: *{len(users)}*\n",
-                                      parse_mode="Markdown")
-        return
-
-    if callback.data == "incomplete_signups":
-        users = await view_users(True)
-        await callback.message.answer(f"🚫👥 Користувачі які не разу не записувалися на заняття: *{len(users)}*\n",
-                                      parse_mode="Markdown")
-        return
-
-    all_users_text = ""
-
-    for i, user in enumerate(users, start=1):
-        all_users_text += (
-            f"*Користувач #{i}:*\n"
-            f"👨‍💻 *Логін:* `{user.login}`\n"
-            f"🧑‍🏫 *Ім'я:* `{user.name}`\n"
-            f"👨‍🎓 *Прізвище:* `{user.surname}`\n"
-            f"🆔 *Telegram ID:* `{user.tg_id}`\n"
-            f"🔐 *Комбо-рядок для реєстрації:*\n"
-            f"`{user.login}|{user.name}|{user.surname}|{user.tg_id}`\n"
-            "----------------------------------------\n"
-        )
-    await callback.message.answer(all_users_text, parse_mode="Markdown", reply_markup=back_button_builder().as_markup())
+# @router.callback_query(F.data.in_({"user_count", "total_stats_user", "incomplete_signups"}))
+# async def go_to_main_menu(callback: CallbackQuery):
+#     users = await view_users()
+#
+#     if not users:
+#         await callback.message.answer("🚫 Користувачів немає")
+#         return
+#
+#     if callback.data == "total_stats_user":
+#         await callback.message.answer(f"👥 Загальна кількість користувачів,яка запускала бота: *{len(users)}*\n",
+#                                       parse_mode="Markdown")
+#         return
+#
+#     if callback.data == "incomplete_signups":
+#         users = await view_users(True)
+#         await callback.message.answer(f"🚫👥 Користувачі які не разу не записувалися на заняття: *{len(users)}*\n",
+#                                       parse_mode="Markdown")
+#         return
+#
+#     all_users_text = ""
+#
+#     for i, user in enumerate(users, start=1):
+#         all_users_text += (
+#             f"*Користувач #{i}:*\n"
+#             f"👨‍💻 *Логін:* `{user.login}`\n"
+#             f"🧑‍🏫 *Ім'я:* `{user.name}`\n"
+#             f"👨‍🎓 *Прізвище:* `{user.surname}`\n"
+#             f"🆔 *Telegram ID:* `{user.tg_id}`\n"
+#             f"🔐 *Комбо-рядок для реєстрації:*\n"
+#             f"`{user.login}|{user.name}|{user.surname}|{user.tg_id}`\n"
+#             "----------------------------------------\n"
+#         )
+#     await callback.message.answer(all_users_text, parse_mode="Markdown", reply_markup=back_button_builder().as_markup())
 
 
