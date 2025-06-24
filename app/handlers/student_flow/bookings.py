@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from app.database.crud import lesson_records_display, cancel_record_db
+from app.database.crud.lessons import lesson_records_display, cancel_record_lessons
 from app.keyboards.students import get_booking_keyboard, cancel_confirmation_keyboard, get_cancel_success_keyboard
 
 router = Router()
@@ -48,7 +48,7 @@ async def ask_cancel_confirmation(callback: CallbackQuery, state: FSMContext):
 async def cancel_record(callback: CallbackQuery, state: FSMContext):
     record = await state.get_data()
     record_id = record.get("record_id")
-    record = await cancel_record_db(int(record_id))
+    record = await cancel_record_lessons(int(record_id))
     if record:
         lesson = record.lesson
         text_result = (

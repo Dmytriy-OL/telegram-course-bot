@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
-from app.database.models import LessonType
+from app.database.core.models import LessonType
 from app.handlers.utils import show_teacher_lessons
 from app.keyboards.teachers import get_lesson_signups_keyboard
 

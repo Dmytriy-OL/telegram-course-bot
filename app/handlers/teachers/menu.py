@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from aiogram.types import CallbackQuery
 
 from app.handlers.utils import delete_previous_message
 from app.keyboards.teachers import teacher_main_menu, get_teachers_command

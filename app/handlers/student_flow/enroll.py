@@ -3,9 +3,10 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-from app.database.crud import enroll_student_to_lesson, set_user
+from app.database.crud.lessons import enroll_student_to_lesson
+from app.database.crud.users import set_user
 from app.handlers.utils import delete_previous_message
-from app.keyboards.students import get_successful_enrollment_keyboard,get_cancel_operation_keyboard
+from app.keyboards.students import get_successful_enrollment_keyboard, get_cancel_operation_keyboard
 
 router = Router()
 
