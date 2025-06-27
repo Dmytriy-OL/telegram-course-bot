@@ -66,18 +66,28 @@ async def remove_student(callback: CallbackQuery):
     await callback.message.delete()
     student_tg_id = int(callback.data.split(":")[-1])
 
+    if student_tg_id > 1000:
+        student_id = student_tg_id
+        student_record = None
+        text_result = '✅ Користувача успішно видалено з усіх занять.'
+    else:
+        student_id = None
+        student_record = student_tg_id
+        text_result = "✅ Користувача успішно видалено з заняття."
+
     teacher, lessons = await show_teacher_lessons(callback)
 
     button_menu = [[InlineKeyboardButton(text="🔙 Назад", callback_data="teachers")]]
     keyboard = InlineKeyboardMarkup(inline_keyboard=button_menu)
 
     for lesson in lessons:
-        enrolled_users = lesson.enrollments
-        for ent in enrolled_users:
-            await remove_enrollment_for_student(ent.lesson_id, student_tg_id)
-
+        await remove_enrollment_for_student(
+            lessons_id=lesson.id,
+            student_id=student_id,
+            student_record=student_record
+        )
     await callback.message.answer(
-        text='✅ Користувача успішно видалено з усіх занять.',
+        text=text_result,
         parse_mode="Markdown",
         reply_markup=keyboard
     )
@@ -105,10 +115,9 @@ async def remove_from_lesson(callback: CallbackQuery, state: FSMContext):
             student_buttons.append([
                 InlineKeyboardButton(
                     text=full_name,
-                    callback_data=f"remove_student:{user_tg_id}"
+                    callback_data=f"remove_student:{ent.id}"
                 )
             ])
-
         text_result += (
             "\n❗️_Натиснувши кнопку «Назад», усі ці повідомлення буде видалено._"
         )

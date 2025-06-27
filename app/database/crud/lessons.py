@@ -133,7 +133,8 @@ async def enroll_student_to_lesson(lesson_id: int, user_tg_id: int, full_name: s
         await session.commit()
 
 
-async def remove_enrollment_for_student(lessons_id: int, student_id: int | None = None) -> None:
+async def remove_enrollment_for_student(lessons_id: int, student_id: int | None = None,
+                                        student_record: int | None = None) -> None:
     async with SessionLocal() as session:
         stmt = (
             select(Lesson)
@@ -146,12 +147,12 @@ async def remove_enrollment_for_student(lessons_id: int, student_id: int | None 
 
         if lesson:
             for ent in lesson.enrollments:
-                if ent.user_tg_id == student_id:
+                if (student_id is not None and ent.user_tg_id == student_id) or \
+                        (student_record is not None and ent.id == student_record):
                     lesson.places += 1
-                    print(f"Заннятя:{lesson.title}-{lesson.places}")
+                    print(f"Заняття: {lesson.title} - вільних місць стало {lesson.places}")
                     print(f"❌ Видаляю: {ent.full_name} ({ent.user_tg_id}) з '{lesson.title}'")
                     await session.delete(ent)
-
             await session.commit()
 
 
