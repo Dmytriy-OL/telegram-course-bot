@@ -1,4 +1,5 @@
 import os
+import asyncio
 from aiogram.types import Message, FSInputFile
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -10,7 +11,6 @@ from app.images import BASE_DIR
 
 from app.database.crud.admin import get_teacher_by_telegram_id
 from app.database.crud.lessons import get_lessons_for_teacher_and_optional_student
-
 
 calendar = SimpleCalendar()
 
@@ -51,3 +51,26 @@ async def show_teacher_lessons(callback: CallbackQuery):
     teacher = await get_teacher_by_telegram_id(tg_id)
     lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
     return teacher, lessons
+
+
+async def delete_lesson_messages(callback: CallbackQuery, state: FSMContext):
+    """Асинхронно видаляє список повідомлень"""
+    await callback.answer()
+
+    data = await state.get_data()
+    message_ids = data.get("lesson_message_ids", [])
+
+    delete_tasks = []
+    for msg_id in message_ids:
+        delete_tasks.append(
+            callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=msg_id)
+        )
+
+    try:
+        await asyncio.gather(*delete_tasks, return_exceptions=True)
+    except Exception as e:
+        print(f"❗️Помилка при одночасному видаленні: {e}")
+
+    await state.clear()
+
+
