@@ -1,4 +1,5 @@
 import os
+import asyncio
 from aiogram.types import Message, FSInputFile
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -53,17 +54,23 @@ async def show_teacher_lessons(callback: CallbackQuery):
 
 
 async def delete_lesson_messages(callback: CallbackQuery, state: FSMContext):
-    """Видаляє список повідомлень"""
+    """Асинхронно видаляє список повідомлень"""
     await callback.answer()
 
     data = await state.get_data()
     message_ids = data.get("lesson_message_ids", [])
 
+    delete_tasks = []
     for msg_id in message_ids:
-        try:
-            await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=msg_id)
-        except Exception as e:
-            print(f"❗️Не вдалося видалити повідомлення {msg_id}: {e}")
+        delete_tasks.append(
+            callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=msg_id)
+        )
 
-    await state.update_data(lesson_message_ids=[])
+    try:
+        await asyncio.gather(*delete_tasks, return_exceptions=True)
+    except Exception as e:
+        print(f"❗️Помилка при одночасному видаленні: {e}")
+
+    await state.clear()
+
 

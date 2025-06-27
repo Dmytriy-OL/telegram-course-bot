@@ -101,13 +101,17 @@ async def remove_from_lesson(callback: CallbackQuery, state: FSMContext):
             username = f"@{ent.user.login}" if ent.user.login else "Немає username"
             user_tg_id = ent.user_tg_id
 
-            text_result += f"▫️ {full_name} ({username})\n"
+            text_result += f"▫️ {full_name}\n({username})\n"
             student_buttons.append([
                 InlineKeyboardButton(
                     text=full_name,
                     callback_data=f"remove_student:{user_tg_id}"
                 )
             ])
+
+        text_result += (
+            "\n❗️_Натиснувши кнопку «Назад», усі ці повідомлення буде видалено._"
+        )
 
         student_buttons.append([
             InlineKeyboardButton(text="🔙 Назад", callback_data="delete_lesson_messages")
@@ -120,7 +124,6 @@ async def remove_from_lesson(callback: CallbackQuery, state: FSMContext):
             parse_mode="Markdown",
             reply_markup=keyboard
         )
-        print(msg.message_id)
         message_ids.append(msg.message_id)
 
     await state.update_data(lesson_message_ids=message_ids)
