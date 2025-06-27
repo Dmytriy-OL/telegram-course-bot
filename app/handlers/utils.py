@@ -11,7 +11,6 @@ from app.images import BASE_DIR
 from app.database.crud.admin import get_teacher_by_telegram_id
 from app.database.crud.lessons import get_lessons_for_teacher_and_optional_student
 
-
 calendar = SimpleCalendar()
 
 
@@ -51,3 +50,20 @@ async def show_teacher_lessons(callback: CallbackQuery):
     teacher = await get_teacher_by_telegram_id(tg_id)
     lessons = await get_lessons_for_teacher_and_optional_student(teacher.id)
     return teacher, lessons
+
+
+async def delete_lesson_messages(callback: CallbackQuery, state: FSMContext):
+    """Видаляє список повідомлень"""
+    await callback.answer()
+
+    data = await state.get_data()
+    message_ids = data.get("lesson_message_ids", [])
+
+    for msg_id in message_ids:
+        try:
+            await callback.bot.delete_message(chat_id=callback.message.chat.id, message_id=msg_id)
+        except Exception as e:
+            print(f"❗️Не вдалося видалити повідомлення {msg_id}: {e}")
+
+    await state.update_data(lesson_message_ids=[])
+

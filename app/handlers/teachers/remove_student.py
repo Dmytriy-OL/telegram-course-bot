@@ -1,9 +1,11 @@
 from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from app.database.crud.lessons import remove_enrollment_for_student
-from app.handlers.utils import show_teacher_lessons
+from app.handlers.utils import show_teacher_lessons, delete_lesson_messages
 from app.keyboards.teachers import remove_student_menu
+
 router = Router()
 
 
@@ -79,3 +81,52 @@ async def remove_student(callback: CallbackQuery):
         parse_mode="Markdown",
         reply_markup=keyboard
     )
+
+
+@router.callback_query(F.data == "select_lesson_to_remove")
+async def remove_from_lesson(callback: CallbackQuery, state: FSMContext):
+    teacher, lessons = await show_teacher_lessons(callback)
+
+    message_ids = []
+
+    for lesson in lessons:
+        text_result = (
+            "🔻 *Натисніть на кнопку з імʼям студента, щоб видалити його із заняття:*\n\n"
+            f"📚 *Заняття:* {lesson.title}\n\n👥 *Учні:*\n"
+        )
+        student_buttons = []
+
+        for ent in lesson.enrollments:
+            full_name = ent.full_name
+            username = f"@{ent.user.login}" if ent.user.login else "Немає username"
+            user_tg_id = ent.user_tg_id
+
+            text_result += f"▫️ {full_name} ({username})\n"
+            student_buttons.append([
+                InlineKeyboardButton(
+                    text=full_name,
+                    callback_data=f"remove_student:{user_tg_id}"
+                )
+            ])
+
+        student_buttons.append([
+            InlineKeyboardButton(text="🔙 Назад", callback_data="delete_lesson_messages")
+        ])
+
+        keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
+
+        msg = await callback.message.answer(
+            text=text_result,
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
+        print(msg.message_id)
+        message_ids.append(msg.message_id)
+
+    await state.update_data(lesson_message_ids=message_ids)
+
+
+@router.callback_query(F.data == "delete_lesson_messages")
+async def handle_delete_lesson_messages(callback: CallbackQuery, state: FSMContext):
+    """Видаляє список повідомлень"""
+    await delete_lesson_messages(callback, state)
