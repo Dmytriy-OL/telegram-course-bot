@@ -109,7 +109,6 @@ async def remove_from_lesson(callback: CallbackQuery, state: FSMContext):
         for ent in lesson.enrollments:
             full_name = ent.full_name
             username = f"@{ent.user.login}" if ent.user.login else "Немає username"
-            user_tg_id = ent.user_tg_id
 
             text_result += f"▫️ {full_name}\n({username})\n"
             student_buttons.append([
