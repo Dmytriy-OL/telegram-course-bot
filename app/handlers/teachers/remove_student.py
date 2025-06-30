@@ -50,7 +50,7 @@ async def remove_from_all_lessons(callback: CallbackQuery):
             )
         ])
 
-    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="lessons_and_signups")])
+    student_buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="lessons_and_signups:view")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=student_buttons)
 
     await callback.message.answer(
