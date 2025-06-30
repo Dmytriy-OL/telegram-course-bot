@@ -6,7 +6,7 @@ def teacher_main_menu():
         inline_keyboard=[
             [InlineKeyboardButton(text="🆕 Додати заняття", callback_data="add_lesson")],
             [InlineKeyboardButton(text="📥 Заняття та записи", callback_data="lessons_and_signups:view")],
-            [InlineKeyboardButton(text="✏️ Редагувати заняття", callback_data="edit_lessons")],
+            [InlineKeyboardButton(text="✏️ Редагувати заняття", callback_data="lessons_and_signups:edit")],
             [InlineKeyboardButton(text="🔗 Додати посилання на заняття", callback_data="lesson_link")],
             [InlineKeyboardButton(text="🔙 Повернутись назад", callback_data="teacher_menu")]
         ]
@@ -62,7 +62,7 @@ def get_lesson_signups_keyboard() -> InlineKeyboardMarkup:
     )
 
 
-def edit_single_lesson_menu(lesson_id: int) -> InlineKeyboardMarkup:
+def edit_single_lesson_menu(lesson_id) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="✏️ Змінити тему", callback_data=f"edit_title:{lesson_id}")],
@@ -70,7 +70,7 @@ def edit_single_lesson_menu(lesson_id: int) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="⏰ Змінити час", callback_data=f"edit_time:{lesson_id}")],
             [InlineKeyboardButton(text="👥 Змінити кількість місць", callback_data=f"edit_places:{lesson_id}")],
             [InlineKeyboardButton(text="🗑 Видалити заняття", callback_data=f"delete_lesson:{lesson_id}")],
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="teachers")]
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="delete_lesson_messages")]
         ]
     )
 
