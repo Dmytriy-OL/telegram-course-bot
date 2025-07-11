@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 
+from sqlalchemy import update
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql.expression import or_, and_
@@ -175,3 +176,69 @@ async def get_enrollments_for_two_weeks() -> list[Enrollment]:
         enrollments = result.scalars().all()
 
         return enrollments
+
+
+async def edit_lesson(
+        lesson_id: int,
+        title: str | None = None,
+        new_date: date | None = None,
+        new_time: time | None = None,
+        places: int | None = None,
+        type_lesson: LessonType | None = None
+) -> bool:
+    async with SessionLocal() as session:
+        result = await session.execute(select(Lesson).where(Lesson.id == lesson_id))
+        lesson = result.scalars().first()
+
+        if not lesson:
+            return False
+
+        update_data = {}
+
+        if title is not None:
+            update_data['title'] = title
+
+        if new_date or new_time:
+            old_dt = lesson.datetime
+
+            # Зберігаємо те, що не передано
+            year = new_date.year if new_date else old_dt.year
+            month = new_date.month if new_date else old_dt.month
+            day = new_date.day if new_date else old_dt.day
+            hour = new_time.hour if new_time else old_dt.hour
+            minute = new_time.minute if new_time else old_dt.minute
+
+            updated_dt = datetime(year, month, day, hour, minute)
+            update_data['datetime'] = updated_dt
+
+        if places is not None:
+            update_data['places'] = places
+
+        if type_lesson is not None:
+            update_data['type_lesson'] = type_lesson
+
+        if not update_data:
+            return False
+
+        stmt = (
+            update(Lesson)
+            .where(Lesson.id == lesson_id)
+            .values(**update_data)
+            .execution_options(synchronize_session="fetch")
+        )
+        await session.execute(stmt)
+        await session.commit()
+        return True
+
+
+async def remove_lesson(lesson_id: int) -> bool:
+    async with SessionLocal() as session:
+        result = await session.execute(select(Lesson).where(Lesson.id == lesson_id))
+        lesson = result.scalars().first()
+
+        if not lesson:
+            return False
+
+        await session.delete(lesson)
+        await session.commit()
+        return True
