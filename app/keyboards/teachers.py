@@ -69,8 +69,9 @@ def edit_single_lesson_menu(lesson_id) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="📅 Змінити дату", callback_data=f"edit_date:{lesson_id}")],
             [InlineKeyboardButton(text="⏰ Змінити час", callback_data=f"edit_time:{lesson_id}")],
             [InlineKeyboardButton(text="👥 Змінити кількість місць", callback_data=f"edit_places:{lesson_id}")],
-            [InlineKeyboardButton(text="🗑 Видалити заняття", callback_data=f"delete_lesson:{lesson_id}")],
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="delete_lesson_messages")]
+            [InlineKeyboardButton(text="🏛️💻 Змінити тип заняття", callback_data=f"edit_type:{lesson_id}")],
+            [InlineKeyboardButton(text="🗑 Видалити заняття", callback_data=f"remove_lesson:{lesson_id}")],
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="teacher_menu_clean")]
         ]
     )
 
@@ -81,5 +82,14 @@ def add_student_menu_keyboard() -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="⬅️ Повернутися до панелі вчителя", callback_data="teacher_menu")],
             [InlineKeyboardButton(text="🔄 Заповнити знову", callback_data="add_student")]
 
+        ]
+    )
+
+
+def remove_lesson_by_id(lesson_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Так", callback_data=f"delete_lesson:{lesson_id}")],
+            [InlineKeyboardButton(text="Ні", callback_data="teacher_menu")]
         ]
     )

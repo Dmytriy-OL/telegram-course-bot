@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from app.database.core.models import LessonType, Lesson
 from app.handlers.utils import show_teacher_lessons
-from app.keyboards.teachers import get_lesson_signups_keyboard, edit_single_lesson_menu
+from app.keyboards.teachers import get_lesson_signups_keyboard, edit_single_lesson_menu, get_teachers_command
 
 router = Router()
 
@@ -18,7 +18,10 @@ async def course_signups(callback: CallbackQuery, state: FSMContext):
 
     teacher, lessons = await show_teacher_lessons(callback)
     if not lessons:
-        await callback.message.answer("ℹ️ На цей та наступний тиждень у вас немає запланованих занять.")
+        await callback.message.answer("ℹ️ На цей та наступний тиждень у вас немає запланованих занять.",
+                                      parse_mode="Markdown",
+                                      reply_markup=get_teachers_command()
+                                      )
         return
 
     if mode == "view":
@@ -68,5 +71,3 @@ def format_lesson_text(i: int, lesson: Lesson, mode: str = "view") -> str:
         text += f"📃 *Учні:*\n{user_list}\n"
 
     return text + "━━━━━━━━━━━━━━━━━━━━━━\n"
-
-
