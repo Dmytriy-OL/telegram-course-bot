@@ -2,7 +2,7 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
-from app.handlers import router
+from app.bot.handlers import router
 from app.database.core.db_setup import create_tables
 from app.database.core.config import DB_PATH
 

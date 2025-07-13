@@ -4,13 +4,13 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 
-from app.images import BASE_DIR
+from app.bot.images import BASE_DIR
 from app.database.crud.users import set_user
 from app.database.crud.images import main_view
 from app.database.crud.admin import get_role
-from app.keyboards.keyboards import get_admin_menu
-from app.keyboards.teachers import get_teachers_command
-from app.keyboards.students import get_student_main_menu
+from app.bot.keyboards.keyboards import get_admin_menu
+from app.bot.keyboards.teachers import get_teachers_command
+from app.bot.keyboards.students import get_student_main_menu
 
 router = Router()
 

@@ -3,8 +3,8 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from app.database.core.models import LessonType, Lesson
-from app.handlers.utils import show_teacher_lessons
-from app.keyboards.teachers import get_lesson_signups_keyboard, edit_single_lesson_menu, get_teachers_command
+from app.bot.handlers.utils import show_teacher_lessons
+from app.bot.keyboards.teachers import get_lesson_signups_keyboard, edit_single_lesson_menu, get_teachers_command
 
 router = Router()
 

@@ -11,8 +11,8 @@ from aiogram_calendar import SimpleCalendarCallback
 
 from app.database.crud.lessons import create_lesson
 from app.database.core.models import LessonType
-from app.handlers.utils import open_calendar, calendar
-from app.keyboards.teachers import confirm_lesson_keyboard, return_teacher_menu
+from app.bot.handlers.utils import open_calendar, calendar
+from app.bot.keyboards.teachers import confirm_lesson_keyboard, return_teacher_menu
 
 router = Router()
 

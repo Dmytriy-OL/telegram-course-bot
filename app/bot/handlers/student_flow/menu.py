@@ -1,8 +1,8 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
-from app.handlers.commands import cmd_start
-from app.keyboards.students import get_week_selection_keyboard
+from app.bot.handlers.commands import cmd_start
+from app.bot.keyboards.students import get_week_selection_keyboard
 
 router = Router()
 

@@ -6,7 +6,7 @@ import asyncio
 import os
 import shutil  # Додаємо shutil для копіювання файлів
 from app.database.admin_crud import download_image,delete_image
-from app.images import BASE_DIR
+from app.bot.images import BASE_DIR
 
 
 async def save_image_to_disk_and_db(file_bytes, title: str, main_image: bool = False):

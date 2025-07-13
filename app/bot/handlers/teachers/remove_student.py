@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 
 from app.database.crud.lessons import remove_enrollment_for_student
-from app.handlers.utils import show_teacher_lessons
-from app.keyboards.teachers import remove_student_menu
+from app.bot.handlers.utils import show_teacher_lessons
+from app.bot.keyboards.teachers import remove_student_menu
 
 router = Router()
 

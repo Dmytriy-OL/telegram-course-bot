@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 
-from app.handlers.utils import show_teacher_lessons
-from app.keyboards.teachers import return_teacher_menu, add_student_menu_keyboard
+from app.bot.handlers.utils import show_teacher_lessons
+from app.bot.keyboards.teachers import return_teacher_menu, add_student_menu_keyboard
 from app.database.crud.lessons import enroll_student_to_lesson
 
 router = Router()
