@@ -1,0 +1,6 @@
+from app.web.routes import create_app
+
+
+def run_flask():
+    app = create_app()
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)

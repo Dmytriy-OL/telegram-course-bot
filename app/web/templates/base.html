@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Система управління записами на індивідуальні та групові заняття з аналітикою та
+        Telegram-ботом{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+    <a href="/">Home</a> |
+    <a href="/about">About</a>
+    <a href="/lessons">Lessons</a>
+    <a href="/staff">Staff</a>
+    <a href="/contact">Contact</a>
+</nav>
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>

@@ -1,30 +1,24 @@
 import asyncio
-import os
-from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv
-from app.bot.handlers import router
-from app.database.core.db_setup import create_tables
-from app.database.core.config import DB_PATH
+import threading
+
+from app.bot.start_bot import start_bot
+from app.web.start_web import run_flask
+
+
+def start_web_in_thread():
+    """Запускає Flask у окремому потоці"""
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
 
 
 async def main():
-    if not os.path.exists(DB_PATH):
-        print("☑️ Файл бази даних не знайдено, створюємо нові таблиці...")
-        await create_tables()
-    else:
-        print("✅ Файл бази даних існує, пропускаємо створення таблиць.")
-
-    load_dotenv()
-    bot = Bot(token=os.getenv('TOKEN'))
-    dp = Dispatcher()
-    dp.include_router(router)
-
-    await dp.start_polling(bot)
+    start_web_in_thread()
+    print("🚀 Запуск Telegram-бота...")
+    await start_bot()
 
 
 if __name__ == "__main__":
     try:
-        print('БОТ ЗАПУЩЕНИЙ')
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("Бот виключений")
+        print("🛑 Бот зупинений")
