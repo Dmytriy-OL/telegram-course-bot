@@ -3,8 +3,8 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
-from app.database.crud.lessons import enroll_student_to_lesson
-from app.database.crud.users import set_user
+from app.database.crud.bot.lessons import enroll_student_to_lesson
+from app.database.crud.bot.users import set_user
 from app.bot.handlers.utils import delete_previous_message
 from app.bot.keyboards.students import get_successful_enrollment_keyboard, get_cancel_operation_keyboard
 

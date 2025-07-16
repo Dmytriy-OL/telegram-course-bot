@@ -6,11 +6,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup
 
 from aiogram_calendar import SimpleCalendar
-from app.database.crud.images import get_images_with_main
+from app.database.crud.bot.images import get_images_with_main
 from app.bot.images import BASE_DIR
 
-from app.database.crud.admin import get_teacher_by_telegram_id
-from app.database.crud.lessons import get_lessons_for_teacher_and_optional_student
+from app.database.crud.bot.admin import get_teacher_by_telegram_id
+from app.database.crud.bot.lessons import get_lessons_for_teacher_and_optional_student
 
 calendar = SimpleCalendar()
 

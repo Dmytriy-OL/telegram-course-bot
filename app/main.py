@@ -2,13 +2,13 @@ import asyncio
 import threading
 
 from app.bot.start_bot import start_bot
-from app.web.start_web import run_flask
+from app.web.start_web import run_fastapi
 
 
 def start_web_in_thread():
     """Запускає Flask у окремому потоці"""
-    flask_thread = threading.Thread(target=run_flask, daemon=True)
-    flask_thread.start()
+    web_thread = threading.Thread(target=run_fastapi, daemon=True)
+    web_thread.start()
 
 
 async def main():

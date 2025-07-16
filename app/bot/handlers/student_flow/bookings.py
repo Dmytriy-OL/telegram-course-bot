@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from app.database.crud.lessons import lesson_records_display, cancel_record_lessons
+from app.database.crud.bot.lessons import lesson_records_display, cancel_record_lessons
 from app.bot.keyboards.students import get_booking_keyboard, cancel_confirmation_keyboard, get_cancel_success_keyboard
 
 router = Router()

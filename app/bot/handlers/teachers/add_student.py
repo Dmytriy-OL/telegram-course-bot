@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 
 from app.bot.handlers.utils import show_teacher_lessons
 from app.bot.keyboards.teachers import return_teacher_menu, add_student_menu_keyboard
-from app.database.crud.lessons import enroll_student_to_lesson
+from app.database.crud.bot.lessons import enroll_student_to_lesson
 
 router = Router()
 

@@ -27,10 +27,14 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    tg_id = Column(Integer, unique=True, nullable=False)
+    tg_id = Column(Integer, unique=True, nullable=True)
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
+    username = Column(String(100), unique=True, nullable=True)
     login = Column(String(100), unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=True, unique=True)
+    google_id = Column(String, unique=True, nullable=True)
 
     enrollments = relationship("Enrollment", back_populates="user")
 

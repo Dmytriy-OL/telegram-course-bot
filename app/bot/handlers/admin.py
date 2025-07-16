@@ -93,7 +93,7 @@ async def admin_stats(callback: CallbackQuery, state: FSMContext):
 
 
 
-# @router.callback_query(F.data == "select_main_image")
+# @routes.callback_query(F.data == "select_main_image")
 # async def select_main_image(callback: CallbackQuery, state: FSMContext):
 #     images = await view_image()
 #     if not images:
@@ -116,7 +116,7 @@ async def admin_stats(callback: CallbackQuery, state: FSMContext):
 #     await state.set_state(ImageProcessor.waiting_for_main_title)
 
 
-# @router.message(ImageProcessor.waiting_for_main_title)
+# @routes.message(ImageProcessor.waiting_for_main_title)
 # async def process_main_image_title(message: Message, state: FSMContext):
 #     title = message.text.strip()
 #
@@ -142,7 +142,7 @@ async def admin_stats(callback: CallbackQuery, state: FSMContext):
 #     await state.clear()
 
 
-# @router.callback_query(F.data == "delete_image")
+# @routes.callback_query(F.data == "delete_image")
 # async def delete_image(callback: CallbackQuery, state: FSMContext):
 #     images = await view_image()
 #     if not images:
@@ -172,7 +172,7 @@ async def filename_delete(callback: CallbackQuery, state: FSMContext):
     await state.set_state(ImageProcessor.waiting_for_delete_image)
 
 
-# @router.message(ImageProcessor.waiting_for_delete_image)
+# @routes.message(ImageProcessor.waiting_for_delete_image)
 # async def delete_image_title(message: Message, state: FSMContext):
 #     title = message.text.strip()
 #     data = await state.get_data()
@@ -193,7 +193,7 @@ async def filename_delete(callback: CallbackQuery, state: FSMContext):
 #     await message.answer(f"❌ Зображення `{title}` не знайдено.", parse_mode="Markdown", reply_markup=keyboard)
 
 
-# @router.callback_query(F.data == "view_all_image")
+# @routes.callback_query(F.data == "view_all_image")
 # async def view_all_image(callback: CallbackQuery):
 #     images = await view_image()
 #
@@ -235,7 +235,7 @@ async def handle_image(message: Message, state: FSMContext):
     await state.set_state(ImageProcessor.waiting_for_title_image)
 
 
-# @router.message(ImageProcessor.waiting_for_title_image)
+# @routes.message(ImageProcessor.waiting_for_title_image)
 # async def handle_image_title(message: Message, state: FSMContext):
 #     title = message.text.strip()
 #     if title == "/cancel":
@@ -263,7 +263,7 @@ async def add_main_text(callback: CallbackQuery, state: FSMContext):
     await state.set_state(NewEntry.waiting_for_title)
 
 
-# @router.message(NewEntry.waiting_for_title)
+# @routes.message(NewEntry.waiting_for_title)
 # async def new_text_and_title(message: Message, state: FSMContext):
 #     """Збереження заголовка та запит тексту"""
 #     title = message.text.strip()
@@ -276,7 +276,7 @@ async def add_main_text(callback: CallbackQuery, state: FSMContext):
 #     await state.set_state(NewEntry.waiting_for_caption)
 
 
-# @router.message(NewEntry.waiting_for_caption)
+# @routes.message(NewEntry.waiting_for_caption)
 # async def save_new_entry(message: Message, state: FSMContext):
 #     """Збереження нового тексту після введення заголовка"""
 #     caption = message.text.strip()
@@ -294,7 +294,7 @@ async def add_main_text(callback: CallbackQuery, state: FSMContext):
 #     await message.answer("🔧 Панель адміністратора", reply_markup=get_admin_command())
 
 
-# @router.callback_query(F.data == "view_all_texts")
+# @routes.callback_query(F.data == "view_all_texts")
 # async def view_all_texts(callback: CallbackQuery):
 #     """Відображення всіх збережених текстів адміністратору"""
 #     captions = await get_all_captions()
@@ -328,7 +328,7 @@ async def select_main_text(callback: CallbackQuery, state: FSMContext):
     await state.set_state(NewEntry.waiting_for_main_text_title)
 
 
-# @router.message(NewEntry.waiting_for_main_text_title)
+# @routes.message(NewEntry.waiting_for_main_text_title)
 # async def process_main_text_title(message: Message, state: FSMContext):
 #     title = message.text.strip()
 #
@@ -361,7 +361,7 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
     await state.set_state(NewEntry.waiting_for_header_removal)
 
 
-# @router.message(NewEntry.waiting_for_header_removal)
+# @routes.message(NewEntry.waiting_for_header_removal)
 # async def process_text_deletion(message: Message, state: FSMContext):
 #     title_delete = message.text.strip()
 #
@@ -383,24 +383,24 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
 #         await message.answer("❌ Заголовок не знайдено.", reply_markup=keyboard)
 
 #
-# @router.message(F.text == "Перегляд зображеннь")
+# @routes.message(F.text == "Перегляд зображеннь")
 # async def view_images_with_main(message: Message):
 #     await display_images(message, "Ось всі доступні зображення:", True)
 #
 #
-# @router.message(F.text == "Вибір головного зображення")
+# @routes.message(F.text == "Вибір головного зображення")
 # async def selecting_main_image(message: Message):
 #     await display_images(message, "Напишіть назву зображення, яке хочете зробити головним.")
 #
 #
-# @router.message(F.text == "Видалення зображення")
+# @routes.message(F.text == "Видалення зображення")
 # async def selecting_main_image(message: Message, state: FSMContext):
 #     await display_images(message, "✏ Напишіть назву зображення, яке хочете видалити.")
 #     await message.answer(f"🔹 Для скасування натисніть /cancel")
 #     await state.set_state(DeleteImageState.waiting_for_filename)
 #
 #
-# @router.message(DeleteImageState.waiting_for_filename)
+# @routes.message(DeleteImageState.waiting_for_filename)
 # async def delete_image(message: Message, state: FSMContext):
 #     """Обробка введеної назви зображення для видалення"""
 #     filename = message.text.strip()  # Отримуємо введене ім'я
@@ -418,7 +418,7 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
 #     await state.clear()  # Скидаємо стан
 #
 #
-# @router.message(F.text == "Користувачі з БД")
+# @routes.message(F.text == "Користувачі з БД")
 # async def greet(message: Message):
 #     """Виводить користувачів з бази даннних."""
 #     await message.answer("Ок, зараз відправлю...")
@@ -444,7 +444,7 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
 
 
 
-# @router.callback_query(F.data == "admin_admins")
+# @routes.callback_query(F.data == "admin_admins")
 # async def go_to_main_menu(callback: CallbackQuery):
 #     admins = await view_admins()
 #
@@ -468,7 +468,7 @@ async def delete_text(callback: CallbackQuery, state: FSMContext):
 #                                   reply_markup=back_button_builder().as_markup())
 
 
-# @router.callback_query(F.data.in_({"user_count", "total_stats_user", "incomplete_signups"}))
+# @routes.callback_query(F.data.in_({"user_count", "total_stats_user", "incomplete_signups"}))
 # async def go_to_main_menu(callback: CallbackQuery):
 #     users = await view_users()
 #

@@ -5,9 +5,9 @@ from aiogram.types import Message, FSInputFile, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 
 from app.bot.images import BASE_DIR
-from app.database.crud.users import set_user
-from app.database.crud.images import main_view
-from app.database.crud.admin import get_role
+from app.database.crud.bot.users import set_user
+from app.database.crud.bot.images import main_view
+from app.database.crud.bot.admin import get_role
 from app.bot.keyboards.keyboards import get_admin_menu
 from app.bot.keyboards.teachers import get_teachers_command
 from app.bot.keyboards.students import get_student_main_menu

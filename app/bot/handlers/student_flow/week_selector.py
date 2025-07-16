@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
-from app.database.crud.lessons import find_activities_by_date
+from app.database.crud.bot.lessons import find_activities_by_date
 from app.bot.keyboards.students import get_lesson_day_actions_keyboard, back_button_markup
 from app.bot.keyboards.generators import generate_week_keyboard
 
