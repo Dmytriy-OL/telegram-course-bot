@@ -1,15 +1,19 @@
+import secrets
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from app.web.routes.router import router
+from starlette.middleware.sessions import SessionMiddleware
 
 
 def create_app() -> FastAPI:
     application = FastAPI()
 
     application.include_router(router)
+    # Додаємо SessionMiddleware
+    application.add_middleware(SessionMiddleware, secret_key=secrets.token_hex(32))
 
     application.add_middleware(
         CORSMiddleware,

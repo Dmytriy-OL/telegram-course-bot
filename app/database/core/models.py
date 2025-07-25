@@ -31,9 +31,9 @@ class User(Base):
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
     username = Column(String(100), unique=True, nullable=True)
-    login = Column(String(100), unique=True, nullable=False)
+    login = Column(String(100), unique=True, nullable=True)
     email = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=True, unique=True)
+    password_hash = Column(String, nullable=True, unique=False)
     google_id = Column(String, unique=True, nullable=True)
 
     enrollments = relationship("Enrollment", back_populates="user")

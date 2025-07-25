@@ -29,27 +29,50 @@ async def home(request: Request):
 #     return templates.TemplateResponse("home.html", {"request": request})
 #
 #
-# @router.get("/register", response_class=HTMLResponse)
-# async def register_get(request: Request):
-#     return templates.TemplateResponse("register.html", {"request": request})
+@router.get("/register", response_class=HTMLResponse)
+async def register_get(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
-# @router.post("/register", response_class=HTMLResponse)
-# async def register_post(
-#         request: Request,
-#         username: str = Form(...),
-#         password: str = Form(...),
-#         password_confirm: str = Form(...),
-#         email: str = Form(...)
-# ):
-#     if password != password_confirm:
-#         return templates.TemplateResponse("register.html", {"request": request, "error": "Паролі не співпадають!"})
-#
-#     if user_exists(username):
-#         return templates.TemplateResponse("register.html", {"request": request, "error": "Такий логін вже існує!"})
-#
-#     password_hash = generate_password_hash(password)
-#     print(f"Логін: {username}, Пароль: {password}, Пошта: {email}")
-#     save_user(username, email, password_hash)
-#
-#     return RedirectResponse(url="/", status_code=HTTP_303_SEE_OTHER)
+@router.post("/register", response_class=HTMLResponse)
+async def register_post(
+        request: Request,
+        username: str = Form(...),
+        password: str = Form(...),
+        password_confirm: str = Form(...),
+        email: str = Form(...)
+):
+    if password != password_confirm:
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Паролі не співпадають!"}
+        )
+
+    if await user_exists(username, email):
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Такий логін вже існує!"}
+        )
+
+    password_hash = generate_password_hash(password)
+    print(f"Логін: {username}, Пароль: {password}, Пошта: {email}")
+
+    await save_user(username, email, password_hash)
+    request.session["user"] = username
+    return RedirectResponse(url="/", status_code=303)
+
+
+@router.get("/logout")
+async def logout(request: Request):
+    request.session.clear()  # Видаляє дані сесії
+    return RedirectResponse(url="/", status_code=303)
+
+
+@router.post("/login")
+async def login_post(
+        request: Request,
+        username: str = Form(...),
+        password: str = Form(...)):
+    # Тут твоя перевірка паролю
+    request.session["user"] = username
+    return RedirectResponse(url="/", status_code=303)

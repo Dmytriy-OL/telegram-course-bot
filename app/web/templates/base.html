@@ -12,8 +12,14 @@
     <a href="/lessons">Lessons</a>
     <a href="/staff">Staff</a>
     <a href="/contact">Contact</a>
-    <a href="/login">Увійти</a>
-    <a href="/register">Зареєструватися</a>
+
+    {% if request.session.get('user') %}
+        <span>Вітаю, {{ request.session['user'] }}!</span>
+        <a href="/logout">Вийти</a>
+    {% else %}
+        <a href="/login">Увійти</a>
+        <a href="/register">Зареєструватися</a>
+    {% endif %}
 </nav>
 <hr>
 {% block content %}{% endblock %}
