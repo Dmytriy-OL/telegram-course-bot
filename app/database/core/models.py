@@ -30,7 +30,6 @@ class User(Base):
     tg_id = Column(Integer, unique=True, nullable=True)
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
-    username = Column(String(100), unique=True, nullable=True)
     login = Column(String(100), unique=True, nullable=True)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=True, unique=False)

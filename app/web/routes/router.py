@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
 from werkzeug.security import generate_password_hash
 import os
-from app.database.crud.web.registration import user_exists, save_user
+from app.database.crud.web.registration import user_exists, save_user, authenticate_user
 
 router = APIRouter()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,17 +18,24 @@ async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-# @router.get("/login", response_class=HTMLResponse)
-# async def login_get(request: Request):
-#     return templates.TemplateResponse("login.html", {"request": request})
-#
-#
-# @router.post("/login", response_class=HTMLResponse)
-# async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
-#     print(f"Логін: {username}, Пароль: {password}")
-#     return templates.TemplateResponse("home.html", {"request": request})
-#
-#
+@router.get("/login", response_class=HTMLResponse)
+async def login_get(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@router.post("/login", response_class=HTMLResponse)
+async def login_post(request: Request, email: str = Form(...), password: str = Form(...)):
+    print(f"Пошта: {email}, Пароль: {password}")
+    user = await authenticate_user(email, password)
+    if not user:
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "error": "Невірний email або пароль!"}
+        )
+    request.session["user"] = email
+    return RedirectResponse(url="/", status_code=303)
+
+
 @router.get("/register", response_class=HTMLResponse)
 async def register_get(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
@@ -37,7 +44,6 @@ async def register_get(request: Request):
 @router.post("/register", response_class=HTMLResponse)
 async def register_post(
         request: Request,
-        username: str = Form(...),
         password: str = Form(...),
         password_confirm: str = Form(...),
         email: str = Form(...)
@@ -48,31 +54,21 @@ async def register_post(
             {"request": request, "error": "Паролі не співпадають!"}
         )
 
-    if await user_exists(username, email):
+    if await user_exists(email):
         return templates.TemplateResponse(
             "register.html",
             {"request": request, "error": "Такий логін вже існує!"}
         )
 
     password_hash = generate_password_hash(password)
-    print(f"Логін: {username}, Пароль: {password}, Пошта: {email}")
+    print(f"Пароль: {password}, Пошта: {email}")
 
-    await save_user(username, email, password_hash)
-    request.session["user"] = username
+    await save_user(email, password_hash)
+    request.session["user"] = email
     return RedirectResponse(url="/", status_code=303)
 
 
 @router.get("/logout")
 async def logout(request: Request):
-    request.session.clear()  # Видаляє дані сесії
-    return RedirectResponse(url="/", status_code=303)
-
-
-@router.post("/login")
-async def login_post(
-        request: Request,
-        username: str = Form(...),
-        password: str = Form(...)):
-    # Тут твоя перевірка паролю
-    request.session["user"] = username
+    request.session.clear()
     return RedirectResponse(url="/", status_code=303)

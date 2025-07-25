@@ -1,18 +1,32 @@
 from sqlalchemy.future import select
 from app.database.core.models import SessionLocal, User
+from werkzeug.security import check_password_hash
 
 
-async def user_exists(username: str, email: str) -> bool:
+async def user_exists(email: str) -> bool:
     async with SessionLocal() as session:
         result = await session.execute(
-            select(User).where((User.username == username) | (User.email == email))
+            select(User).where(User.email == email)
         )
         return result.scalar_one_or_none() is not None
 
 
-async def save_user(username: str, email: str, password_hash: str) -> None:
+async def save_user(email: str, password_hash: str) -> None:
     async with SessionLocal() as session:
-        new_user = User(username=username, email=email, password_hash=password_hash)
+        new_user = User(email=email, password_hash=password_hash)
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
+
+
+async def authenticate_user(email: str, password: str) -> User | None:
+    async with SessionLocal() as session:
+        result = await session.execute(select(User).where(User.email == email))
+        user: User | None = result.scalar_one_or_none()
+        if not user:
+            return None
+
+        if not check_password_hash(user.password_hash, password):
+            return None
+
+        return user
