@@ -5,8 +5,8 @@ from app.web.start_web import run_fastapi
 
 
 def open_browser():
-    time.sleep(1)  # Трошки почекати, поки сервер стартує
-    webbrowser.open("http://192.168.0.103:5000 ")
+    time.sleep(1)
+    webbrowser.open("http://127.0.0.1:5000 ")
 
 
 if __name__ == "__main__":

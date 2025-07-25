@@ -27,4 +27,4 @@ app = create_app()
 
 def run_fastapi():
     import uvicorn
-    uvicorn.run("app.web.start_web:app", host="192.168.0.103", port=5000, reload=True)
+    uvicorn.run("app.web.start_web:app", host="127.0.0.1", port=5000, reload=True)
