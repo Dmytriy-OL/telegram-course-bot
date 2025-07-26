@@ -11,9 +11,10 @@ async def user_exists(email: str) -> bool:
         return result.scalar_one_or_none() is not None
 
 
-async def save_user(email: str, password_hash: str) -> None:
+async def save_user(email: str, password_hash: str = None, google_id: str = None, name: str = None,
+                    surname: str = None) -> None:
     async with SessionLocal() as session:
-        new_user = User(email=email, password_hash=password_hash)
+        new_user = User(email=email, password_hash=password_hash, google_id=google_id, name=name, surname=surname)
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
