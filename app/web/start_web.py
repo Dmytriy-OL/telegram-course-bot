@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
-from app.web.routes.router import router
+from app.web.routes import router
 from starlette.middleware.sessions import SessionMiddleware
 
 

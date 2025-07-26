@@ -11,6 +11,11 @@ async def user_exists(email: str) -> bool:
         return result.scalar_one_or_none() is not None
 
 
+async def get_user_by_email(email: str) -> User | None:
+    async with SessionLocal() as session:
+        return await session.scalar(select(User).where(User.email == email))
+
+
 async def save_user(email: str, password_hash: str = None, google_id: str = None, name: str = None,
                     surname: str = None) -> None:
     async with SessionLocal() as session:

@@ -16,6 +16,7 @@
     {% if request.session.get('user') %}
         <span>Вітаю, {{ request.session['user'] }}!</span>
         <a href="/logout">Вийти</a>
+        <a href="/profile">Мій профіль</a>
     {% else %}
         <a href="/login">Увійти</a>
         <a href="/register">Зареєструватися</a>

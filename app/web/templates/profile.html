@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Профіль{% endblock %}
+
+{% block content %}
+<h1>Профіль користувача</h1>
+
+{% if user %}
+    <div style="margin-bottom: 20px;">
+        <p><strong>Ім’я:</strong> {{ user.name or "Не вказано" }}</p>
+        <p><strong>Прізвище:</strong> {{ user.surname or "Не вказано" }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        {% if user.google_id %}
+            <p><strong>Вхід через:</strong> Google</p>
+        {% elif user.tg_id %}
+            <p><strong>Вхід через:</strong> Telegram</p>
+        {% else %}
+            <p><strong>Вхід через:</strong> Email/Пароль</p>
+        {% endif %}
+    </div>
+{% else %}
+    <p>Ви не авторизовані. <a href="/login">Увійдіть</a></p>
+{% endif %}
+{% endblock %}

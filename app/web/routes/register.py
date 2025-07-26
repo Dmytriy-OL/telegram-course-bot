@@ -1,17 +1,14 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.templating import Jinja2Templates
+
 from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
-from app.web.auth import oauth
+from app.web.dependencies.auth import oauth,validate_register_form
 from werkzeug.security import generate_password_hash
-import os
-from app.database.crud.web.registration import user_exists, save_user, authenticate_user
+from app.database.crud.web.registration import user_exists, save_user, authenticate_user, get_user_by_email
+from app.web.templates import templates
 
 router = APIRouter()
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
-templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -49,17 +46,9 @@ async def register_post(
         password_confirm: str = Form(...),
         email: str = Form(...)
 ):
-    if password != password_confirm:
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Паролі не співпадають!"}
-        )
-
-    if await user_exists(email):
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Такий логін вже існує!"}
-        )
+    error = await validate_register_form(password, password_confirm, email)
+    if error:
+        return templates.TemplateResponse("register.html", {"request": request, "error": error})
 
     password_hash = generate_password_hash(password)
     print(f"Пароль: {password}, Пошта: {email}")
@@ -87,7 +76,7 @@ async def auth_google_callback(request: Request):
     user_info = token.get("userinfo")
 
     if not user_info:
-        return RedirectResponse(url="/register")  # fallback
+        return RedirectResponse(url="/register")
 
     email = user_info["email"]
     google_id = user_info["sub"]
