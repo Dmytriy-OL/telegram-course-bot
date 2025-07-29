@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Вхід{% endblock %}
+{% block title %}Реєстрація{% endblock %}
 
 {% block content %}
-<h1>Форма входу</h1>
+<h1>Форма реєстрації</h1>
 
 <form method="POST" action="/register">
     <div>
@@ -22,8 +22,10 @@
 
     <button type="submit">Зареєструватися</button>
     <a href="/auth/google">
-        <button type="button">Увійти через Google</button>
+        <button type="button">Зареєструватися через Google</button>
     </a>
+    <br>
+    <p>Уже маєш акаунт? <a href="/login">Увійти</a></p>
 </form>
     {% if error %}
         <p style="color:red;">{{ error }}</p>

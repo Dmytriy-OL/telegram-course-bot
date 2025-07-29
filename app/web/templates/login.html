@@ -17,6 +17,10 @@
         </div>
 
         <button type="submit">Увійти</button>
+        <a href="/auth/google">
+        <button type="button">Увійти через Google</button>
+    </a>
+            <p>Немає акаунта? <a href="/register">Зареєструватися</a></p>
     </form>
     {% if error %}
         <p style="color:red;">{{ error }}</p>

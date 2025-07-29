@@ -4,11 +4,14 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 
 from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
-from app.web.dependencies.auth import oauth, validate_register_form, validate_login_form
+from app.web.dependencies.auth_dependencies import oauth, validate_register_form, validate_login_form
 from werkzeug.security import generate_password_hash
-from app.database.crud.web.registration import user_exists, save_user, authenticate_user, get_user_by_email
+from app.database.crud.web.repository.user_repo import user_exists, save_user
+from app.web.schemas.forms import RegisterForm
 from app.database.core.models import User
 from app.web.templates import templates
+
+from pydantic import ValidationError
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -39,21 +42,25 @@ async def register_get(request: Request):
 
 
 @router.post("/register", response_class=HTMLResponse)
-async def register_post(
-        request: Request,
-        password: str = Form(...),
-        password_confirm: str = Form(...),
-        email: str = Form(...)
-):
-    error = await validate_register_form(password, password_confirm, email)
-    if error:
-        return templates.TemplateResponse("register.html", {"request": request, "error": error})
+async def register_post(request: Request):
+    form = await request.form()
+    try:
+        form_data = RegisterForm(
+            email=form.get("email"),
+            password=form.get("password"),
+            password_confirm=form.get("password_confirm")
+        )
+    except ValidationError as e:
+        raw_msg = e.errors()[0].get('msg', 'Помилка валідації')
+        error_message = raw_msg.replace("Value error, ", "")
+        return templates.TemplateResponse("register.html", {"request": request, "error": error_message})
 
-    password_hash = generate_password_hash(password)
-    print(f"Пароль: {password}, Пошта: {email}")
+    if await user_exists(form_data.email):
+        return templates.TemplateResponse("register.html", {"request": request, "error": "Такий логін вже існує!"})
 
-    await save_user(email, password_hash)
-    request.session["user"] = email
+    password_hash = generate_password_hash(form_data.password)
+    await save_user(email=form_data.email, password_hash=password_hash)
+    request.session["user"] = form_data.email
     return RedirectResponse(url="/", status_code=303)
 
 

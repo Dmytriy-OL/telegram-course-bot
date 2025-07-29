@@ -4,7 +4,8 @@ from fastapi import Request, HTTPException, status, Form
 from authlib.integrations.starlette_client import OAuth
 from starlette.responses import HTMLResponse
 
-from app.database.crud.web.registration import get_user_by_email, user_exists, authenticate_user
+from app.database.crud.web.repository.user_repo import get_user_by_email, user_exists
+from app.database.crud.web.services.auth_service import authenticate_user
 from app.database.core.models import User
 from app.web.templates import templates
 
