@@ -1,14 +1,17 @@
+import logging
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
 
 from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
-from app.web.dependencies.auth import oauth,validate_register_form
+from app.web.dependencies.auth import oauth, validate_register_form, validate_login_form
 from werkzeug.security import generate_password_hash
 from app.database.crud.web.registration import user_exists, save_user, authenticate_user, get_user_by_email
+from app.database.core.models import User
 from app.web.templates import templates
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -22,15 +25,11 @@ async def login_get(request: Request):
 
 
 @router.post("/login", response_class=HTMLResponse)
-async def login_post(request: Request, email: str = Form(...), password: str = Form(...)):
-    print(f"Пошта: {email}, Пароль: {password}")
-    user = await authenticate_user(email, password)
-    if not user:
-        return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "error": "Невірний email або пароль!"}
-        )
-    request.session["user"] = email
+async def login_post(request: Request, user_or_response: User | HTMLResponse = Depends(validate_login_form)):
+    if isinstance(user_or_response, HTMLResponse):
+        return user_or_response
+
+    request.session["user"] = user_or_response.email
     return RedirectResponse(url="/", status_code=303)
 
 
@@ -72,21 +71,26 @@ async def auth_google(request: Request):
 
 @router.get("/auth/google/callback")
 async def auth_google_callback(request: Request):
-    token = await oauth.google.authorize_access_token(request)
-    user_info = token.get("userinfo")
+    try:
+        token = await oauth.google.authorize_access_token(request)
+        user_info = token.get("userinfo")
 
-    if not user_info:
-        return RedirectResponse(url="/register")
+        if not user_info:
+            return RedirectResponse(url="/register")
 
-    email = user_info["email"]
-    google_id = user_info["sub"]
-    name = user_info.get("given_name")
-    surname = user_info.get("family_name")
+        email = user_info["email"]
+        google_id = user_info["sub"]
+        name = user_info.get("given_name")
+        surname = user_info.get("family_name")
 
-    # Перевірка чи користувач вже існує
-    user = await user_exists(email)
-    if not user:
-        await save_user(email=email, password_hash=None, google_id=google_id, name=name, surname=surname)
+        # Перевірка чи користувач вже існує
+        user = await user_exists(email)
+        if not user:
+            await save_user(email=email, password_hash=None, google_id=google_id, name=name, surname=surname)
 
-    request.session["user"] = email
-    return RedirectResponse(url="/")
+        request.session["user"] = email
+        return RedirectResponse(url="/")
+
+    except Exception as e:
+        logger.error(f"🔴 Помилка при Google авторизації: {e}")
+        return RedirectResponse(url="/login?error=google_oauth_failed")

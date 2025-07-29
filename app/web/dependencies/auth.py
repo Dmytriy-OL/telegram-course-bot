@@ -1,10 +1,12 @@
 import os
 
-from fastapi import Request, HTTPException, status
+from fastapi import Request, HTTPException, status, Form
 from authlib.integrations.starlette_client import OAuth
+from starlette.responses import HTMLResponse
 
-from app.database.crud.web.registration import get_user_by_email, user_exists
+from app.database.crud.web.registration import get_user_by_email, user_exists, authenticate_user
 from app.database.core.models import User
+from app.web.templates import templates
 
 oauth = OAuth()
 
@@ -21,16 +23,20 @@ async def get_current_user(request: Request) -> User:
     return user
 
 
-async def get_optional_user(request: Request) -> User | None:
-    email = request.session.get("user")
-    if not email:
-        return None
-    return await get_user_by_email(email)
-
-
-async def require_guest(request: Request):
-    if request.session.get("user"):
-        raise HTTPException(status_code=400, detail="Ви вже авторизовані!")
+async def validate_login_form(request: Request, email: str = Form(...),
+                              password: str = Form(...)) -> User | HTMLResponse:
+    auth_status, user = await authenticate_user(email, password)
+    match auth_status:
+        case "not_found":
+            return templates.TemplateResponse("login.html", {"request": request, "error": "Користувача не знайдено",
+                                                             "email": email},
+                                              status_code=400)
+        case "wrong_password":
+            return templates.TemplateResponse("login.html", {"request": request, "error": "Невірний пароль",
+                                                             "email": email},
+                                              status_code=400)
+        case "ok":
+            return user
 
 
 async def validate_register_form(password: str, password_confirm: str, email: str):
