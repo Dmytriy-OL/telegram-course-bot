@@ -10,7 +10,7 @@ from app.database.crud.web.repository.user_repo import validate_user_unique, sav
 from app.web.schemas.forms import RegisterForm
 from app.database.core.models import User
 from app.web.templates import templates
-
+from app.web.utils.form_parsers import get_form_values
 from pydantic import ValidationError
 
 router = APIRouter()
@@ -45,14 +45,8 @@ async def register_get(request: Request):
 async def register_post(request: Request):
     form = await request.form()
 
-    form_values = {
-        "birth_day": form.get("birth_day", ""),
-        "birth_month": form.get("birth_month", ""),
-        "birth_year": form.get("birth_year", ""),
-        "email": form.get("email", ""),
-        "username": form.get("login", ""),
-        "terms": bool(form.get("terms")),
-    }
+    form_values = get_form_values(form)
+
     try:
         form_data = RegisterForm(
             birth_day=int(form.get("birth_day")),
