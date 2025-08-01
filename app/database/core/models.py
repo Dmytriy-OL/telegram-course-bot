@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker, AsyncAttrs
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, relationship, declarative_base
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, LargeBinary, Text, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, LargeBinary, Text, Enum, Date
+from sqlalchemy.sql import func
 from datetime import datetime
 from dotenv import load_dotenv
 from app.database.core.config import SQLALCHEMY_URL
@@ -30,12 +31,15 @@ class User(Base):
     tg_id = Column(Integer, unique=True, nullable=True)
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
+    birth_date = Column(Date, nullable=True)
     login = Column(String(100), unique=True, nullable=True)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=True, unique=False)
     google_id = Column(String, unique=True, nullable=True)
-
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     enrollments = relationship("Enrollment", back_populates="user")
+    terms_accepted = Column(Boolean, default=False, nullable=False)
 
 
 class Lesson(Base):
