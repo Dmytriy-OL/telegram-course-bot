@@ -1,12 +1,12 @@
 import logging
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse, HTMLResponse
-
+from datetime import date
 from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
-from app.web.dependencies.auth_dependencies import oauth, validate_register_form, validate_login_form
+from app.web.dependencies.auth_dependencies import oauth, validate_register_form, user_exists, validate_login_form
 from werkzeug.security import generate_password_hash
-from app.database.crud.web.repository.user_repo import user_exists, save_user
+from app.database.crud.web.repository.user_repo import validate_user_unique, save_user
 from app.web.schemas.forms import RegisterForm
 from app.database.core.models import User
 from app.web.templates import templates
@@ -38,29 +38,58 @@ async def login_post(request: Request, user_or_response: User | HTMLResponse = D
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_get(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse("register.html", {"request": request, "form_values": {}})
 
 
 @router.post("/register", response_class=HTMLResponse)
 async def register_post(request: Request):
     form = await request.form()
+
+    form_values = {
+        "birth_day": form.get("birth_day", ""),
+        "birth_month": form.get("birth_month", ""),
+        "birth_year": form.get("birth_year", ""),
+        "email": form.get("email", ""),
+        "username": form.get("login", ""),
+        "terms": bool(form.get("terms")),
+    }
     try:
         form_data = RegisterForm(
+            birth_day=int(form.get("birth_day")),
+            birth_month=int(form.get("birth_month")),
+            birth_year=int(form.get("birth_year")),
             email=form.get("email"),
-            password=form.get("password"),
-            password_confirm=form.get("password_confirm")
+            username=form.get("login"),
+            password=str(form.get("password")),
+            password_confirm=str(form.get("password_confirm")),
+            terms=bool(form.get("terms"))
         )
     except ValidationError as e:
         raw_msg = e.errors()[0].get('msg', 'Помилка валідації')
         error_message = raw_msg.replace("Value error, ", "")
-        return templates.TemplateResponse("register.html", {"request": request, "error": error_message})
+        return templates.TemplateResponse("register.html",
+                                          {"request": request,
+                                           "error": error_message,
+                                           "form_values": form_values})
 
-    if await user_exists(form_data.email):
-        return templates.TemplateResponse("register.html", {"request": request, "error": "Такий логін вже існує!"})
+    try:
+        await validate_user_unique(form_data.email, form_data.username)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": str(e),
+                "form_values": form_values
+            }
+        )
 
+    birth_date = form_data.birth_date
     password_hash = generate_password_hash(form_data.password)
-    await save_user(email=form_data.email, password_hash=password_hash)
-    request.session["user"] = form_data.email
+
+    await save_user(email=form_data.email, password_hash=password_hash, birth_date=birth_date,
+                    username=form_data.username, terms_accepted=form_data.terms)
+    request.session["user"] = form_data.username
     return RedirectResponse(url="/", status_code=303)
 
 

@@ -32,6 +32,7 @@ class User(Base):
     name = Column(String(50), unique=False, nullable=True)
     surname = Column(String(50), unique=False, nullable=True)
     birth_date = Column(Date, nullable=True)
+    username = Column(String(100), unique=True, nullable=True)
     login = Column(String(100), unique=True, nullable=True)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=True, unique=False)
