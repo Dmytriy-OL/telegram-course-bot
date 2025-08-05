@@ -11,7 +11,7 @@
         <select id="birth_day" name="birth_day" required>
             <option value="">--</option>
             {% for day in range(1, 32) %}
-            <option value="{{ day }}" {% if form_values.birth_day== day|string %}selected{% endif %}>{{ day }}</option>
+            <option value="{{ day }}" {% if form_values.birth_day == day|string %}selected{% endif %}>{{ day }}</option>
             {% endfor %}
         </select>
 
@@ -19,21 +19,21 @@
         <select id="birth_month" name="birth_month" required>
             <option value="">--</option>
             {% set months = [
-            ('1', 'Січень'),
-            ('2', 'Лютий'),
-            ('3', 'Березень'),
-            ('4', 'Квітень'),
-            ('5', 'Травень'),
-            ('6', 'Червень'),
-            ('7', 'Липень'),
-            ('8', 'Серпень'),
-            ('9', 'Вересень'),
-            ('10', 'Жовтень'),
-            ('11', 'Листопад'),
-            ('12', 'Грудень')
+                ('1', 'Січень'),
+                ('2', 'Лютий'),
+                ('3', 'Березень'),
+                ('4', 'Квітень'),
+                ('5', 'Травень'),
+                ('6', 'Червень'),
+                ('7', 'Липень'),
+                ('8', 'Серпень'),
+                ('9', 'Вересень'),
+                ('10', 'Жовтень'),
+                ('11', 'Листопад'),
+                ('12', 'Грудень')
             ] %}
             {% for value, name in months %}
-            <option value="{{ value }}" {% if form_values.birth_month== value %}selected{% endif %}>{{ name }}</option>
+            <option value="{{ value }}" {% if form_values.birth_month == value %}selected{% endif %}>{{ name }}</option>
             {% endfor %}
         </select>
 
@@ -42,8 +42,7 @@
             <option value="">--</option>
             {% set current_year = 2025 %}
             {% for year in range(current_year - 60, current_year + 1) %}
-            <option value="{{ year }}" {% if form_values.birth_year== year|string %}selected{% endif %}>{{ year }}
-            </option>
+            <option value="{{ year }}" {% if form_values.birth_year == year|string %}selected{% endif %}>{{ year }}</option>
             {% endfor %}
         </select>
     </div>
@@ -52,34 +51,48 @@
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required value="{{ form_values.email | default('') }}">
     </div>
+
     <div>
         <label for="login">Ім'я користувача:</label>
         <input type="text" id="login" name="login" required value="{{ form_values.username | default('') }}">
     </div>
+
     <div>
         <label for="password">Пароль:</label>
         <input type="password" id="password" name="password" required>
     </div>
+
     <div>
         <label for="password_confirm">Повторіть пароль:</label>
         <input type="password" id="password_confirm" name="password_confirm" required>
     </div>
+
     <br>
+
     <label>
         <input type="checkbox" name="terms" required {% if form_values.terms %}checked{% endif %}>
-        Я приймаю <a href="/terms" target="_blank">Умови надання послуг</a> та <a href="/privacy" target="_blank">Політику
-        конфіденційності</a>
+        Я приймаю <a href="/terms" target="_blank">Умови надання послуг</a> та <a href="/privacy" target="_blank">Політику конфіденційності</a>
     </label>
-    <br>
-    <br>
+
+    <br><br>
+
     <button type="submit">Зареєструватися</button>
+
     <a href="/auth/google">
         <button type="button">Зареєструватися через Google</button>
     </a>
 
-    <br>
+    <br><br>
     <p>Уже маєш акаунт? <a href="/login">Увійти</a></p>
 </form>
+
+{% if email_sent %}
+<div style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;">
+    <h2>Перевірте електронну пошту</h2>
+    <p>На <strong>{{ email }}</strong> було надіслано лист із посиланням для підтвердження.</p>
+    <p>Перейдіть за ним, щоб завершити реєстрацію.</p>
+</div>
+{% endif %}
 
 {% if error %}
 <p style="color:red;">{{ error }}</p>

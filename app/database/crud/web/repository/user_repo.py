@@ -1,6 +1,8 @@
+from sqlalchemy import update, delete
 from sqlalchemy.future import select
-from app.database.core.models import User
+from app.database.core.models import User, PendingUser
 from app.database.core.models import SessionLocal
+
 from datetime import date
 
 
@@ -11,19 +13,20 @@ async def get_user_by_email(email: str) -> User | None:
 
 async def validate_user_unique(email: str, username: str) -> None:
     async with SessionLocal() as session:
-        result_email = await session.execute(select(User).where(User.email == email))
+        result_email = await session.execute(select(PendingUser).where((PendingUser.email == email)))
         if result_email.scalar_one_or_none():
             raise ValueError("Така електронна адреса вже існує!")
 
         # Перевірка username
-        result_username = await session.execute(select(User).where(User.username == username))
+        result_username = await session.execute(
+            select(PendingUser).where((PendingUser.username == username)))
         if result_username.scalar_one_or_none():
             raise ValueError("Такий користувач вже існує!")
 
 
 async def user_exists(email: str) -> bool:
     async with SessionLocal() as session:
-        result = await session.execute(select(User).where(User.email == email))
+        result = await session.execute(select(User).where(User.email == email) and (User.is_verified.is_(True)))
         return result.scalar_one_or_none() is not None
 
 
@@ -36,3 +39,42 @@ async def save_user(email: str, username: str = None, password_hash: str = None,
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user)
+
+
+async def pending_user(email: str, username: str = None, password_hash: str = None, birth_date: date = None) -> None:
+    async with SessionLocal() as session:
+        await session.execute(delete(PendingUser).where(PendingUser.email == email))
+        pending = PendingUser(email=email, username=username, password_hash=password_hash, birth_date=birth_date)
+        session.add(pending)
+        try:
+            await session.commit()
+        except Exception:
+            raise ValueError("Така електронна адреса або логін уже в процесі підтвердження.")
+
+
+async def confirm_email(email: str):
+    async with SessionLocal() as session:
+        result = await session.execute(select(PendingUser).where(PendingUser.email == email))
+        pending = result.scalar_one_or_none()
+        if not pending:
+            raise ValueError("Користувач не знайдений або вже підтверджений")
+
+        user = User(
+            email=pending.email,
+            username=pending.username,
+            password_hash=pending.password_hash,
+            birth_date=pending.birth_date,
+            is_verified=True,
+            terms_accepted=True
+        )
+
+        session.add(user)
+
+        # Видаляємо з тимчасових
+        await session.execute(delete(PendingUser).where(PendingUser.id == pending.id))
+
+        await session.commit()
+
+# async def is_user_verified(email: str) -> User | None:
+#     async with SessionLocal() as session:
+#         return await session.scalar(select(User).where((User.email == email) & (User.is_verified.is_(True))))

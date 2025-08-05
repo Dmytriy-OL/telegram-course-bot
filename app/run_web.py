@@ -1,12 +1,16 @@
 import webbrowser
 import threading
 import time
+import os
 from app.web.start_web import run_fastapi
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def open_browser():
     time.sleep(1)
-    webbrowser.open("http://127.0.0.1:5000 ")
+    webbrowser.open(os.getenv("BASE_URL"))
 
 
 if __name__ == "__main__":

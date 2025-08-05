@@ -8,6 +8,8 @@ from app.database.crud.web.repository.user_repo import get_user_by_email, user_e
 from app.database.crud.web.services.auth_service import authenticate_user
 from app.database.core.models import User
 from app.web.templates import templates
+from app.web.schemas.forms import RegisterForm
+from pydantic import ValidationError
 
 oauth = OAuth()
 
@@ -46,6 +48,34 @@ async def validate_register_form(password: str, password_confirm: str, email: st
     if await user_exists(email):
         return "Такий логін вже існує!"
     return None
+
+
+async def parse_register_form(
+        birth_day: int = Form(...),
+        birth_month: int = Form(...),
+        birth_year: int = Form(...),
+        email: str = Form(...),
+        username: str = Form(..., alias="login"),
+        password: str = Form(...),
+        password_confirm: str = Form(...),
+        terms: bool = Form(...)
+):
+    try:
+        form_data = RegisterForm(
+            birth_day=birth_day,
+            birth_month=birth_month,
+            birth_year=birth_year,
+            email=email,
+            username=username,
+            password=password,
+            password_confirm=password_confirm,
+            terms=terms,
+        )
+    except ValidationError as e:
+        raw_msg = e.errors()[0].get('msg', 'Помилка валідації')
+        error_message = raw_msg.replace("Value error, ", "")
+        raise ValueError(error_message)
+    return form_data
 
 
 oauth.register(

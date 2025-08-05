@@ -44,6 +44,17 @@ class User(Base):
     terms_accepted = Column(Boolean, default=False, nullable=False)
 
 
+class PendingUser(Base):
+    __tablename__ = "pending_users"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String, unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    birth_date = Column(Date, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Lesson(Base):
     __tablename__ = "lessons"
 

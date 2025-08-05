@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат підтвердження</title>
+</head>
+<body>
+    {% if success %}
+        <h2 style="color: green;">Успіх!</h2>
+    {% else %}
+        <h2 style="color: red;">Помилка!</h2>
+    {% endif %}
+    <p>{{ message }}</p>
+    <a href="/login">Перейти до входу</a>
+</body>
+</html>

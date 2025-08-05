@@ -4,14 +4,15 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from datetime import date
 from fastapi.staticfiles import StaticFiles
 from starlette.status import HTTP_303_SEE_OTHER
-from app.web.dependencies.auth_dependencies import oauth, validate_register_form, user_exists, validate_login_form
+from app.web.dependencies.auth_dependencies import oauth, validate_register_form, user_exists, parse_register_form
 from werkzeug.security import generate_password_hash
-from app.database.crud.web.repository.user_repo import validate_user_unique, save_user
+from app.database.crud.web.repository.user_repo import validate_user_unique, save_user, confirm_email, \
+    pending_user
 from app.web.schemas.forms import RegisterForm
-from app.database.core.models import User
 from app.web.templates import templates
-from app.web.utils.form_parsers import get_form_values
-from pydantic import ValidationError
+from app.web.utils.tokens import generate_token
+from app.web.utils.email_sender import send_verification_email
+from app.web.utils.tokens import verify_token
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -22,49 +23,17 @@ async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-@router.get("/login", response_class=HTMLResponse)
-async def login_get(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-
-@router.post("/login", response_class=HTMLResponse)
-async def login_post(request: Request, user_or_response: User | HTMLResponse = Depends(validate_login_form)):
-    if isinstance(user_or_response, HTMLResponse):
-        return user_or_response
-
-    request.session["user"] = user_or_response.email
-    return RedirectResponse(url="/", status_code=303)
-
-
 @router.get("/register", response_class=HTMLResponse)
 async def register_get(request: Request):
     return templates.TemplateResponse("register.html", {"request": request, "form_values": {}})
 
 
 @router.post("/register", response_class=HTMLResponse)
-async def register_post(request: Request):
-    form = await request.form()
-
-    form_values = get_form_values(form)
-
-    try:
-        form_data = RegisterForm(
-            birth_day=int(form.get("birth_day")),
-            birth_month=int(form.get("birth_month")),
-            birth_year=int(form.get("birth_year")),
-            email=form.get("email"),
-            username=form.get("login"),
-            password=str(form.get("password")),
-            password_confirm=str(form.get("password_confirm")),
-            terms=bool(form.get("terms"))
-        )
-    except ValidationError as e:
-        raw_msg = e.errors()[0].get('msg', 'Помилка валідації')
-        error_message = raw_msg.replace("Value error, ", "")
-        return templates.TemplateResponse("register.html",
-                                          {"request": request,
-                                           "error": error_message,
-                                           "form_values": form_values})
+async def register_post(
+        request: Request,
+        form_data: RegisterForm = Depends(parse_register_form),
+):
+    form_values = form_data.model_dump()
 
     try:
         await validate_user_unique(form_data.email, form_data.username)
@@ -81,9 +50,57 @@ async def register_post(request: Request):
     birth_date = form_data.birth_date
     password_hash = generate_password_hash(form_data.password)
 
-    await save_user(email=form_data.email, password_hash=password_hash, birth_date=birth_date,
-                    username=form_data.username, terms_accepted=form_data.terms)
-    request.session["user"] = form_data.username
+    try:
+        await pending_user(email=form_data.email, username=form_data.username, password_hash=password_hash,
+                           birth_date=birth_date)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "register.html",
+            {
+                "request": request,
+                "error": str(e),
+                "form_values": form_values
+            }
+        )
+
+    # підтвердження ектроной адреси
+    # token = generate_token(form_data.email)
+    # send_verification_email(form_data.email, token)
+    # return templates.TemplateResponse("register.html", {
+    #     "request": request,
+    #     "form_values": form_data.model_dump(),
+    #     "email_sent": True,
+    #     "email": form_data.email
+    # })
+
+    # без підтвердження
+    await confirm_email(form_data.email)
+    request.session["user"] = form_data.email
+    return RedirectResponse(url="/", status_code=303)
+
+
+
+
+@router.get("/verify-email")
+async def verify_email(request: Request, token: str):
+    try:
+        email = verify_token(token)
+    except Exception:
+        return templates.TemplateResponse("verify_result.html", {
+            "request": request,
+            "success": False,
+            "message": "Недійсний або прострочений токен"
+        })
+    try:
+        await confirm_email(email)
+    except ValueError as e:
+        return templates.TemplateResponse("verify_result.html", {
+            "request": request,
+            "success": False,
+            "message": str(e)
+        })
+
+    request.session["user"] = email
     return RedirectResponse(url="/", status_code=303)
 
 

@@ -3,14 +3,12 @@ from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
-
 from app.web.routes import router
 from starlette.middleware.sessions import SessionMiddleware
 
 
 def create_app() -> FastAPI:
     application = FastAPI()
-
     application.include_router(router)
     # Додаємо SessionMiddleware
     application.add_middleware(SessionMiddleware, secret_key=secrets.token_hex(32))
@@ -31,4 +29,4 @@ app = create_app()
 
 def run_fastapi():
     import uvicorn
-    uvicorn.run("app.web.start_web:app", host="127.0.0.1", port=5000, reload=True)
+    uvicorn.run("app.web.start_web:app", host="0.0.0.0", port=5000, reload=True)
