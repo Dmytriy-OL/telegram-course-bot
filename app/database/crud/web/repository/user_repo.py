@@ -26,7 +26,7 @@ async def validate_user_unique(email: str, username: str) -> None:
 
 async def user_exists(email: str) -> bool:
     async with SessionLocal() as session:
-        result = await session.execute(select(User).where(User.email == email) and (User.is_verified.is_(True)))
+        result = await session.execute(select(User).where(User.email == email, User.is_verified.is_(True)))
         return result.scalar_one_or_none() is not None
 
 
