@@ -141,3 +141,5 @@ async def auth_google_callback(request: Request):
     except Exception as e:
         logger.error(f"🔴 Помилка при Google авторизації: {e}")
         return RedirectResponse(url="/login?error=google_oauth_failed")
+
+

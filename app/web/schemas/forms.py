@@ -34,3 +34,16 @@ class RegisterForm(BaseModel):
         if v is not True:
             raise ValueError("Ви маєте прийняти умови політики")
         return v
+
+
+class PasswordForm(BaseModel):
+    token: str
+    password: str
+    password_confirm: str
+
+    @field_validator("password_confirm")
+    @classmethod
+    def passwords_match(cls, v, info):
+        if "password" in info.data and v != info.data["password"]:
+            raise ValueError("Паролі не співпадають")
+        return v

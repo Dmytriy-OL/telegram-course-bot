@@ -75,6 +75,22 @@ async def confirm_email(email: str):
 
         await session.commit()
 
+
+async def password_recovery(email: str, password: str):
+    async with SessionLocal() as session:
+        result = await session.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        if not user:
+            raise ValueError("Користувач не знайдений")
+        user.password_hash = password
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+
+        return user
+
+
+
 # async def is_user_verified(email: str) -> User | None:
 #     async with SessionLocal() as session:
 #         return await session.scalar(select(User).where((User.email == email) & (User.is_verified.is_(True))))
