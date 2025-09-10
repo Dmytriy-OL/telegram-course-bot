@@ -29,6 +29,7 @@ async def get_current_user(request: Request) -> User:
 async def validate_login_form(request: Request, email: str = Form(...),
                               password: str = Form(...)) -> User | HTMLResponse:
     auth_status, user = await authenticate_user(email, password)
+    print("AUTH:", auth_status, user)
     match auth_status:
         case "not_found":
             return templates.TemplateResponse("login.html", {"request": request, "error": "Користувача не знайдено",
@@ -48,6 +49,12 @@ async def validate_register_form(password: str, password_confirm: str, email: st
     if await user_exists(email):
         return "Такий логін вже існує!"
     return None
+
+
+async def get_authenticated_user(request: Request) -> User | None:
+    email = request.session.get("user")
+    user = await get_user_by_email(email)
+    return user
 
 
 async def parse_register_form(

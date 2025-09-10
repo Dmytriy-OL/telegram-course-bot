@@ -43,6 +43,8 @@ class User(Base):
     is_verified = Column(Boolean, nullable=False, default=False)
     terms_accepted = Column(Boolean, default=False, nullable=False)
 
+    avatar = relationship("UserAvatar", back_populates="user", uselist=False, cascade="all, delete")
+
 
 class PendingUser(Base):
     __tablename__ = "pending_users"
@@ -53,6 +55,16 @@ class PendingUser(Base):
     password_hash = Column(String, nullable=False)
     birth_date = Column(Date, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserAvatar(Base):
+    __tablename__ = "user_avatars"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    file_path = Column(String, nullable=False)
+
+    user = relationship("User", back_populates="avatar")
 
 
 class Lesson(Base):

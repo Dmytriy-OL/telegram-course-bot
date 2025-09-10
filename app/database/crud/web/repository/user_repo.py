@@ -1,6 +1,10 @@
-from sqlalchemy import update, delete
+from fastapi import Request
+
+from sqlalchemy import update, delete, and_
 from sqlalchemy.future import select
-from app.database.core.models import User, PendingUser
+from sqlalchemy.orm import selectinload
+
+from app.database.core.models import User, PendingUser, UserAvatar
 from app.database.core.models import SessionLocal
 
 from datetime import date
@@ -8,7 +12,13 @@ from datetime import date
 
 async def get_user_by_email(email: str) -> User | None:
     async with SessionLocal() as session:
-        return await session.scalar(select(User).where(User.email == email))
+        result = await session.execute(
+            select(User)
+            .options(selectinload(User.avatar))  # підвантажуємо аватар
+            .where(User.email == email)
+        )
+        user = result.scalars().first()
+        return user
 
 
 async def validate_user_unique(email: str, username: str) -> None:
@@ -90,7 +100,64 @@ async def password_recovery(email: str, password: str):
         return user
 
 
+async def is_username_taken(username: str, current_email: str) -> bool:
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(User.id).where(
+                and_(
+                    User.username == username,
+                    User.email != current_email,  # виключаємо поточного користувача
+                    User.is_verified.is_(True)
+                )
+            )
+        )
+        return result.scalar() is not None
 
-# async def is_user_verified(email: str) -> User | None:
-#     async with SessionLocal() as session:
-#         return await session.scalar(select(User).where((User.email == email) & (User.is_verified.is_(True))))
+
+async def update_user_data(email: str, name: str = None, surname: str = None, username: str = None,
+                           birth_date: date = None) -> User:
+    async with SessionLocal() as session:
+        result = await session.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+
+        if name is not None:
+            user.name = name
+        if surname is not None:
+            user.surname = surname
+        if username is not None:
+            user.username = username
+        if birth_date is not None:
+            user.birth_date = birth_date
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return user
+
+
+async def update_user_avatar(user_id: int, file_name: str):
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(UserAvatar).where(UserAvatar.user_id == user_id)
+        )
+        avatar = result.scalars().first()
+
+        if avatar:
+            # Якщо аватар існує — оновлюємо шлях
+            avatar.file_path = file_name
+        else:
+            # Якщо аватара немає — створюємо новий
+            avatar = UserAvatar(user_id=user_id, file_path=file_name)
+            session.add(avatar)
+
+        await session.commit()
+
+
+async def fetch_updated_user_with_avatar(updated_user: User) -> User | None:
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(User).options(selectinload(User.avatar)).where(User.id == updated_user.id)
+        )
+        updated_user = result.scalars().first()
+        return updated_user
