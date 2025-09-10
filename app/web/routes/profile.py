@@ -66,12 +66,11 @@ async def profile(
     updated_user = await update_user_data(user.email, name, surname, username, birth_date_obj)
 
     # Якщо є аватар — зберігаємо його
-    if avatar:
+    if avatar and avatar.filename:
         file_name = await save_image_to_disk_and_db(avatar)
         await update_user_avatar(updated_user.id, file_name)
 
     # Підтягуємо оновлені дані разом з аватаром
-
     updated_user = await fetch_updated_user_with_avatar(updated_user)
 
     return templates.TemplateResponse(
