@@ -7,7 +7,7 @@ from starlette.status import HTTP_303_SEE_OTHER
 from app.web.dependencies.auth_dependencies import oauth, validate_register_form, user_exists, parse_register_form
 from werkzeug.security import generate_password_hash
 from app.database.crud.web.repository.user_repo import validate_user_unique, save_user, confirm_email, \
-    pending_user
+    pending_user, get_user_by_email, update_user_google_id
 from app.web.schemas.forms import RegisterForm
 from app.web.templates import templates
 from app.web.utils.tokens import generate_token
@@ -79,8 +79,6 @@ async def register_post(
     return RedirectResponse(url="/", status_code=303)
 
 
-
-
 @router.get("/verify-email")
 async def verify_email(request: Request, token: str):
     try:
@@ -131,9 +129,12 @@ async def auth_google_callback(request: Request):
         surname = user_info.get("family_name")
 
         # Перевірка чи користувач вже існує
-        user = await user_exists(email)
+        user = await get_user_by_email(email)
         if not user:
             await save_user(email=email, password_hash=None, google_id=google_id, name=name, surname=surname)
+        else:
+            if not user.google_id:
+                await update_user_google_id(user, google_id)
 
         request.session["user"] = email
         return RedirectResponse(url="/")

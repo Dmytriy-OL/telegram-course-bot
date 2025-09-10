@@ -51,6 +51,13 @@ async def save_user(email: str, username: str = None, password_hash: str = None,
         await session.refresh(new_user)
 
 
+async def update_user_google_id(user: User, google_id: str) -> None:
+    async with SessionLocal() as session:
+        user.google_id = google_id
+        session.add(user)
+        await session.commit()
+
+
 async def pending_user(email: str, username: str = None, password_hash: str = None, birth_date: date = None) -> None:
     async with SessionLocal() as session:
         await session.execute(delete(PendingUser).where(PendingUser.email == email))
