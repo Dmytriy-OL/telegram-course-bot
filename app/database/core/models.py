@@ -106,6 +106,7 @@ class Administrator(Base):
     main_admin = Column(Boolean, default=False)
 
     lessons = relationship("Lesson", back_populates="administrator")
+    courses = relationship("Courses", back_populates="administrator")
 
 
 class Image(Base):
@@ -123,3 +124,37 @@ class Caption(Base):
     title = Column(String(50), unique=True, nullable=False)
     caption = Column(Text, nullable=False)
     main = Column(Boolean, default=False)
+
+
+class Courses(Base):
+    __tablename__ = "courses"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(50), unique=False, nullable=False)
+    price = Column(Integer, unique=False, nullable=False)
+    caption = Column(Text, nullable=False)
+    lesson_count = Column(Integer, unique=False, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=False)
+    teacher = relationship("Administrator", back_populates="courses")
+    lessons = relationship("Lesson", back_populates="course", cascade="all, delete-orphan")
+
+
+class Module(Base):
+    __tablename__ = "modules"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(100), nullable=False)
+    video_url = Column(String(255), nullable=True)  # відео до уроку
+    notes = Column(Text, nullable=True)  # конспект уроку
+    assignment = Column(Text, nullable=True)  # завдання
+
+    order = Column(Integer, nullable=False)  # порядок уроку в курсі (1,2,3…)
+
+    is_active = Column(Boolean, default=False)  # чи урок відкритий для студента
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # зв’язок з курсом
+    course_id = Column(Integer, ForeignKey("courses.id"))
+    course = relationship("Courses", back_populates="lessons")
