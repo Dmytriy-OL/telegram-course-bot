@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Додати адміністратора</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #2196F3;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Додати адміністратора</h2>
+    <form method="POST">
+        {% if success %}
+            <div class="alert success">{{ success }}</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert error">{{ error }}</div>
+        {% endif %}
+
+        <label for="tg_id">Telegram ID</label>
+        <input type="number" name="tg_id" id="tg_id" required>
+
+        <label for="name">Ім'я</label>
+        <input type="text" name="name" id="name" required>
+
+        <label for="surname">Прізвище</label>
+        <input type="text" name="surname" id="surname" required>
+
+        <label for="login">Логін</label>
+        <input type="text" name="login" id="login" required>
+
+        <label for="main_admin">Головний адміністратор</label>
+        <select name="main_admin" id="main_admin" required>
+            <option value="false" selected>Ні</option>
+            <option value="true">Так</option>
+        </select>
+
+        <button type="submit">Зберегти адміністратора</button>
+    </form>
+</div>
+</body>
+</html>
