@@ -47,3 +47,14 @@ class PasswordForm(BaseModel):
         if "password" in info.data and v != info.data["password"]:
             raise ValueError("Паролі не співпадають")
         return v
+
+
+class CoursesForm(BaseModel):
+    price: int
+
+    @field_validator("price")
+    @classmethod
+    def check_price(cls, v):
+        if v < 0:
+            raise ValueError("Ціна не може бути від'ємною")
+        return v
