@@ -77,10 +77,13 @@ class Lesson(Base):
     freely = Column(Boolean, default=True)
     places = Column(Integer, default=1)
 
-    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=False)
-
-    enrollments = relationship("Enrollment", back_populates="lesson")
+    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=True)
     administrator = relationship("Administrator", back_populates="lessons")
+
+    # course_id = Column(Integer, ForeignKey("courses.id"), nullable=True)
+    # course = relationship("Courses", back_populates="lessons")
+    enrollments = relationship("Enrollment", back_populates="lesson")
+    # enrollments = relationship("Enrollment", back_populates="lesson", cascade="all, delete-orphan")
 
 
 class Enrollment(Base):
@@ -99,14 +102,14 @@ class Administrator(Base):
     __tablename__ = "administrators"
 
     id = Column(Integer, primary_key=True)
-    tg_id = Column(Integer, unique=True, nullable=False)
+    tg_id = Column(Integer, unique=True, nullable=True)
     name = Column(String(50), unique=False, nullable=False)
     surname = Column(String(50), unique=False, nullable=False)
-    login = Column(String(100), unique=True, nullable=False)
+    login = Column(String(100), unique=True, nullable=True)
     main_admin = Column(Boolean, default=False)
 
     lessons = relationship("Lesson", back_populates="administrator")
-    courses = relationship("Courses", back_populates="administrator")
+    courses = relationship("Courses", back_populates="teacher")
 
 
 class Image(Base):
@@ -136,9 +139,10 @@ class Courses(Base):
     lesson_count = Column(Integer, unique=False, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=False)
+    teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=True)
     teacher = relationship("Administrator", back_populates="courses")
-    lessons = relationship("Lesson", back_populates="course", cascade="all, delete-orphan")
+
+    modules = relationship("Module", back_populates="course", cascade="all, delete-orphan")
 
 
 class Module(Base):
@@ -157,4 +161,4 @@ class Module(Base):
 
     # зв’язок з курсом
     course_id = Column(Integer, ForeignKey("courses.id"))
-    course = relationship("Courses", back_populates="lessons")
+    course = relationship("Courses", back_populates="modules")
