@@ -152,7 +152,6 @@ class Module(Base):
     title = Column(String(100), nullable=False)
     video_url = Column(String(255), nullable=True)  # відео до уроку
     notes = Column(Text, nullable=True)  # конспект уроку
-    assignment = Column(Text, nullable=True)  # завдання
 
     order = Column(Integer, nullable=False)  # порядок уроку в курсі (1,2,3…)
 
@@ -162,3 +161,29 @@ class Module(Base):
     # зв’язок з курсом
     course_id = Column(Integer, ForeignKey("courses.id"))
     course = relationship("Courses", back_populates="modules")
+
+    tasks = relationship("Task", back_populates="module", cascade="all, delete-orphan")
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True)
+    question = Column(Text, nullable=False)
+    filename_img = Column(String(50), unique=True, nullable=True)
+
+    answers = relationship("Answer", back_populates="task", cascade="all, delete-orphan")
+
+    module_id = Column(Integer, ForeignKey("modules.id"))
+    module = relationship("Module", back_populates="tasks")
+
+
+class Answer(Base):
+    __tablename__ = "answers"
+
+    id = Column(Integer, primary_key=True)
+    text = Column(String(255), nullable=False)
+    is_correct = Column(Boolean, default=False)
+
+    task_id = Column(Integer, ForeignKey("tasks.id"))
+    task = relationship("Task", back_populates="answers")
