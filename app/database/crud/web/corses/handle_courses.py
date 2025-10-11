@@ -2,7 +2,7 @@ from sqlalchemy import update, delete, and_
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from app.database.core.models import Courses, Administrator
+from app.database.core.models import Courses, Administrator, Module, Task, Answer
 from app.database.core.models import SessionLocal
 
 from datetime import date
@@ -22,3 +22,40 @@ async def all_courses():
         result = await session.execute(select(Courses).options(selectinload(Courses.teacher)))
         return result.scalars().all()
 
+
+async def create_module(title: str, video_url: str, notes: str, order: int, is_active: bool, course_id: int):
+    async with SessionLocal() as session:
+        add_module = Module(title=title, video_url=video_url, notes=notes, order=order,
+                            is_active=is_active, course_id=course_id)
+        try:
+            session.add(add_module)
+            await session.commit()
+            await session.refresh(add_module)
+            return add_module.id
+        except Exception as e:
+            await session.rollback()
+            raise e
+
+
+async def create_task_for_module(question: str, filename_img: str, module_id: int) -> int:
+    async with SessionLocal() as session:
+        add_task = Task(question=question, filename_img=filename_img, module_id=module_id, )
+        try:
+            session.add(add_task)
+            await session.commit()
+            await session.refresh(add_task)
+            return add_task.id
+        except Exception as e:
+            await session.rollback()
+            raise e
+
+
+async def generate_answer(text: str, is_correct: bool, task_id: int):
+    async with SessionLocal() as session:
+        add_answer_to_question = Answer(text=text, is_correct=is_correct, task_id=task_id)
+        try:
+            session.add(add_answer_to_question)
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            raise e
