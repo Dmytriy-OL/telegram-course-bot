@@ -142,7 +142,19 @@ class Courses(Base):
     teacher_id = Column(Integer, ForeignKey("administrators.id"), nullable=True)
     teacher = relationship("Administrator", back_populates="courses")
 
+    avatar = relationship("CourseAvatar", back_populates="course", uselist=False, cascade="all, delete")
+
     modules = relationship("Module", back_populates="course", cascade="all, delete-orphan")
+
+
+class CourseAvatar(Base):
+    __tablename__ = "course_avatar"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"), unique=True)
+    file_name = Column(String, nullable=False)
+
+    course = relationship("Courses", back_populates="avatar")
 
 
 class Module(Base):
