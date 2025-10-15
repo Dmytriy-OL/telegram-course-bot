@@ -18,7 +18,7 @@ async def module_create_get(request: Request):
     administrators = await all_administrators()
     courses = await all_courses()
     return templates.TemplateResponse(
-        "courses_module_add.html",
+        "create_module_courses.html",
         {"request": request, "courses": courses, "teachers": administrators}
     )
 
@@ -66,7 +66,7 @@ async def module_create_post(request: Request,
         logging.info("Модуль створено без завдань")
         message = "Модуль успішно створено без завдань."
 
-    return templates.TemplateResponse("courses_module_add.html", {
+    return templates.TemplateResponse("create_module_courses.html", {
         "request": request,
         "success": message,
     })
