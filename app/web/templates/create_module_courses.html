@@ -1,199 +1,264 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Додати модуль із завданнями</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #e0e7ff);
-      padding: 40px;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <title>Додати модуль із завданнями</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          background: linear-gradient(135deg, #f0f4f8, #e0e7ff);
+          padding: 40px;
+          margin: 0;
+        }
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      transition: 0.3s;
-    }
+        .container {
+          max-width: 800px;
+          margin: auto;
+          background: white;
+          padding: 30px;
+          border-radius: 14px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          transition: 0.3s;
+        }
 
-    .container:hover {
-      box-shadow: 0 6px 25px rgba(0,0,0,0.12);
-    }
+        .container:hover {
+          box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+        }
 
-    h2 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 25px;
-    }
+        h2 {
+          text-align: center;
+          color: #333;
+          margin-bottom: 25px;
+        }
 
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: 600;
-      color: #444;
-    }
+        label {
+          display: block;
+          margin-top: 12px;
+          font-weight: 600;
+          color: #444;
+        }
 
-    input, textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
+        input, textarea, select {
+          width: 100%;
+          padding: 10px;
+          margin-top: 6px;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          font-size: 14px;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
 
-    input:focus, textarea:focus, select:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
-      outline: none;
-    }
+        input:focus, textarea:focus, select:focus {
+          border-color: #4f46e5;
+          box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+          outline: none;
+        }
 
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #4f46e5;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
+        button {
+          margin-top: 20px;
+          padding: 10px 20px;
+          background: #4f46e5;
+          border: none;
+          border-radius: 6px;
+          color: white;
+          font-size: 15px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background 0.2s, transform 0.1s;
+        }
 
-    button:hover {
-      background: #4338ca;
-      transform: translateY(-1px);
-    }
+        button:hover {
+          background: #4338ca;
+          transform: translateY(-1px);
+        }
 
-    .task {
-      border: 1px solid #ddd;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 8px;
-      background: #fafafa;
-    }
+        .task {
+          border: 1px solid #ddd;
+          padding: 15px;
+          margin-top: 20px;
+          border-radius: 8px;
+          background: #fafafa;
+        }
 
-    .answers {
-      margin-left: 10px;
-      margin-top: 10px;
-    }
+        .answers {
+          margin-left: 10px;
+          margin-top: 10px;
+        }
 
-    h3 {
-      margin-top: 25px;
-      color: #333;
-      border-bottom: 2px solid #4f46e5;
-      display: inline-block;
-      padding-bottom: 4px;
-    }
+        h3 {
+          margin-top: 25px;
+          color: #333;
+          border-bottom: 2px solid #4f46e5;
+          display: inline-block;
+          padding-bottom: 4px;
+        }
 
-    .alert {
-      margin-top: 20px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-align: center;
-    }
+        .alert {
+          margin-top: 20px;
+          padding: 12px 16px;
+          border-radius: 8px;
+          font-weight: 600;
+          text-align: center;
+        }
 
-    .alert.success {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
+        .alert.success {
+          background: #d1fae5;
+          color: #065f46;
+          border: 1px solid #a7f3d0;
+        }
 
-    .alert.error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-    }
-  </style>
+        .alert.error {
+          background: #fee2e2;
+          color: #991b1b;
+          border: 1px solid #fecaca;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-  <h2>Додати модуль</h2>
+    <h2>Додати модуль</h2>
 
-  {% if success %}
-    <div class="alert success">{{ success }}</div>
-  {% endif %}
+    {% if message %}
+    <div class="alert success">{{ message }}</div>
+    {% endif %}
 
-  {% if error %}
+    {% if error %}
     <div class="alert error">{{ error }}</div>
-  {% endif %}
+    {% endif %}
 
-  <form method="POST">
-    <label for="title">Назва модуля</label>
-    <input type="text" name="title" id="title" required>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="title">Назва модуля</label>
+        <input type="text" name="title" id="title" required>
 
-    <label for="video_url">Посилання на відео</label>
-    <input type="text" name="video_url" id="video_url" placeholder="https://...">
+        <!--    <label for="video_url">Посилання на відео</label>-->
+        <!--    <input type="text" name="video_url" id="video_url" placeholder="https://...">-->
 
-    <label for="notes">Конспект</label>
-    <textarea name="notes" id="notes" rows="4" placeholder="Текст конспекту..."></textarea>
+        <label for="notes">Конспект</label>
+        <textarea name="notes" id="notes" rows="4" placeholder="Текст конспекту..."></textarea>
 
-    <label for="order">Порядок уроку</label>
-    <input type="number" name="order" id="order" min="1" required>
+        <label for="order">Порядок уроку</label>
+        <input type="number" name="order" id="order" min="1" required>
 
-    <label for="is_active">Урок відкритий</label>
-    <select name="is_active" id="is_active">
-      <option value="true">Так</option>
-      <option value="false" selected>Ні</option>
-    </select>
+        <label for="is_active">Урок відкритий</label>
+        <select name="is_active" id="is_active">
+            <option value="true">Так</option>
+            <option value="false" selected>Ні</option>
+        </select>
 
-    <label for="course_id">Курс</label>
-    <select name="course_id" id="course_id" required>
-      {% for course in courses %}
-        <option value="{{ course.id }}">{{ course.title }}</option>
-      {% endfor %}
-    </select>
+        <label for="course_id">Курс</label>
+        <select name="course_id" id="course_id" required>
+            {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.title }}</option>
+            {% endfor %}
+        </select>
 
-    <h3>Завдання</h3>
-    <div id="tasks"></div>
-    <button type="button" onclick="addTask()">+ Додати завдання</button>
+        <h3>Посилання на відео</h3>
+        <div id="video_url"></div>
+        <button type="button" onclick="addVideo_url()">+ Додати посилання на відео</button>
+        <br>
+        <h3>Завантажити відео</h3>
+        <div id="video_download"></div>
+        <button type="button" onclick="addVideo()">+ Завантажити відео</button>
+        <br>
+        <h3>Завдання</h3>
+        <div id="tasks"></div>
+        <button type="button" onclick="addTask()">+ Додати завдання</button>
 
-    <button type="submit">💾 Зберегти модуль</button>
-  </form>
+        <button type="submit">💾 Зберегти модуль</button>
+    </form>
 </div>
+<script>
+    let video_url_Count = 0;
+
+    function addVideo_url() {
+      video_url_Count++;
+      const video_url_Div = document.createElement("div");
+      video_url_Div.classList.add("video_url");
+
+      video_url_Div.innerHTML = `
+        <label>Напишіть назву відео ${video_url_Count}</label>
+        <input type="text"name="videos_url[${video_url_Count}][title]" placeholder="Назва відео" required>
+
+        <label>Вставте посилання на відео ${video_url_Count}</label>
+        <input type="text" name="videos_url[${video_url_Count}[url]" placeholder="https://..." required>
+
+        <button type="button" class="remove-video-btn">🗑 Видалити</button>
+      `;
+    // Додаємо обробник видалення
+      video_url_Div.querySelector(".remove-video-btn").addEventListener("click", () => {
+        video_url_Div.remove();
+      });
+
+      document.getElementById("video_url").appendChild(video_url_Div);
+      video_url_Div.scrollIntoView({ behavior: "smooth" });
+    }
+</script>
+<script>
+    let videoCount = 0;
+
+    function addVideo() {
+        videoCount++;
+        const videoDiv = document.createElement("div");
+        videoDiv.classList.add("video");
+
+        videoDiv.innerHTML = `
+            <label>Виберіть відео ${videoCount}</label>
+            <input type="file" name="videos_file" accept="video/*" required>
+
+            <label>Опис відео ${videoCount}</label>
+            <textarea name="videos_description" placeholder="Опишіть відео..." rows="3" required></textarea>
+
+            <button type="button" class="remove-video-btn">🗑 Видалити</button>
+            <hr>
+        `;
+
+        videoDiv.querySelector(".remove-video-btn").addEventListener("click", () => videoDiv.remove());
+
+        document.getElementById("video_download").appendChild(videoDiv);
+        videoDiv.scrollIntoView({ behavior: "smooth" });
+    }
+</script>
 
 <script>
-  let taskCount = 0;
+    let taskCount = 0;
 
-  function addTask() {
-    taskCount++;
-    const taskDiv = document.createElement("div");
-    taskDiv.classList.add("task");
+    function addTask() {
+      taskCount++;
+      const taskDiv = document.createElement("div");
+      taskDiv.classList.add("task");
 
-    taskDiv.innerHTML = `
-      <label>Питання ${taskCount}</label>
-      <textarea name="tasks[${taskCount}][question]" rows="2" required></textarea>
+      taskDiv.innerHTML = `
+        <label>Питання ${taskCount}</label>
+        <textarea name="tasks[${taskCount}][question]" rows="2" required></textarea>
 
-      <div class="answers">
-        <label>✅ Правильна відповідь</label>
-        <input type="text" name="tasks[${taskCount}][answers][0][text]" required>
-        <input type="hidden" name="tasks[${taskCount}][answers][0][is_correct]" value="true">
+        <div class="answers">
+          <label>✅ Правильна відповідь</label>
+          <input type="text" name="tasks[${taskCount}][answers][0][text]" required>
+          <input type="hidden" name="tasks[${taskCount}][answers][0][is_correct]" value="true">
 
-        <label>❌ Неправильна відповідь 1</label>
-        <input type="text" name="tasks[${taskCount}][answers][1][text]" required>
-        <input type="hidden" name="tasks[${taskCount}][answers][1][is_correct]" value="false">
+          <label>❌ Неправильна відповідь 1</label>
+          <input type="text" name="tasks[${taskCount}][answers][1][text]" required>
+          <input type="hidden" name="tasks[${taskCount}][answers][1][is_correct]" value="false">
 
-        <label>❌ Неправильна відповідь 2</label>
-        <input type="text" name="tasks[${taskCount}][answers][2][text]" required>
-        <input type="hidden" name="tasks[${taskCount}][answers][2][is_correct]" value="false">
+          <label>❌ Неправильна відповідь 2</label>
+          <input type="text" name="tasks[${taskCount}][answers][2][text]" required>
+          <input type="hidden" name="tasks[${taskCount}][answers][2][is_correct]" value="false">
 
-        <label>❌ Неправильна відповідь 3</label>
-        <input type="text" name="tasks[${taskCount}][answers][3][text]" required>
-        <input type="hidden" name="tasks[${taskCount}][answers][3][is_correct]" value="false">
-      </div>
-    `;
+          <label>❌ Неправильна відповідь 3</label>
+          <input type="text" name="tasks[${taskCount}][answers][3][text]" required>
+          <input type="hidden" name="tasks[${taskCount}][answers][3][is_correct]" value="false">
+        </div>
+        <button type="button" class="remove-task-btn">🗑 Видалити</button>
+      `;
 
-    document.getElementById("tasks").appendChild(taskDiv);
-    taskDiv.scrollIntoView({ behavior: "smooth" });
-  }
+        // Додаємо обробник видалення
+      taskDiv.querySelector(".remove-task-btn").addEventListener("click", () => {
+        taskDiv.remove();
+      });
+
+      document.getElementById("tasks").appendChild(taskDiv);
+      taskDiv.scrollIntoView({ behavior: "smooth" });
+    }
 </script>
 </body>
 </html>
