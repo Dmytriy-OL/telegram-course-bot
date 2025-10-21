@@ -1,8 +1,10 @@
+import logging
+
 from sqlalchemy import update, delete, and_
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from app.database.core.models import Courses, Administrator, Module, Task, Answer, CourseAvatar
+from app.database.core.models import Courses, Administrator, Module, Task, Answer, CourseAvatar, VideoModule
 from app.database.core.models import SessionLocal
 
 from datetime import date
@@ -25,9 +27,9 @@ async def all_courses():
         return result.scalars().all()
 
 
-async def create_module(title: str, video_url: str, notes: str, order: int, is_active: bool, course_id: int):
+async def create_module(title: str, notes: str, order: int, is_active: bool, course_id: int):
     async with SessionLocal() as session:
-        add_module = Module(title=title, video_url=video_url, notes=notes, order=order,
+        add_module = Module(title=title, notes=notes, order=order,
                             is_active=is_active, course_id=course_id)
         try:
             session.add(add_module)
@@ -61,3 +63,41 @@ async def generate_answer(text: str, is_correct: bool, task_id: int):
         except Exception as e:
             await session.rollback()
             raise e
+
+
+async def create_video_url(title: str, module_id: int, video_url: str | None = None, video_file: str | None = None):
+    async with SessionLocal() as session:
+        create_video = VideoModule(title=title, video_url=video_url, video_file=video_file,
+                                   module_id=module_id)
+        try:
+            session.add(create_video)
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            raise e
+
+
+async def get_course_by_id(id_course: int) -> str:
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(Courses).where(Courses.id == id_course)
+        )
+        course = result.scalar_one_or_none()
+
+        if not course:
+            raise ValueError("Сталася помилка: курс не знайдено")
+
+        return course.title
+
+
+async def create_video_record(description: str, module_id: int, video_url: str | None = None,
+                              video_file: str | None = None):
+    async with SessionLocal() as session:
+        create_video = VideoModule(title=description, video_url=video_url, video_file=video_file, module_id=module_id)
+        try:
+            session.add(create_video)
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            logging.error(f"Помилка при записі відео в базу: {e}")
+            raise
