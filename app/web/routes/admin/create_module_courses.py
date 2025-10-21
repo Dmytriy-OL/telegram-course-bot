@@ -1,14 +1,16 @@
 import logging
-from fastapi import APIRouter, Request, Form, Depends
+from fastapi import APIRouter, Request, Form, Depends, UploadFile, File, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
-
+from typing import List
 from app.database.crud.web.administrator.handle_administrator import all_administrators
 from app.database.crud.web.corses.handle_courses import all_courses, create_module, \
-    create_task_for_module, generate_answer
+    create_task_for_module, generate_answer, create_video_url
+from app.database.crud.web.services.module_service import parse_video_data, save_videos, parse_tasks_data, save_tasks
 from app.web.dependencies.auth_dependencies import validate_login_form
 from app.database.core.models import User
 from app.web.schemas.forms import CoursesForm
 from app.web.templates import templates
+from app.web.utils.image_handler import save_video_to_module_folder
 
 router = APIRouter()
 
@@ -26,47 +28,53 @@ async def module_create_get(request: Request):
 @router.post("/create_module_courses", response_class=HTMLResponse)
 async def module_create_post(request: Request,
                              title: str = Form(...),
-                             video_url: str = Form(...),
                              notes: str = Form(...),
                              order: int = Form(...),
                              is_active: bool = Form(...),
-                             course_id: int = Form(...)
+                             course_id: int = Form(...),
+                             videos_file: List[UploadFile] = File(None),
+                             videos_description: List[str] = Form(None),
                              ):
     form = await request.form()
-    tasks = {}
-    module_id = await create_module(title, video_url, notes, order, is_active, course_id)
+    message = ""
 
-    for key, value in form.items():
-        if key.startswith("tasks["):
-            # приклад: tasks[1][answers][2][text]
-            parts = key.replace("tasks[", "").replace("]", "").split("[")
-            task_index = int(parts[0])
-            field = parts[1]
+    try:
+        module_id = await create_module(title, notes, order, is_active, course_id)
+        message += "Модуль створено. "
 
-            if task_index not in tasks:
-                tasks[task_index] = {"question": None, "answers": []}
+        videos_data_url = parse_video_data(form)
+        if videos_data_url:
+            await save_videos(videos_data_url, module_id)
+            message += "🎥 Посилання на відео збережено. "
 
-            if field == "question":
-                tasks[task_index]["question"] = value
-            elif field == "answers":
-                ans_index = int(parts[2])
-                ans_field = parts[3]
-                while len(tasks[task_index]["answers"]) <= ans_index:
-                    tasks[task_index]["answers"].append({})
-                tasks[task_index]["answers"][ans_index][ans_field] = value
-    if tasks:
-        for task in tasks.values():
-            task_id = await create_task_for_module(task["question"], None, module_id)
-            for answer in task["answers"]:
-                text = answer.get("text")
-                is_correct = str(answer.get("is_correct")).lower() == "true"
-                await generate_answer(text, is_correct, task_id)
-                message = "Модуль успішно створено з завданнями."
-    else:
-        logging.info("Модуль створено без завдань")
-        message = "Модуль успішно створено без завдань."
+        # обробка відео
+        if videos_file and videos_description:
+            for video, description in zip(videos_file, videos_description):
+                await save_video_to_module_folder(video, description, course_id, module_id)
+            message += f"🎥 Завантажено {len(videos_file)} відео. "
+
+        tasks_data = parse_tasks_data(form)
+        if tasks_data:
+            await save_tasks(tasks_data, module_id)
+            message += " Завдання вдало створено"
+        else:
+            logging.info("Модуль створено без завдань")
+            message += " Модуль успішно створено без завдань."
+
+    except HTTPException as e:
+        return templates.TemplateResponse("create_module_courses.html", {
+            "request": request,
+            "error": e.detail
+        })
+
+    except Exception as e:
+        logging.error(f"Невідома помилка: {e}")
+        return templates.TemplateResponse("create_module_courses.html", {
+            "request": request,
+            "error": "❌ Сталася непередбачена помилка. Спробуйте пізніше."
+        })
 
     return templates.TemplateResponse("create_module_courses.html", {
         "request": request,
-        "success": message,
+        "message": message,
     })
