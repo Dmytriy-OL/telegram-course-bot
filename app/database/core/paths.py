@@ -12,6 +12,6 @@ AVATAR_DIR = STATIC_DIR / "images" / "avatars"
 AVATAR_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# Папка для зберігання аватарок курсу
-AVATAR_COURSES_DIR = STATIC_DIR / "images" / "courses_avatars"
-AVATAR_COURSES_DIR.mkdir(parents=True, exist_ok=True)
+# Створення папки курсу для зберігання аватарок
+CREATION_COURSES_DIR = STATIC_DIR / "images" / "courses"
+CREATION_COURSES_DIR.mkdir(parents=True, exist_ok=True)
