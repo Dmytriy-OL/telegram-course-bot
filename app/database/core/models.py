@@ -162,7 +162,6 @@ class Module(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
-    video_url = Column(String(255), nullable=True)  # відео до уроку
     notes = Column(Text, nullable=True)  # конспект уроку
 
     order = Column(Integer, nullable=False)  # порядок уроку в курсі (1,2,3…)
@@ -175,6 +174,21 @@ class Module(Base):
     course = relationship("Courses", back_populates="modules")
 
     tasks = relationship("Task", back_populates="module", cascade="all, delete-orphan")
+
+    videos = relationship("VideoModule", back_populates="module", cascade="all, delete-orphan")
+
+
+class VideoModule(Base):
+    __tablename__ = "video_modules"
+
+    id = Column(Integer, primary_key=True)
+    description = Column(String(250), nullable=False)
+    video_url = Column(String(255), nullable=True)
+    video_file = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    module_id = Column(Integer, ForeignKey("modules.id"))
+    module = relationship("Module", back_populates="videos")
 
 
 class Task(Base):
