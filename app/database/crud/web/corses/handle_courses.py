@@ -67,7 +67,7 @@ async def generate_answer(text: str, is_correct: bool, task_id: int):
 
 async def create_video_url(title: str, module_id: int, video_url: str | None = None, video_file: str | None = None):
     async with SessionLocal() as session:
-        create_video = VideoModule(title=title, video_url=video_url, video_file=video_file,
+        create_video = VideoModule(description=title, video_url=video_url, video_file=video_file,
                                    module_id=module_id)
         try:
             session.add(create_video)
@@ -93,7 +93,7 @@ async def get_course_by_id(id_course: int) -> str:
 async def create_video_record(description: str, module_id: int, video_url: str | None = None,
                               video_file: str | None = None):
     async with SessionLocal() as session:
-        create_video = VideoModule(title=description, video_url=video_url, video_file=video_file, module_id=module_id)
+        create_video = VideoModule(description=description, video_url=video_url, video_file=video_file, module_id=module_id)
         try:
             session.add(create_video)
             await session.commit()
