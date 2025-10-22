@@ -8,10 +8,10 @@ STATIC_DIR = BASE_DIR / "web" / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 # Папка для зберігання аватарок користувача
-AVATAR_DIR = STATIC_DIR / "images" / "avatars"
+AVATAR_DIR = STATIC_DIR / "media" / "avatars"
 AVATAR_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Створення папки курсу для зберігання аватарок
-CREATION_COURSES_DIR = STATIC_DIR / "images" / "courses"
+CREATION_COURSES_DIR = STATIC_DIR / "media" / "courses"
 CREATION_COURSES_DIR.mkdir(parents=True, exist_ok=True)

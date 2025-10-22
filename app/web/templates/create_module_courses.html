@@ -167,98 +167,14 @@
         <button type="submit">💾 Зберегти модуль</button>
     </form>
 </div>
-<script>
-    let video_url_Count = 0;
+<script type="module">
+    import {addVideo_url} from "/static/js/videoLinks.js";
+    import {addVideo} from "/static/js/videoUpload.js";
+    import {addTask} from "/static/js/tasks.js";
 
-    function addVideo_url() {
-      video_url_Count++;
-      const video_url_Div = document.createElement("div");
-      video_url_Div.classList.add("video_url");
-
-      video_url_Div.innerHTML = `
-        <label>Напишіть назву відео ${video_url_Count}</label>
-        <input type="text"name="videos_url[${video_url_Count}][title]" placeholder="Назва відео" required>
-
-        <label>Вставте посилання на відео ${video_url_Count}</label>
-        <input type="text" name="videos_url[${video_url_Count}[url]" placeholder="https://..." required>
-
-        <button type="button" class="remove-video-btn">🗑 Видалити</button>
-      `;
-    // Додаємо обробник видалення
-      video_url_Div.querySelector(".remove-video-btn").addEventListener("click", () => {
-        video_url_Div.remove();
-      });
-
-      document.getElementById("video_url").appendChild(video_url_Div);
-      video_url_Div.scrollIntoView({ behavior: "smooth" });
-    }
-</script>
-<script>
-    let videoCount = 0;
-
-    function addVideo() {
-        videoCount++;
-        const videoDiv = document.createElement("div");
-        videoDiv.classList.add("video");
-
-        videoDiv.innerHTML = `
-            <label>Виберіть відео ${videoCount}</label>
-            <input type="file" name="videos_file" accept="video/*" required>
-
-            <label>Опис відео ${videoCount}</label>
-            <textarea name="videos_description" placeholder="Опишіть відео..." rows="3" required></textarea>
-
-            <button type="button" class="remove-video-btn">🗑 Видалити</button>
-            <hr>
-        `;
-
-        videoDiv.querySelector(".remove-video-btn").addEventListener("click", () => videoDiv.remove());
-
-        document.getElementById("video_download").appendChild(videoDiv);
-        videoDiv.scrollIntoView({ behavior: "smooth" });
-    }
-</script>
-
-<script>
-    let taskCount = 0;
-
-    function addTask() {
-      taskCount++;
-      const taskDiv = document.createElement("div");
-      taskDiv.classList.add("task");
-
-      taskDiv.innerHTML = `
-        <label>Питання ${taskCount}</label>
-        <textarea name="tasks[${taskCount}][question]" rows="2" required></textarea>
-
-        <div class="answers">
-          <label>✅ Правильна відповідь</label>
-          <input type="text" name="tasks[${taskCount}][answers][0][text]" required>
-          <input type="hidden" name="tasks[${taskCount}][answers][0][is_correct]" value="true">
-
-          <label>❌ Неправильна відповідь 1</label>
-          <input type="text" name="tasks[${taskCount}][answers][1][text]" required>
-          <input type="hidden" name="tasks[${taskCount}][answers][1][is_correct]" value="false">
-
-          <label>❌ Неправильна відповідь 2</label>
-          <input type="text" name="tasks[${taskCount}][answers][2][text]" required>
-          <input type="hidden" name="tasks[${taskCount}][answers][2][is_correct]" value="false">
-
-          <label>❌ Неправильна відповідь 3</label>
-          <input type="text" name="tasks[${taskCount}][answers][3][text]" required>
-          <input type="hidden" name="tasks[${taskCount}][answers][3][is_correct]" value="false">
-        </div>
-        <button type="button" class="remove-task-btn">🗑 Видалити</button>
-      `;
-
-        // Додаємо обробник видалення
-      taskDiv.querySelector(".remove-task-btn").addEventListener("click", () => {
-        taskDiv.remove();
-      });
-
-      document.getElementById("tasks").appendChild(taskDiv);
-      taskDiv.scrollIntoView({ behavior: "smooth" });
-    }
+    window.addVideo_url = addVideo_url;
+    window.addVideo = addVideo;
+    window.addTask = addTask;
 </script>
 </body>
 </html>
