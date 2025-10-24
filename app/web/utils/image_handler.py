@@ -44,12 +44,12 @@ async def save_image_to_course_folder(course_avatar: UploadFile, title: str):
 
 async def save_video_to_module_folder(video: UploadFile, description: str, course_id: int, module_id: int):
     try:
-        course_title = await get_course_by_id(course_id)
+        course = await get_course_by_id(course_id)
     except ValueError as e:
         logging.error(f"Помилка при отриманні курсу: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-    video_path = CREATION_COURSES_DIR / course_title / f"module_{module_id}" / "video"
+    video_path = CREATION_COURSES_DIR / course.title / f"module_{module_id}" / "video"
     video_path.mkdir(parents=True, exist_ok=True)
 
     file_path = video_path / video.filename
