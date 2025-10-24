@@ -77,7 +77,7 @@ async def create_video_url(title: str, module_id: int, video_url: str | None = N
             raise e
 
 
-async def get_course_by_id(id_course: int) -> str:
+async def get_course_by_id(id_course: int) -> Courses:
     async with SessionLocal() as session:
         result = await session.execute(
             select(Courses).where(Courses.id == id_course)
@@ -87,7 +87,7 @@ async def get_course_by_id(id_course: int) -> str:
         if not course:
             raise ValueError("Сталася помилка: курс не знайдено")
 
-        return course.title
+        return course
 
 
 async def create_video_record(description: str, module_id: int, video_url: str | None = None,
@@ -101,3 +101,12 @@ async def create_video_record(description: str, module_id: int, video_url: str |
             await session.rollback()
             logging.error(f"Помилка при записі відео в базу: {e}")
             raise
+
+
+async def get_used_lessons_for_course(course_id: int) -> list[int]:
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(Module.order).where(Module.course_id == course_id)
+        )
+        used_orders = [row[0] for row in result.all()]
+        return used_orders
