@@ -127,29 +127,26 @@
     {% endif %}
 
     <form method="POST" enctype="multipart/form-data">
+        <p>Курс: {{ course.title }}</p>
+        <input type="hidden" name="course_id" value="{{ course.id }}">
+
+
         <label for="title">Назва модуля</label>
         <input type="text" name="title" id="title" required>
 
-        <!--    <label for="video_url">Посилання на відео</label>-->
-        <!--    <input type="text" name="video_url" id="video_url" placeholder="https://...">-->
-
         <label for="notes">Конспект</label>
         <textarea name="notes" id="notes" rows="4" placeholder="Текст конспекту..."></textarea>
-
         <label for="order">Порядок уроку</label>
-        <input type="number" name="order" id="order" min="1" required>
+        <select name="order" id="order" required>
+            {% for i in available_orders %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
 
         <label for="is_active">Урок відкритий</label>
         <select name="is_active" id="is_active">
             <option value="true">Так</option>
             <option value="false" selected>Ні</option>
-        </select>
-
-        <label for="course_id">Курс</label>
-        <select name="course_id" id="course_id" required>
-            {% for course in courses %}
-            <option value="{{ course.id }}">{{ course.title }}</option>
-            {% endfor %}
         </select>
 
         <h3>Посилання на відео</h3>
