@@ -2,9 +2,12 @@ import logging
 from fastapi import APIRouter, Request, Form, Depends, UploadFile, File, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
 from typing import List
+
+from starlette.responses import JSONResponse
+
 from app.database.crud.web.administrator.handle_administrator import all_administrators
 from app.database.crud.web.corses.handle_courses import all_courses, create_module, \
-    create_task_for_module, generate_answer, create_video_url
+    create_task_for_module, generate_answer, create_video_url, get_course_by_id, get_used_lessons_for_course
 from app.database.crud.web.services.module_service import parse_video_data, save_videos, parse_tasks_data, save_tasks
 from app.web.dependencies.auth_dependencies import validate_login_form
 from app.database.core.models import User
@@ -16,12 +19,27 @@ router = APIRouter()
 
 
 @router.get("/create_module_courses", response_class=HTMLResponse)
-async def module_create_get(request: Request):
+async def create_module_get(request: Request, course_id: int):
     administrators = await all_administrators()
-    courses = await all_courses()
+    course = await get_course_by_id(course_id)
+
+    if not course:
+        return templates.TemplateResponse(
+            "create_module_courses.html",
+            {"request": request, "error": "Курс не знайдено."}
+        )
+
+    used_orders = await get_used_lessons_for_course(course_id)
+    available_orders = [i for i in range(1, course.lesson_count + 1) if i not in used_orders]
+
     return templates.TemplateResponse(
         "create_module_courses.html",
-        {"request": request, "courses": courses, "teachers": administrators}
+        {
+            "request": request,
+            "course": course,
+            "teachers": administrators,
+            "available_orders": available_orders
+        }
     )
 
 
