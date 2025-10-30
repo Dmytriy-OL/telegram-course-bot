@@ -93,7 +93,8 @@ async def get_course_by_id(id_course: int) -> Courses:
 async def create_video_record(description: str, module_id: int, video_url: str | None = None,
                               video_file: str | None = None):
     async with SessionLocal() as session:
-        create_video = VideoModule(description=description, video_url=video_url, video_file=video_file, module_id=module_id)
+        create_video = VideoModule(description=description, video_url=video_url, video_file=video_file,
+                                   module_id=module_id)
         try:
             session.add(create_video)
             await session.commit()
