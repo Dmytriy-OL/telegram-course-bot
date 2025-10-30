@@ -137,11 +137,8 @@
         <label for="notes">Конспект</label>
         <textarea name="notes" id="notes" rows="4" placeholder="Текст конспекту..."></textarea>
         <label for="order">Порядок уроку</label>
-        <select name="order" id="order" required>
-            {% for i in available_orders %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
-        </select>
+        <input type="number" name="order" id="order" value="{{ next_order }}" readonly>
+
 
         <label for="is_active">Урок відкритий</label>
         <select name="is_active" id="is_active">
