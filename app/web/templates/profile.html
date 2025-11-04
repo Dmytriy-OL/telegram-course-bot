@@ -1,75 +1,71 @@
 {% extends "base.html" %}
 
-{% block title %}Профіль{% endblock %}
+{% block title %}Мій профіль — LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/profile.css') }}">
+{% endblock %}
 
 {% block content %}
-<h1>Профіль користувача</h1>
+<section class="profile-container">
+    {% if user %}
+    <div class="profile-card">
+        <!-- Аватар -->
+        <div class="avatar-section">
+            {% if user.avatar and user.avatar.file_path %}
+                <img src="{{ url_for('static', path='media/avatars/' + user.avatar.file_path) }}" alt="Аватар" class="avatar">
+            {% else %}
+                <img src="{{ url_for('static', path='media/content/default-avatar.png') }}" alt="Аватар" class="avatar">
+            {% endif %}
+            <label for="avatar" class="upload-label">📷 Змінити фото</label>
+            <input type="file" id="avatar" name="avatar" accept="image/*" form="profileForm" style="display: none;">
+        </div>
 
-{% if user %}
-<form method="post" action="/profile" enctype="multipart/form-data" style="max-width: 400px;">
+        <!-- Інформація -->
+        <form id="profileForm" method="post" action="/profile" enctype="multipart/form-data" class="profile-form">
+            <div class="form-group">
+                <label for="name">Ім’я</label>
+                <input type="text" id="name" name="name" value="{{ user.name or '' }}">
+            </div>
 
-    <!-- Аватар -->
-    <div style="margin-bottom: 10px;">
-        {% if user.avatar and user.avatar.file_path %}
-            <img src="{{ url_for('static', path='images/avatars/' + user.avatar.file_path) }}"
-                 alt="Аватар" style="max-width: 150px; border-radius: 10px;">
-        {% else %}
-            <img src="{{ url_for('static', path='images/default-avatar.png') }}"
-                 alt="Аватар" style="max-width: 150px; border-radius: 10px;">
+            <div class="form-group">
+                <label for="surname">Прізвище</label>
+                <input type="text" id="surname" name="surname" value="{{ user.surname or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Нік</label>
+                <input type="text" id="username" name="username" value="{{ user.username or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" readonly class="readonly">
+                <small>Email не можна змінити</small>
+            </div>
+
+            <div class="form-group">
+                <label for="birth_date">Дата народження</label>
+                <input type="date" id="birth_date" name="birth_date" value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}">
+            </div>
+
+            <button type="submit" class="btn save-btn">💾 Зберегти зміни</button>
+        </form>
+
+        {% if message %}
+        <p class="message success">{{ message }}</p>
         {% endif %}
-        <br>
-        <label for="avatar"
-               style="cursor: pointer; display: inline-flex; align-items: center; margin-top: 5px; color: #007bff;">
-            Завантажити фото
-        </label>
-        <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;">
+        {% if error %}
+        <p class="message error">{{ error }}</p>
+        {% endif %}
     </div>
 
-    <!-- Ім'я -->
-    <div style="margin-bottom: 10px;">
-        <label for="name">Ім’я:</label><br>
-        <input type="text" id="name" name="name" value="{{ user.name or '' }}">
-    </div>
+    {% else %}
+    <p class="message error">Користувач не знайдений</p>
+    {% endif %}
+</section>
+{% endblock %}
 
-    <!-- Прізвище -->
-    <div style="margin-bottom: 10px;">
-        <label for="surname">Прізвище:</label><br>
-        <input type="text" id="surname" name="surname" value="{{ user.surname or '' }}">
-    </div>
-
-    <!-- Email -->
-    <div style="margin-bottom: 10px;">
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" value="{{ user.email }}" readonly>
-        <small style="color: gray;">Email не можна змінити</small>
-    </div>
-
-    <!-- Нік -->
-    <div style="margin-bottom: 10px;">
-        <label for="username">Нік:</label><br>
-        <input type="text" id="username" name="username" value="{{ user.username or '' }}">
-    </div>
-
-    <!-- Дата народження -->
-    <div style="margin-bottom: 10px;">
-        <label for="birth_date">Дата народження:</label><br>
-        <input type="date" id="birth_date" name="birth_date"
-               value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}">
-    </div>
-
-    <button type="submit" style="padding: 6px 12px;">Зберегти</button>
-</form>
-
-<!-- Повідомлення -->
-{% if message %}
-<p style="color: green;">{{ message }}</p>
-{% endif %}
-{% if error %}
-<p style="color: red;">{{ error }}</p>
-{% endif %}
-
-{% else %}
-<p style="color:red;">Користувач не знайдений</p>
-{% endif %}
-
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/profile.js') }}"></script>
 {% endblock %}
