@@ -23,7 +23,8 @@ async def create_course(title: str, save_image: str, price: int, caption: str, l
 
 async def all_courses():
     async with SessionLocal() as session:
-        result = await session.execute(select(Courses).options(selectinload(Courses.teacher)))
+        result = await session.execute(select(Courses).options(selectinload(Courses.teacher),
+                                                               selectinload(Courses.avatar)))
         return result.scalars().all()
 
 
