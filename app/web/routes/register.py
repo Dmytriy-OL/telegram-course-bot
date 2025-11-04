@@ -18,9 +18,9 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+# @router.get("/", response_class=HTMLResponse)
+# async def home(request: Request):
+#     return templates.TemplateResponse("home.html", {"request": request})
 
 
 @router.get("/register", response_class=HTMLResponse)
