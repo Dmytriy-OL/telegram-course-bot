@@ -4,26 +4,40 @@
     <meta charset="UTF-8">
     <title>{% block title %}Система управління записами на індивідуальні та групові заняття з аналітикою та
         Telegram-ботом{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}">
+    {% block head_extra %}{% endblock %}
 </head>
 <body>
-<nav>
-    <a href="/">Home</a> |
-    <a href="/about">About</a>
-    <a href="/lessons">Lessons</a>
-    <a href="/staff">Staff</a>
-    <a href="/contact">Contact</a>
+<nav class="site-nav">
+    <a class="logo" href="/">LinguaPro</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/lessons">Lessons</a>
+        <a href="/staff">Staff</a>
+        <a href="/contact">Contact</a>
 
-    {% if request.session.get('user') %}
-        <span>Вітаю, {{ request.session['user'] }}!</span>
-        <a href="/logout">Вийти</a>
-        <a href="/profile">Мій профіль</a>
-        <a href="/">Мої курси</a>
-    {% else %}
-        <a href="/login">Увійти</a>
-        <a href="/register">Зареєструватися</a>
-    {% endif %}
+        {% if request.session.get('user') %}
+        <div class="dropdown">
+            <button class="dropbtn">👤 {{ request.session['user'] }}</button>
+            <div class="dropdown-content">
+                <a href="/profile">Профіль</a>
+                <a href="/my-courses">Мої курси</a>
+                <a href="/notes">Нотатки</a>
+                <a href="/settings">Налаштування</a>
+                <hr>
+                <a href="/logout" class="logout">Вийти</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="nav-auth">
+            <a href="/login" class="btn small outline">Увійти</a>
+            <a href="/register" class="btn small register">Реєстрація</a>
+        </div>
+        {% endif %}
+    </div>
 </nav>
-<hr>
 {% block content %}{% endblock %}
+{% block scripts %} {% endblock %}
 </body>
 </html>
