@@ -1,9 +1,252 @@
-{% extends "courses.html" %}
+{% extends "base.html" %}
 
-{% block title %}Головна{% endblock %}
+{% block title %}Курси англійської мови{% endblock %}
 
 {% block content %}
-    <h1>Мої курси</h1>
-    <p>Курси</p>
+<!-- ================= HERO (розділена секція) ================= -->
+<section class="hero-split">
+    <div class="hero-left">
+        <h1>Вивчайте англійську<br><span class="accent">на найвищому рівні</span></h1>
+        <p class="lead">
+            {% if request.session.get('user') %}
+                👋 Вітаємо, <strong>{{ request.session['user'] }}</strong>! Ми вже чекаємо на тебе — обери курс та почни сьогодні.
+            {% else %}
+                👋 Ми вже чекаємо на тебе! Зареєструйся та почни вивчення англійської з професійними викладачами.
+            {% endif %}
+        </p>
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="icon">💻</div>
+                <div>
+                    <h4>ОНЛАЙН-ЗАНЯТТЯ</h4>
+                    <p>Заняття в реальному часі та запис кожного уроку.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="icon">🌍</div>
+                <div>
+                    <h4>ПРАКТИКА З НОСІЯМИ</h4>
+                    <p>Практичні сесії з викладачами з різних країн.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="icon">🎓</div>
+                <div>
+                    <h4>СЕМІНАРИ & ТРЕНІНГИ</h4>
+                    <p>Інтенсивні курси для швидкого прогресу.</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="icon">📜</div>
+                <div>
+                    <h4>СЕРТИФІКАТИ</h4>
+                    <p>Після завершення курсу — офіційний сертифікат.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-cta">
+            {% if request.session.get('user') %}
+                <a class="btn large" href="/lessons">Переглянути курси</a>
+                <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
+            {% else %}
+                <a class="btn large" href="/register">Приєднатися</a>
+                <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="hero-right">
+        <div class="why-box">
+            <h3>ЧОМУ ОБИРАЮТЬ НАС?</h3>
+            <p>Ми допомагаємо почуватися впевнено: робота, подорожі, навчання — англійська стане твоїм інструментом.</p>
+
+            <ul class="benefits">
+                <li>Покращуйте кар’єру та бізнес</li>
+                <li>Практика з реальними носіями</li>
+                <li>Гнучкий графік та записи уроків</li>
+                <li>Персональна траєкторія навчання</li>
+                <li>Сертифікати по закінченню</li>
+            </ul>
+
+            <a class="btn gradient" href="/lessons">Дізнатися більше</a>
+        </div>
+
+        <div class="promo-box">
+            <h4>Спробуйте перший урок безкоштовно</h4>
+            <p>Зареєструйтесь і отримайте демо-урок — знайдемо оптимальний план навчання для вас.</p>
+            <a class="btn outline" href="/register">Отримати демо</a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= Переваги (докладніше) ================= -->
+<section class="advantages">
+    <div class="container">
+        <h2>Наші переваги</h2>
+        <div class="adv-grid">
+            <div class="adv-card">
+                <div class="adv-icon">⚡</div>
+                <h4>Інтенсивні програми</h4>
+                <p>Короткі курси для швидкого результату: 4–8 тижнів.</p>
+            </div>
+            <div class="adv-card">
+                <div class="adv-icon">🧭</div>
+                <h4>Індивідуальний підхід</h4>
+                <p>Персональна траєкторія залежно від мети та рівня.</p>
+            </div>
+            <div class="adv-card">
+                <div class="adv-icon">🤝</div>
+                <h4>Міжнародні контакти</h4>
+                <p>Мережа студентів та підтримка у працевлаштуванні.</p>
+            </div>
+            <div class="adv-card">
+                <div class="adv-icon">🏆</div>
+                <h4>Підтверджені результати</h4>
+                <p>Наші випускники проходять співбесіди мовою впевнено.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= Популярні курси ================= -->
+<section class="popular-courses">
+    <div class="container">
+        <h2>Популярні курси</h2>
+        <div class="courses-grid">
+            {% for course in courses %}
+            <article class="course-card">
+                <div class="card-media">
+                    <img src="{{ course.avatar_url or url_for('static', filename='img/course-placeholder.jpg') }}"
+                         alt="{{ course.title }}">
+                </div>
+                <div class="card-body">
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <div class="meta">Викладач: {{ course.teacher_full_name }}</div>
+                    <div class="desc">{{ course.short_description if course.short_description is defined else "Короткий опис курсу." }}</div>
+                    <div class="card-actions">
+                        <span class="price">{{ course.price }} ₴</span>
+                        <a class="btn small" href="/create_module_courses?course_id={{ course.id }}">Дізнатися більше</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ================= Відгуки ================= -->
+<section class="testimonials">
+    <div class="container">
+        <h2>Що кажуть студенти</h2>
+        <div class="test-grid">
+            <!-- Це приклади — можна підставити реальні відгуки -->
+            <blockquote class="test">
+                <p>“Мої розмовні навички значно покращились за 3 місяці. Викладач підтримував і давав чіткі завдання.”</p>
+                <cite>— Олександра, студентка</cite>
+            </blockquote>
+            <blockquote class="test">
+                <p>“Гнучкий графік та індивідуальний підхід зробили своє — я пройшов співбесіду англійською!”</p>
+                <cite>— Ігор, розробник</cite>
+            </blockquote>
+            <blockquote class="test">
+                <p>“Корисні семінари та практика з носіями — рекомендую.”</p>
+                <cite>— Марина, маркетолог</cite>
+            </blockquote>
+        </div>
+    </div>
+</section>
+
+<!-- ================= Викладачі ================= -->
+<section class="teachers">
+    <div class="container">
+        <h2>Наші викладачі</h2>
+        <div class="teachers-grid">
+            {% for t in teachers if teachers is defined %}
+            <div class="teacher-card">
+                <img src="{{ t.photo_url or url_for('static', filename='img/teacher-placeholder.jpg') }}" alt="{{ t.name }}">
+                <h4>{{ t.name }}</h4>
+                <p class="role">{{ t.role or 'Викладач англійської' }}</p>
+                <p class="bio">{{ t.bio or 'Досвідчений викладач з міжнародною практикою.' }}</p>
+            </div>
+            {% endfor %}
+            {% if teachers is not defined %}
+            <!-- Заглушки, якщо в контексті немає teachers -->
+            <div class="teacher-card">
+                <img src="{{ url_for('static', filename='img/teacher-placeholder.jpg') }}" alt="Teacher">
+                <h4>Анна Петрова</h4>
+                <p class="role">Викладач англійської</p>
+                <p class="bio">10+ років викладання, підготовка до IELTS та співбесід.</p>
+            </div>
+            <div class="teacher-card">
+                <img src="{{ url_for('static', filename='img/teacher-placeholder.jpg') }}" alt="Teacher">
+                <h4>Джон Сміт</h4>
+                <p class="role">Носій мови</p>
+                <p class="bio">Практика розмовної англійської, культура та вимова.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ================= Процес навчання ================= -->
+<section class="process">
+    <div class="container">
+        <h2>Як проходить навчання</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="num">1</div>
+                <h4>Реєстрація</h4>
+                <p>Заповни форму і пройди коротке тестування для підбору курсу.</p>
+            </div>
+            <div class="step">
+                <div class="num">2</div>
+                <h4>План навчання</h4>
+                <p>Ми підбираємо індивідуальний план з урахуванням твоїх цілей.</p>
+            </div>
+            <div class="step">
+                <div class="num">3</div>
+                <h4>Заняття</h4>
+                <p>Зустрічі в режимі онлайн з викладачем та практичні завдання.</p>
+            </div>
+            <div class="step">
+                <div class="num">4</div>
+                <h4>Оцінка прогресу</h4>
+                <p>Регулярні тестування та зворотний зв'язок для корекції траєкторії.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= Контакт / CTA ================= -->
+<section class="cta-contact">
+    <div class="container cta-grid">
+        <div class="cta-left">
+            <h2>Готові почати?</h2>
+            <p>Залиш заявку — ми підберемо найкращий курс під ваші цілі.</p>
+            <a class="btn large gradient" href="/register">Приєднатись зараз</a>
+        </div>
+
+        <div class="cta-right">
+            <form id="contactForm" class="contact-form" method="post" action="/contact_submit">
+                <label>Ім'я
+                    <input name="name" required placeholder="Ваше ім'я">
+                </label>
+                <label>Email
+                    <input name="email" type="email" required placeholder="email@domain.com">
+                </label>
+                <label>Повідомлення
+                    <textarea name="message" rows="4" placeholder="Коротко про ваші цілі"></textarea>
+                </label>
+                <button class="btn large" type="submit">Надіслати</button>
+                <div id="contactFormMsg" class="form-msg" aria-live="polite"></div>
+            </form>
+        </div>
+    </div>
+</section>
 
 {% endblock %}
