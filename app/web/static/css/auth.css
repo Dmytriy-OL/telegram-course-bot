@@ -60,6 +60,63 @@
   outline: none;
 }
 
+/* 🎂 Стилі для вибору дати народження */
+.birth-selects {
+  display: flex;
+  gap: 10px;
+}
+
+.birth-selects select {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: #ffffff; /* світлий фон */
+  color: #000000; /* чорний текст */
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.birth-selects select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+  outline: none;
+}
+
+/* ✅ Умови та політика */
+.terms {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  text-align: left;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  line-height: 1.4;
+  gap: 6px;
+  white-space: nowrap; /* ⚡ не дає переносити текст */
+}
+
+.terms input[type="checkbox"] {
+  margin-top: 0;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.terms a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.terms a:hover {
+  color: var(--accent-2);
+}
+
+/* Кнопки */
 .login-btn {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   color: white;
@@ -78,6 +135,7 @@
   box-shadow: 0 6px 20px rgba(167,139,250,0.3);
 }
 
+/* Розділювач */
 .divider {
   display: flex;
   align-items: center;
@@ -96,6 +154,7 @@
   margin: 0 10px;
 }
 
+/* Google-кнопка */
 .google-btn {
   display: flex;
   align-items: center;
@@ -121,6 +180,7 @@
   height: 20px;
 }
 
+/* Посилання під формою */
 .links {
   margin-top: 20px;
 }
@@ -141,12 +201,14 @@
   color: var(--accent-2);
 }
 
+/* Повідомлення про помилку */
 .error-msg {
   color: #f87171;
   margin-top: 15px;
   font-size: 14px;
 }
 
+/* Анімація */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
