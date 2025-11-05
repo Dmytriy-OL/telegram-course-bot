@@ -1,100 +1,97 @@
 {% extends "base.html" %}
-
 {% block title %}Реєстрація{% endblock %}
 
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Форма реєстрації</h1>
+<div class="login-wrapper">
+  <div class="login-card">
+    <h1>Створи акаунт 🚀</h1>
+    <p class="subtitle">Долучайся до навчання вже сьогодні</p>
 
-<form method="POST" action="/register">
-    <div>
-        <label for="birth_day">День народження:</label>
-        <select id="birth_day" name="birth_day" required>
-            <option value="">--</option>
+    <form method="POST" action="/register">
+      <!-- Дата народження -->
+      <div class="form-group">
+        <label>Дата народження</label>
+        <div class="birth-selects">
+          <select id="birth_day" name="birth_day" required>
+            <option value="">День</option>
             {% for day in range(1, 32) %}
-            <option value="{{ day }}" {% if form_values.birth_day == day|string %}selected{% endif %}>{{ day }}</option>
+              <option value="{{ day }}" {% if form_values.birth_day == day|string %}selected{% endif %}>{{ day }}</option>
             {% endfor %}
-        </select>
+          </select>
 
-        <label for="birth_month">Місяць:</label>
-        <select id="birth_month" name="birth_month" required>
-            <option value="">--</option>
+          <select id="birth_month" name="birth_month" required>
+            <option value="">Місяць</option>
             {% set months = [
-                ('1', 'Січень'),
-                ('2', 'Лютий'),
-                ('3', 'Березень'),
-                ('4', 'Квітень'),
-                ('5', 'Травень'),
-                ('6', 'Червень'),
-                ('7', 'Липень'),
-                ('8', 'Серпень'),
-                ('9', 'Вересень'),
-                ('10', 'Жовтень'),
-                ('11', 'Листопад'),
-                ('12', 'Грудень')
+              ('1', 'Січень'), ('2', 'Лютий'), ('3', 'Березень'),
+              ('4', 'Квітень'), ('5', 'Травень'), ('6', 'Червень'),
+              ('7', 'Липень'), ('8', 'Серпень'), ('9', 'Вересень'),
+              ('10', 'Жовтень'), ('11', 'Листопад'), ('12', 'Грудень')
             ] %}
             {% for value, name in months %}
-            <option value="{{ value }}" {% if form_values.birth_month == value %}selected{% endif %}>{{ name }}</option>
+              <option value="{{ value }}" {% if form_values.birth_month == value %}selected{% endif %}>{{ name }}</option>
             {% endfor %}
-        </select>
+          </select>
 
-        <label for="birth_year">Рік:</label>
-        <select id="birth_year" name="birth_year" required>
-            <option value="">--</option>
+          <select id="birth_year" name="birth_year" required>
+            <option value="">Рік</option>
             {% set current_year = 2025 %}
             {% for year in range(current_year - 60, current_year + 1) %}
-            <option value="{{ year }}" {% if form_values.birth_year == year|string %}selected{% endif %}>{{ year }}</option>
+              <option value="{{ year }}" {% if form_values.birth_year == year|string %}selected{% endif %}>{{ year }}</option>
             {% endfor %}
-        </select>
-    </div>
+          </select>
+        </div>
+      </div>
 
-    <div>
-        <label for="email">Email:</label>
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Електронна пошта</label>
         <input type="email" id="email" name="email" required value="{{ form_values.email | default('') }}">
-    </div>
+      </div>
 
-    <div>
-        <label for="login">Ім'я користувача:</label>
+      <!-- Логін -->
+      <div class="form-group">
+        <label for="login">Ім’я користувача</label>
         <input type="text" id="login" name="login" required value="{{ form_values.username | default('') }}">
-    </div>
+      </div>
 
-    <div>
-        <label for="password">Пароль:</label>
+      <!-- Паролі -->
+      <div class="form-group">
+        <label for="password">Пароль</label>
         <input type="password" id="password" name="password" required>
-    </div>
+      </div>
 
-    <div>
-        <label for="password_confirm">Повторіть пароль:</label>
+      <div class="form-group">
+        <label for="password_confirm">Повторіть пароль</label>
         <input type="password" id="password_confirm" name="password_confirm" required>
-    </div>
+      </div>
 
-    <br>
-
-    <label>
+      <!-- Умови -->
+      <label class="terms">
         <input type="checkbox" name="terms" required {% if form_values.terms %}checked{% endif %}>
-        Я приймаю <a href="/terms" target="_blank">Умови надання послуг</a> та <a href="/privacy" target="_blank">Політику конфіденційності</a>
-    </label>
+        Я приймаю <a href="/terms" target="_blank">умови</a> та <a href="/privacy" target="_blank">політику конфіденційності</a>
+      </label>
 
-    <br><br>
+      <button type="submit" class="login-btn">Зареєструватися</button>
+    </form>
 
-    <button type="submit">Зареєструватися</button>
+    <div class="divider"><span>або</span></div>
 
-    <a href="/auth/google">
-        <button type="button">Зареєструватися через Google</button>
+    <a href="/auth/google" class="google-btn">
+      <img src="{{ url_for('static', path='/media/content/icons/icons-google.png') }}" alt="Google" class="google-icon">
+      Зареєструватися через Google
     </a>
 
-    <br><br>
-    <p>Уже маєш акаунт? <a href="/login">Увійти</a></p>
-</form>
+    <div class="links">
+      <p>Уже маєш акаунт? <a href="/login">Увійти</a></p>
+    </div>
 
-{% if email_sent %}
-<div style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;">
-    <h2>Перевірте електронну пошту</h2>
-    <p>На <strong>{{ email }}</strong> було надіслано лист із посиланням для підтвердження.</p>
-    <p>Перейдіть за ним, щоб завершити реєстрацію.</p>
+    {% if error %}
+      <p class="error-msg">{{ error }}</p>
+    {% endif %}
+  </div>
 </div>
-{% endif %}
-
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
 {% endblock %}
