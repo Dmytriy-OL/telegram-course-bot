@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Просте появлення елементів при скролі
+
+  /* --- Анімація появи елементів --- */
   const appearElems = document.querySelectorAll('.course-card, .teacher-card, .adv-card, .test, .feature-item');
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     io.observe(el);
   });
 
-  // Просте відправлення контактної форми через fetch (порожня заглушка)
+  /* --- Відправка форми --- */
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
@@ -27,21 +28,42 @@ document.addEventListener('DOMContentLoaded', () => {
       msg.textContent = 'Відправляємо...';
       const formData = new FormData(contactForm);
       try {
-        // Заміни URL на реальний endpoint у бекенді
         const res = await fetch(contactForm.action || '/contact_submit', {
           method: 'POST',
           body: formData
         });
-        if (res.ok) {
-          msg.textContent = 'Дякуємо! Ми зв’яжемося з вами найближчим часом.';
-          contactForm.reset();
-        } else {
-          msg.textContent = 'Сталася помилка. Спробуйте ще раз.';
-        }
-      } catch (err) {
-        msg.textContent = 'Помилка мережі. Перевірте підключення.';
+        msg.textContent = res.ok
+          ? 'Дякуємо! Ми зв’яжемося з вами.'
+          : 'Сталася помилка. Спробуйте ще раз.';
+        if (res.ok) contactForm.reset();
+      } catch {
+        msg.textContent = 'Помилка мережі.';
       }
       setTimeout(()=> msg.textContent = '', 6000);
     });
   }
+
+  /* --- Меню користувача по кліку --- */
+  const dropBtn = document.querySelector(".dropbtn");
+  const dropMenu = document.querySelector(".dropdown-content");
+
+  if (dropBtn && dropMenu) {
+    dropBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropMenu.classList.toggle("show");
+    });
+
+    document.addEventListener("click", () => {
+      dropMenu.classList.remove("show");
+    });
+  }
+
 });
+const sidebar = document.getElementById("sidebar");
+const openSidebar = document.getElementById("openSidebar");
+const closeSidebar = document.getElementById("closeSidebar");
+
+if (openSidebar && closeSidebar && sidebar) {
+  openSidebar.addEventListener("click", () => sidebar.classList.add("open"));
+  closeSidebar.addEventListener("click", () => sidebar.classList.remove("open"));
+}
