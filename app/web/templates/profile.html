@@ -13,9 +13,10 @@
         <!-- Аватар -->
         <div class="avatar-section">
             {% if user.avatar and user.avatar.file_path %}
-                <img src="{{ url_for('static', path='media/avatars/' + user.avatar.file_path) }}" alt="Аватар" class="avatar">
+            <img src="{{ url_for('static', path='media/avatars/' + user.avatar.file_path) }}" alt="Аватар"
+                 class="avatar">
             {% else %}
-                <img src="{{ url_for('static', path='media/content/default-avatar.png') }}" alt="Аватар" class="avatar">
+            <img src="{{ url_for('static', path='media/content/default-avatar.png') }}" alt="Аватар" class="avatar">
             {% endif %}
             <label for="avatar" class="upload-label">📷 Змінити фото</label>
             <input type="file" id="avatar" name="avatar" accept="image/*" form="profileForm" style="display: none;">
@@ -45,10 +46,45 @@
             </div>
 
             <div class="form-group">
-                <label for="birth_date">Дата народження</label>
-                <input type="date" id="birth_date" name="birth_date" value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}">
-            </div>
+                <label>Дата народження</label>
 
+                <div class="birth-date-selects">
+                    <select id="birth_day" name="birth_day" class="modern-select" required>
+                        <option value="">День</option>
+                        {% for day in range(1,32) %}
+                        <option value="{{ day }}"
+                                {% if user.birth_date and user.birth_date.day== day %} selected {% endif %}>
+                            {{ day }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select id="birth_month" name="birth_month" class="modern-select" required>
+                        <option value="">Місяць</option>
+                        {% set months = [
+                        ('1','Січень'),('2','Лютий'),('3','Березень'),('4','Квітень'),
+                        ('5','Травень'),('6','Червень'),('7','Липень'),('8','Серпень'),
+                        ('9','Вересень'),('10','Жовтень'),('11','Листопад'),('12','Грудень')
+                        ] %}
+                        {% for val, label in months %}
+                        <option value="{{ val }}"
+                                {% if user.birth_date and user.birth_date.month== val|int %} selected {% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select id="birth_year" name="birth_year" class="modern-select" required>
+                        <option value="">Рік</option>
+                        {% for year in range(1950, 2026) %}
+                        <option value="{{ year }}"
+                                {% if user.birth_date and user.birth_date.year== year %} selected {% endif %}>
+                            {{ year }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <button type="submit" class="btn save-btn">💾 Зберегти зміни</button>
         </form>
 
