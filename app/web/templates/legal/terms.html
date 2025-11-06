@@ -24,7 +24,11 @@
       Ваші особисті дані обробляються відповідно до <a href="/privacy" class="link">Політики конфіденційності</a>.
     </p>
 
-    <a href="/register" class="back-btn">← Повернутися до реєстрації</a>
+    {% if request.headers.referer and '/register' in request.headers.referer %}
+        <div><a href="/register" class="back-btn">← Повернутися до реєстрації</a></div>
+    {% else %}
+        <div><a href="javascript:history.back()" class="back-btn">← Повернутися назад</a></div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
