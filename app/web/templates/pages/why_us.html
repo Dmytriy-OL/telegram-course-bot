@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Чому обирають EnglishPro{% endblock %}
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/why_us.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="why-hero container">
+    <h1>Чому обирають <span class="accent">EnglishPro?</span></h1>
+    <p>Ми створюємо сучасний, ефективний та персоналізований формат вивчення англійської з носіями мови.</p>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Переваги -->
+<section class="why-benefits container">
+    <div class="benefit-card"><span>💼</span><h3>Кар'єра та бізнес</h3><p>Професійна англійська для роботи, інтерв'ю та міжнародних переговорів.</p></div>
+    <div class="benefit-card"><span>🗣️</span><h3>Практика з носіями</h3><p>Заняття з викладачами з США та Великої Британії.</p></div>
+    <div class="benefit-card"><span>📅</span><h3>Гнучкий графік</h3><p>Навчайтесь коли зручно — онлайн + записи уроків.</p></div>
+    <div class="benefit-card"><span>🎯</span><h3>Персональний план</h3><p>Індивідуальна програма під вашу мету.</p></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Статистика -->
+<section class="why-stats container">
+    <div><h2>95%</h2><p>студентів починають говорити на 2-му місяці</p></div>
+    <div><h2>+1500</h2><p>випускників по всьому світу</p></div>
+    <div><h2>7.5</h2><p>середній бал IELTS серед студентів</p></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Викладачі -->
+<section class="teachers container">
+    <h2>Наші викладачі</h2>
+    <p>Досвідчені фахівці з міжнародною практикою викладання.</p>
+    <div class="teachers-grid">
+        <div class="teacher-card">
+            <img src="/static/media/teachers/teacher1.png">
+            <h4>Emily Carter 🇬🇧</h4>
+            <p>10+ років досвіду, Cambridge CELTA</p>
+        </div>
+        <div class="teacher-card">
+            <img src="/static/media/teachers/teacher2.png">
+            <h4>Mike Johnson 🇺🇸</h4>
+            <p>Спеціаліст з бізнес-англійської</p>
+        </div>
+        <div class="teacher-card">
+            <img src="/static/media/teachers/teacher3.png">
+            <h4>Sophia Lee 🇨🇦</h4>
+            <p>Підготовка до IELTS / TOEFL</p>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Формат навчання -->
+<section class="why-format container">
+    <div class="format-grid">
+        <div class="format-text">
+            <h2 class="left-title">Як проходить навчання</h2>
+            <ul>
+                <li>📚 Інтерактивні уроки + домашні завдання</li>
+                <li>🧑‍🏫 Живі заняття з викладачем</li>
+                <li>💬 Спікінг-клуби та розмовна практика</li>
+                <li>📈 Відстеження прогресу та навчальний план</li>
+            </ul>
+            <div class="buttons">
+                <a href="/register" class="btn primary">Записатись на приватний урок</a>
+                <a href="/lessons" class="btn outline">Переглянути уроки</a>
+            </div>
+        </div>
+
+        <div class="format-image">
+            <img src="/static/media/content/lesson_preview.png" alt="Онлайн заняття EnglishPro">
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Рівні навчання -->
+<section class="levels container">
+    <h2>Рівні навчання</h2>
+    <p class="levels-subtitle">
+        Ми навчаємо за міжнародною шкалою CEFR — від повного початківця до просунутого рівня.
+        Ти рухаєшся крок за кроком, а система показує твій прогрес.
+    </p>
+
+    <div class="levels-track">
+        {% for level, name, text in [
+            ('A1','Beginner','Початковий рівень — базові фрази та повсякденне спілкування.'),
+            ('A2','Elementary','Розумієш прості теми, підтримуєш розмову.'),
+            ('B1','Intermediate','Говориш про роботу, подорожі, життя.'),
+            ('B2','Upper-Intermediate','Вільне спілкування + підготовка до IELTS.'),
+            ('C1','Advanced','Професійна англійська, впевнене мовлення.'),
+            ('C2','Proficiency','Рівень носія мови.')
+        ] %}
+        <div>
+            <strong>{{level}}</strong>
+            <span>{{name}}</span>
+            <p>{{text}}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p class="levels-note">
+        Починаємо з тесту, визначаємо твій рівень і створюємо персональний план навчання ✨
+    </p>
+
+    <div class="levels-cta">
+        <a href="/placement-test" class="btn primary lg">Пройти тест на рівень</a>
+        <button type="button" class="btn outline lg" id="testInfoBtn">Що буде в тесті?</button>
+    </div>
+
+    {% include "pages/test_modal.html" %}
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Сертифікат -->
+<section class="certificate container">
+    <h2>Сертифікат після завершення</h2>
+    <img src="/static/media/content/certificate_mockup.png">
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Відгуки -->
+<section class="why-reviews container">
+    <h2>Відгуки студентів</h2>
+    <div class="review-grid">
+        <div class="review">⭐️⭐️⭐️⭐️⭐️ “Нарешті почав говорити англійською!” — Андрій</div>
+        <div class="review">⭐️⭐️⭐️⭐️⭐️ “Підготовка до IELTS — 7.5! Дякую!” — Ірина</div>
+        <div class="review">⭐️⭐️⭐️⭐️⭐️ “Круті викладачі 💯 Рекомендую!” — Олена</div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CTA -->
+<section class="cta container">
+    <h2>Готові почати навчання?</h2>
+    <a href="/register" class="btn large">Почати зараз</a>
+    <a href="/lessons" class="btn outline large">Переглянути курси</a>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', path='/js/why_us.js') }}"></script>
+{% endblock %}
