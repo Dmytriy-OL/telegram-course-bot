@@ -1,0 +1,315 @@
+/* =========================== */
+/* HERO БЛОК (ТИТУЛ)           */
+/* =========================== */
+.why-hero {
+    text-align:center;
+    padding:60px 20px;
+}
+.why-hero h1 {
+    font-size:42px;
+    margin-bottom:10px;
+}
+.why-hero p {
+    max-width:700px;
+    margin:0 auto;
+    color:var(--muted);
+}
+
+
+/* =========================== */
+/* ПЕРЕВАГИ                    */
+/* =========================== */
+.why-benefits {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    padding:40px 0;
+}
+
+.benefit-card {
+    background:var(--glass);
+    padding:30px;
+    border-radius:18px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,0.06);
+    backdrop-filter:blur(12px);
+    transition:0.25s;
+}
+.benefit-card:hover { transform:translateY(-5px); }
+.benefit-card span { font-size:40px; display:block; margin-bottom:10px; }
+
+
+/* =========================== */
+/* СТАТИСТИКА                  */
+/* =========================== */
+.why-stats {
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    padding:50px 0;
+    text-align:center;
+}
+.why-stats h2 {
+    font-size:42px;
+    color:var(--accent);
+}
+
+
+/* =========================== */
+/* БЛОК "ЯК ПРОХОДИТЬ НАВЧАННЯ" */
+/* =========================== */
+.why-format {
+    padding:80px 0;
+}
+
+.format-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    align-items:center;
+    gap:60px;
+}
+
+/* вирівнювання заголовка */
+.format-text h2 {
+    font-size:36px;
+    margin-bottom:20px;
+    margin-top:-70px; /* підняти заголовок */
+}
+
+/* список */
+.format-text ul {
+    list-style:none;
+    padding:0;
+    margin-bottom:25px;
+}
+.format-text li {
+    font-size:18px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+/* кнопки */
+.buttons {
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-top:25px;
+}
+@media(max-width:900px) {
+    .buttons {
+        justify-content:center;
+        flex-direction:column;
+        gap:12px;
+    }
+}
+
+/* зображення праворуч */
+.format-image img {
+    width:100%;
+    max-width:530px;
+    border-radius:18px;
+    display:block;
+    margin:0 auto;
+    box-shadow:0 0 25px rgba(127,106,255,0.35);
+}
+
+
+/* =========================== */
+/* КНОПКИ                      */
+/* =========================== */
+.btn.primary {
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    color:#fff;
+    padding:12px 26px;
+    border-radius:10px;
+    font-weight:600;
+    transition:0.25s;
+}
+.btn.primary:hover {
+    opacity:0.9;
+    transform:translateY(-2px);
+}
+
+.btn.outline {
+    border:1px solid var(--accent);
+    color:var(--accent);
+    padding:11px 24px;
+    border-radius:10px;
+    transition:0.25s;
+}
+.btn.outline:hover {
+    background:rgba(167,139,250,0.1);
+    transform:translateY(-2px);
+}
+
+
+/* =========================== */
+/* РІВНІ CEFR                  */
+/* =========================== */
+.levels {
+    text-align:center;
+    padding:80px 0;
+}
+
+.levels-subtitle {
+    max-width:700px;
+    margin:0 auto 30px;
+    color:var(--muted);
+    font-size:18px;
+}
+
+.levels-track {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.levels-track div {
+    background:var(--glass);
+    padding:20px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    backdrop-filter:blur(10px);
+}
+
+.levels-track strong {
+    font-size:28px;
+    color:var(--accent);
+}
+.levels-track span {
+    display:block;
+    font-size:14px;
+    color:var(--muted);
+}
+.levels-track p {
+    margin-top:8px;
+    font-size:14px;
+}
+
+.levels-note {
+    font-size:18px;
+    color:var(--accent);
+}
+
+.levels-cta {
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    margin-top:18px;
+}
+.btn.lg {
+    padding:14px 28px;
+    border-radius:12px;
+    font-weight:600;
+}
+
+@media (max-width:900px) {
+  .levels-cta { flex-direction:column; align-items:center; }
+}
+
+
+/* =========================== */
+/* МОДАЛЬНЕ ВІКНО ТЕСТУ        */
+/* =========================== */
+.modal {
+    position:fixed; inset:0; display:none;
+}
+.modal[aria-hidden="false"] { display:block; }
+
+.modal__backdrop {
+    position:absolute; inset:0;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(2px);
+}
+.modal__dialog {
+    position:relative;
+    max-width:520px;
+    margin:8vh auto;
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+.modal__list { margin:12px 0 18px; color:var(--muted); }
+.modal__list li { margin:6px 0; }
+.modal__actions { display:flex; gap:12px; justify-content:flex-end; }
+
+@media (max-width:900px) {
+    .modal__dialog { margin:10vh 16px; }
+}
+
+
+/* =========================== */
+/* ВІДГУКИ І CTA              */
+/* =========================== */
+.review-grid {
+    display:grid;
+    gap:15px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+}
+.review {
+    background:var(--glass);
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.cta {
+    text-align:center;
+    padding:60px 0;
+}
+/* Сертифікат */
+.certificate {
+    text-align: center;
+    padding: 70px 0;
+}
+
+.certificate h2 {
+    margin-bottom: 25px;
+}
+
+.certificate img {
+    width: 100%;
+    max-width: 650px;   /* Розмір сертифікату */
+    border-radius: 14px;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 0 35px rgba(0,0,0,0.45);
+    background: #fff;
+    padding: 10px;
+}
+
+/* Менший розмір на мобільних */
+@media (max-width: 600px) {
+    .certificate img {
+        max-width: 90%;
+    }
+}
+
+/* ===== Розділювачі між секціями ===== */
+.section-divider {
+    width: 100%;
+    max-width: 1200px;
+    height: 1px;
+    margin: 70px auto;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.12),
+        transparent
+    );
+}
+
+/* Додаткові відступи між секціями */
+section {
+    margin-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+    section {
+        margin-bottom: 40px;
+    }
+}
