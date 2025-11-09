@@ -8,6 +8,14 @@ router = APIRouter()
 @router.get("/learn-more", response_class=HTMLResponse)
 async def learn_more(request: Request):
     return templates.TemplateResponse(
-        "learn_more.html",
+        "pages/learn_more.html",
+        {"request": request}
+    )
+
+
+@router.get("/why_us", response_class=HTMLResponse)
+async def learn_more(request: Request):
+    return templates.TemplateResponse(
+        "pages/why_us.html",
         {"request": request}
     )
