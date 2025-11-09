@@ -1,19 +1,23 @@
 {% extends "base.html" %}
 
 {% block title %}Дізнатися більше — EnglishPro{% endblock %}
-
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/learn_more.css') }}">
+{% endblock %}
 {% block content %}
 <section class="container learn-more">
 
     <div class="intro-section">
         <h1 class="accent">Про платформу EnglishPro</h1>
         <div class="intro-content">
-            <img src="{{ url_for('static', path='/images/learning.jpg') }}" alt="Онлайн навчання" class="illustration">
-            <p>
-                <strong>EnglishPro</strong> — це сучасна освітня онлайн-платформа, що допомагає кожному
-                досягти впевненості у володінні англійською. Ми створюємо індивідуальні програми,
-                підлаштовані під рівень, цілі та стиль навчання кожного користувача.
-            </p>
+            <img src="{{ url_for('static', path='/media/content/learning.png') }}" alt="Онлайн навчання" class="illustration">
+            <div class="text-block">
+                <p>
+                    <strong>EnglishPro</strong> — це сучасна освітня онлайн-платформа, що допомагає кожному
+                    досягти впевненості у володінні англійською. Ми створюємо індивідуальні програми,
+                    підлаштовані під рівень, цілі та стиль навчання кожного користувача.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -21,7 +25,7 @@
 
     <div class="section">
         <h2>Індивідуальний підхід до кожного</h2>
-        <div class="content-with-image">
+        <div class="content-with-image reverse">
             <div>
                 <p>
                     Після реєстрації користувач проходить коротке тестування, за результатами якого
@@ -34,9 +38,10 @@
                     <li>🏁 Мету — робота, подорожі, навчання або підготовка до іспитів</li>
                 </ul>
             </div>
-            <img src="{{ url_for('static', path='/images/individual.jpg') }}" alt="Індивідуальний підхід">
+            <img src="{{ url_for('static', path='/media/content/individual.png') }}" alt="Індивідуальний підхід">
         </div>
     </div>
+
 
     <hr>
 
@@ -76,7 +81,7 @@
     <div class="section">
         <h2>Групові заняття та репетиторство</h2>
         <div class="content-with-image reverse">
-            <img src="{{ url_for('static', path='/images/group.jpg') }}" alt="Group lessons">
+            <img src="{{ url_for('static', path='/media/content/group.png') }}" alt="Group lessons">
             <div>
                 <p>
                     EnglishPro пропонує три основні формати навчання:
@@ -93,11 +98,13 @@
     <hr>
 
     <div class="section">
-        <h2>Відео-презентація EnglishPro</h2>
+    <h2>Відео-презентація EnglishPro</h2>
         <div class="video-container">
-            <!-- Можеш вставити своє відео або YouTube -->
-            <iframe width="100%" height="400" src="https://www.youtube.com/embed/UPL3bV5Dj4E"
-                title="EnglishPro Video Presentation" frameborder="0" allowfullscreen></iframe>
+            <video width="100%" height="400" controls
+                   poster="{{ url_for('static', path='/media/content/videos/preview.jpg') }}">
+                <source src="{{ url_for('static', path='/media/content/videos/videoplayback.mp4') }}" type="video/mp4">
+                Ваш браузер не підтримує відео тег.
+            </video>
         </div>
     </div>
 
