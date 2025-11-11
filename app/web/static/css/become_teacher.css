@@ -1,0 +1,122 @@
+.become-teacher-page {
+  padding:60px 0;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.become-teacher-page h1 {
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.subtitle {
+  margin-bottom:30px;
+  font-size:1.1rem;
+  color:var(--muted);
+}
+
+.teacher-form {
+  background:var(--glass);
+  padding:30px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.form-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+  gap:20px;
+  margin-bottom:20px;
+}
+
+.form-group {
+  display:flex;
+  flex-direction:column;
+}
+
+.form-group label {
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+input, select, textarea {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;
+  padding:12px;
+  color:var(--text);
+}
+
+input[type="file"] {
+  padding:8px;
+}
+
+.checkbox-group {
+  display:flex;
+  align-items:center;
+}
+
+textarea {
+  resize:vertical;
+}
+
+.full {
+  grid-column:1/-1;
+}
+
+.apply-btn {
+  margin-top:20px;
+  width:100%;
+}
+/* Темний стиль select */
+select {
+  background: #0f172a; /* твій темний фон */
+  color: var(--text);
+}
+
+/* Темний фон для опцій */
+select option {
+  background: #0f172a;
+  color: var(--text);
+}
+
+/* Для фокусу */
+select:focus {
+  background: #0f172a;
+  border-color: var(--accent);
+}
+
+/* Для Windows/Chrome сховати білий default highlight */
+select:-internal-list-box {
+  background-color: #0f172a !important;
+}
+.optional-socials {
+    margin-top: 20px;
+}
+
+.toggle-socials {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 12px;
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.toggle-socials:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.socials-content {
+    margin-top: 15px;
+    animation: fadeSlide .25s ease;
+}
+
+@keyframes fadeSlide {
+    from {opacity: 0; transform: translateY(-5px);}
+    to {opacity: 1; transform: translateY(0);}
+}
