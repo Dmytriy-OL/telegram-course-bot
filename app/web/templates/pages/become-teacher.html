@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Стати викладачем | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/become_teacher.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="become-teacher-page container">
+    <h1>Подати заявку на викладача</h1>
+    <p class="subtitle">Заповніть форму — і ми зв'яжемося з вами протягом 24 годин.</p>
+
+    <form method="POST" action="/become-teacher" enctype="multipart/form-data" class="teacher-form">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Імʼя *</label>
+                <input type="text" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Прізвище *</label>
+                <input type="text" name="surname" required>
+            </div>
+
+            <div class="form-group">
+                <label>Фото</label>
+                <input type="file" name="photo" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label>Стать *</label>
+                <select name="sex" required>
+                    <option value="" disabled selected>Оберіть стать</option>
+                    <option value="male">Чоловіча</option>
+                    <option value="female">Жіноча</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Досвід (років) *</label>
+                <input type="number" name="experience_years" min="0" max="50" required>
+            </div>
+
+            <div class="form-group">
+                <label>Рівень англійської *</label>
+                <select name="english_level" required>
+                    <option value="" disabled selected>Оберіть ваш рівень</option>
+                    <option value="B1">B1 — Intermediate</option>
+                    <option value="B2">B2 — Upper-Intermediate</option>
+                    <option value="C1">C1 — Advanced</option>
+                    <option value="C2">C2 — Proficiency</option>
+                    <option value="NATIVE">NATIVE — Native Speaker</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Телефон *</label>
+                <input type="tel" name="phone_number" placeholder="+380..." required>
+            </div>
+
+        </div>
+
+        <div class="form-group full">
+            <label>Про себе *</label>
+            <textarea name="description" rows="5" required
+                      placeholder="Розкажіть про свій досвід, методику та підхід..."></textarea>
+        </div>
+
+        <h3>Соцмережі</h3>
+
+        <!-- Telegram -->
+        <div class="form-group full">
+            <label>Telegram *</label>
+            <input type="text" name="telegram" placeholder="@nickname" required>
+        </div>
+
+        <!-- Optional socials accordion -->
+        <div class="optional-socials">
+            <button type="button" class="toggle-socials">
+                Соцмережі (за бажанням) ⯈
+            </button>
+
+            <div class="socials-content" style="display: none;">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Instagram</label>
+                        <input type="url" name="instagram" placeholder="https://instagram.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Facebook</label>
+                        <input type="url" name="facebook" placeholder="https://facebook.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>YouTube</label>
+                        <input type="url" name="youtube" placeholder="https://youtube.com/...">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn primary lg apply-btn">Надіслати заявку</button>
+    </form>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/become_teacher.js') }}"></script>
+{% endblock %}
