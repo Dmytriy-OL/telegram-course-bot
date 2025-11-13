@@ -4,11 +4,11 @@ from pydantic import computed_field
 
 
 class RegisterForm(BaseModel):
-    birth_day: int
-    birth_month: int
-    birth_year: int
+    # birth_day: int
+    # birth_month: int
+    # birth_year: int
     email: str
-    username: str
+    # username: str
     password: str
     password_confirm: str
     terms: bool
@@ -20,13 +20,13 @@ class RegisterForm(BaseModel):
             raise ValueError("Паролі не співпадають")
         return v
 
-    @computed_field
-    @property
-    def birth_date(self) -> date:
-        try:
-            return date(self.birth_year, self.birth_month, self.birth_day)
-        except ValueError as e:
-            raise ValueError(f"Невірна дата народження!!!")
+    # @computed_field
+    # @property
+    # def birth_date(self) -> date:
+    #     try:
+    #         return date(self.birth_year, self.birth_month, self.birth_day)
+    #     except ValueError as e:
+    #         raise ValueError(f"Невірна дата народження!!!")
 
     @field_validator("terms")
     @classmethod
