@@ -5,7 +5,9 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql.expression import or_, and_
 
-from app.database.core.models import SessionLocal, Lesson, Enrollment, Administrator, LessonType
+from app.database.core.models import Lesson,Administrator,Enrollment
+from app.database.core.base import SessionLocal
+from app.database.core.enums import LessonType
 
 
 async def get_lessons_for_teacher_and_optional_student(teacher_id: int, student_id: int | None = None) -> list[Lesson]:

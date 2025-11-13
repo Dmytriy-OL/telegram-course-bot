@@ -2,7 +2,8 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from app.database.core.models import LessonType, Lesson
+from app.database.core.models import Lesson
+from app.database.core.enums import LessonType
 from app.bot.handlers.utils import show_teacher_lessons
 from app.bot.keyboards.teachers import get_lesson_signups_keyboard, edit_single_lesson_menu, get_teachers_command
 

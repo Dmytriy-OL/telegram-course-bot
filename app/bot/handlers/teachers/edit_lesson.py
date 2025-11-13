@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 
 from app.bot.handlers.utils import delete_lesson_messages
 from app.database.crud.bot.lessons import edit_lesson, remove_lesson
-from app.database.core.models import LessonType
+from app.database.core.enums import LessonType
 from app.bot.keyboards.teachers import return_teacher_menu, teacher_main_menu, remove_lesson_by_id
 
 router = Router()

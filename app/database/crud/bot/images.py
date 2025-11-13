@@ -1,5 +1,6 @@
 from sqlalchemy.future import select
-from app.database.core.models import SessionLocal, Image
+from app.database.core.models import Image
+from app.database.core.base import SessionLocal
 
 
 async def download_image(filename: str, main_image: bool = False) -> None:

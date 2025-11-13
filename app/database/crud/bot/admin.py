@@ -1,6 +1,7 @@
 import asyncio
 from sqlalchemy.future import select
-from app.database.core.models import SessionLocal, Administrator
+from app.database.core.models import Administrator
+from app.database.core.base import SessionLocal
 
 
 async def add_admin(tg_id: int, name: str, surname: str, login: str, main_admin: bool = False) -> None:

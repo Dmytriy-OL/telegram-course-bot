@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.database.core.models import Courses, Administrator, Module, Task, Answer, CourseAvatar, VideoModule
-from app.database.core.models import SessionLocal
+from app.database.core.base import SessionLocal
 
 from datetime import date
 

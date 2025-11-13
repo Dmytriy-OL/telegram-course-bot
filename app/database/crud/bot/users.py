@@ -1,5 +1,6 @@
 from sqlalchemy.future import select
-from app.database.core.models import SessionLocal, User
+from app.database.core.models import User
+from app.database.core.base import SessionLocal
 
 
 async def set_user(tg_id: int, login: str, name: str = None, surname: str = None) -> User:
