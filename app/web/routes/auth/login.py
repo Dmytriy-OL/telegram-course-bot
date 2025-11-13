@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_get(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("auth/login.html", {"request": request})
 
 
 @router.post("/login", response_class=HTMLResponse)
@@ -19,5 +19,9 @@ async def login_post(request: Request, user_or_response: User | HTMLResponse = D
     if isinstance(user_or_response, HTMLResponse):
         return user_or_response
 
-    request.session["user"] = user_or_response.email
+    request.session["user"] = {
+        "email": user_or_response.email,
+        "name": user_or_response.name,
+        "surname": user_or_response.surname
+    }
     return RedirectResponse(url="/", status_code=303)
