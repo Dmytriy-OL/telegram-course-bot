@@ -313,3 +313,33 @@ section {
         margin-bottom: 40px;
     }
 }
+/* =========================== */
+/* Стань викладачем */
+/* =========================== */
+.become-teacher {
+    text-align: center;
+    padding: 80px 0;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.become-teacher p {
+    color: var(--muted);
+    margin-bottom: 20px;
+}
+
+.teacher-benefits {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.teacher-benefits li {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
