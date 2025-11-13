@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 @router.get("/", response_class=HTMLResponse)
-@router.get("/courses", response_class=HTMLResponse)
+@router.get("/main_page", response_class=HTMLResponse)
 async def select_courses_get(request: Request):
     courses = await all_courses()
     courses_with_teacher = []
@@ -29,11 +29,11 @@ async def select_courses_get(request: Request):
         })
 
     return templates.TemplateResponse(
-        "courses.html",
+        "main_page.html",
         {"request": request, "courses": courses_with_teacher,"teachers": []}
     )
 
 
-@router.post("/courses", response_class=HTMLResponse)
+@router.post("/main_page", response_class=HTMLResponse)
 async def module_create_post(request: Request, course_id: int = Form(...)):
     pass
