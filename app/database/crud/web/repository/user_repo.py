@@ -21,17 +21,17 @@ async def get_user_by_email(email: str) -> User | None:
         return user
 
 
-async def validate_user_unique(email: str, username: str) -> None:
+async def validate_user_unique(email: str, username: str | None = None) -> None:
     async with SessionLocal() as session:
         result_email = await session.execute(select(PendingUser).where((PendingUser.email == email)))
         if result_email.scalar_one_or_none():
             raise ValueError("Така електронна адреса вже існує!")
 
         # Перевірка username
-        result_username = await session.execute(
-            select(PendingUser).where((PendingUser.username == username)))
-        if result_username.scalar_one_or_none():
-            raise ValueError("Такий користувач вже існує!")
+        # result_username = await session.execute(
+        #     select(PendingUser).where((PendingUser.username == username)))
+        # if result_username.scalar_one_or_none():
+        #     raise ValueError("Такий користувач вже існує!")
 
 
 async def user_exists(email: str) -> bool:
@@ -168,3 +168,13 @@ async def fetch_updated_user_with_avatar(updated_user: User) -> User | None:
         )
         updated_user = result.scalars().first()
         return updated_user
+
+
+async def update_user_name(email: str, name: str, surname: str):
+    async with SessionLocal() as session:
+        await session.execute(
+            update(User)
+            .where(User.email == email)
+            .values(name=name, surname=surname)
+        )
+        await session.commit()

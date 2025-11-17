@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from app.database.core.base import Base
 from datetime import datetime
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -33,7 +34,7 @@ class PendingUser(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
-    username = Column(String, unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=True)
     password_hash = Column(String, nullable=False)
     birth_date = Column(Date, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

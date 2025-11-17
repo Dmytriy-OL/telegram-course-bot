@@ -9,9 +9,13 @@
         <h1>Вивчайте англійську<br><span class="accent">на найвищому рівні</span></h1>
         <p class="lead">
             {% if request.session.get('user') %}
-                👋 Вітаємо, <strong>{{ request.session['user'] }}</strong>! Ми вже чекаємо на тебе — обери курс та почни сьогодні.
+            👋 Вітаємо,
+            <strong>
+                {{request.session['user']['name'] }} {{ request.session['user']['surname']}}
+            </strong>
+            ! Ми вже чекаємо на тебе — обери курс та почни сьогодні.
             {% else %}
-                👋 Ми вже чекаємо на тебе! Зареєструйся та почни вивчення англійської з професійними викладачами.
+            👋 Ми вже чекаємо на тебе! Зареєструйся та почни вивчення англійської з професійними викладачами.
             {% endif %}
         </p>
 
@@ -51,11 +55,11 @@
 
         <div class="hero-cta">
             {% if request.session.get('user') %}
-                <a class="btn large" href="/lessons">Переглянути курси</a>
-                <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
+            <a class="btn large" href="/lessons">Переглянути курси</a>
+            <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
             {% else %}
-                <a class="btn large" href="/register">Приєднатися</a>
-                <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
+            <a class="btn large" href="/register">Приєднатися</a>
+            <a class="btn outline large" href="/learn-more">Дізнатися більше</a>
             {% endif %}
         </div>
     </div>
@@ -127,10 +131,13 @@
                 <div class="card-body">
                     <h3 class="course-title">{{ course.title }}</h3>
                     <div class="meta">Викладач: {{ course.teacher_full_name }}</div>
-                    <div class="desc">{{ course.short_description if course.short_description is defined else "Короткий опис курсу." }}</div>
+                    <div class="desc">{{ course.short_description if course.short_description is defined else "Короткий
+                        опис курсу." }}
+                    </div>
                     <div class="card-actions">
                         <span class="price">{{ course.price }} ₴</span>
-                        <a class="btn small" href="/create_module_courses?course_id={{ course.id }}">Дізнатися більше</a>
+                        <a class="btn small" href="/create_module_courses?course_id={{ course.id }}">Дізнатися
+                            більше</a>
                     </div>
                 </div>
             </article>
@@ -146,7 +153,8 @@
         <div class="test-grid">
             <!-- Це приклади — можна підставити реальні відгуки -->
             <blockquote class="test">
-                <p>“Мої розмовні навички значно покращились за 3 місяці. Викладач підтримував і давав чіткі завдання.”</p>
+                <p>“Мої розмовні навички значно покращились за 3 місяці. Викладач підтримував і давав чіткі
+                    завдання.”</p>
                 <cite>— Олександра, студентка</cite>
             </blockquote>
             <blockquote class="test">
@@ -168,7 +176,8 @@
         <div class="teachers-grid">
             {% for t in teachers if teachers is defined %}
             <div class="teacher-card">
-                <img src="{{ t.photo_url or url_for('static', filename='img/teacher-placeholder.jpg') }}" alt="{{ t.name }}">
+                <img src="{{ t.photo_url or url_for('static', filename='img/teacher-placeholder.jpg') }}"
+                     alt="{{ t.name }}">
                 <h4>{{ t.name }}</h4>
                 <p class="role">{{ t.role or 'Викладач англійської' }}</p>
                 <p class="bio">{{ t.bio or 'Досвідчений викладач з міжнародною практикою.' }}</p>

@@ -13,38 +13,38 @@
 
     <form method="POST" action="/register">
       <!-- Дата народження -->
-      <div class="form-group">
-        <label>Дата народження</label>
-        <div class="birth-selects">
-          <select id="birth_day" name="birth_day" required>
-            <option value="">День</option>
-            {% for day in range(1, 32) %}
-              <option value="{{ day }}" {% if form_values.birth_day == day|string %}selected{% endif %}>{{ day }}</option>
-            {% endfor %}
-          </select>
+<!--      <div class="form-group">-->
+<!--        <label>Дата народження</label>-->
+<!--        <div class="birth-selects">-->
+<!--          <select id="birth_day" name="birth_day" required>-->
+<!--            <option value="">День</option>-->
+<!--            {% for day in range(1, 32) %}-->
+<!--              <option value="{{ day }}" {% if form_values.birth_day == day|string %}selected{% endif %}>{{ day }}</option>-->
+<!--            {% endfor %}-->
+<!--          </select>-->
 
-          <select id="birth_month" name="birth_month" required>
-            <option value="">Місяць</option>
-            {% set months = [
-              ('1', 'Січень'), ('2', 'Лютий'), ('3', 'Березень'),
-              ('4', 'Квітень'), ('5', 'Травень'), ('6', 'Червень'),
-              ('7', 'Липень'), ('8', 'Серпень'), ('9', 'Вересень'),
-              ('10', 'Жовтень'), ('11', 'Листопад'), ('12', 'Грудень')
-            ] %}
-            {% for value, name in months %}
-              <option value="{{ value }}" {% if form_values.birth_month == value %}selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-          </select>
+<!--          <select id="birth_month" name="birth_month" required>-->
+<!--            <option value="">Місяць</option>-->
+<!--           {# {% set months = [
+                  ('1', 'Січень'), ('2', 'Лютий'), ('3', 'Березень'),-->
+<!--              ('4', 'Квітень'), ('5', 'Травень'), ('6', 'Червень'),-->
+<!--              ('7', 'Липень'), ('8', 'Серпень'), ('9', 'Вересень'),-->
+<!--              ('10', 'Жовтень'), ('11', 'Листопад'), ('12', 'Грудень')-->
+<!--            ] %} #}
+                 {% for value, name in months %}-->
+<!--              <option value="{{ value }}" {% if form_values.birth_month == value %}selected{% endif %}>{{ name }}</option>-->
+<!--            {% endfor %}-->
+<!--          </select>-->
 
-          <select id="birth_year" name="birth_year" required>
-            <option value="">Рік</option>
-            {% set current_year = 2025 %}
-            {% for year in range(current_year - 60, current_year + 1) %}
-              <option value="{{ year }}" {% if form_values.birth_year == year|string %}selected{% endif %}>{{ year }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
+<!--          <select id="birth_year" name="birth_year" required>-->
+<!--            <option value="">Рік</option>-->
+<!--            {% set current_year = 2025 %}-->
+<!--            {% for year in range(current_year - 60, current_year + 1) %}-->
+<!--              <option value="{{ year }}" {% if form_values.birth_year == year|string %}selected{% endif %}>{{ year }}</option>-->
+<!--            {% endfor %}-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <!-- Email -->
       <div class="form-group">
@@ -53,10 +53,10 @@
       </div>
 
       <!-- Логін -->
-      <div class="form-group">
-        <label for="login">Ім’я користувача</label>
-        <input type="text" id="login" name="login" required value="{{ form_values.username | default('') }}">
-      </div>
+<!--      <div class="form-group">-->
+<!--        <label for="login">Ім’я користувача</label>-->
+<!--        <input type="text" id="login" name="login" required value="{{ form_values.username | default('') }}">-->
+<!--      </div>-->
 
       <!-- Паролі -->
       <div class="form-group">
