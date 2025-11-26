@@ -1,4 +1,5 @@
 from fastapi import Request, HTTPException, status, Form
+from fastapi.responses import RedirectResponse
 from starlette.responses import HTMLResponse
 
 from app.database.crud.web.repository.user_repo import get_user_by_email, user_exists
@@ -10,13 +11,34 @@ from pydantic import ValidationError
 
 
 async def get_current_user(request: Request) -> User:
-    email = request.session.get("user")
+    session_user = request.session.get("user")
+
+    if not session_user:
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            detail="Not authenticated",
+            headers={"Location": "/login"}
+        )
+
+    # підтримка dict і просто email
+    email = session_user["email"] if isinstance(session_user, dict) else session_user
+
     if not email:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            detail="Empty email",
+            headers={"Location": "/login"}
+        )
 
     user = await get_user_by_email(email)
+
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        request.session.clear()
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            detail="User not found",
+            headers={"Location": "/login"}
+        )
 
     return user
 
@@ -46,9 +68,19 @@ async def validate_register_form(password: str, password_confirm: str, email: st
     return None
 
 
-async def get_authenticated_user(request: Request) -> User | None:
-    email = request.session.get("user")
+async def get_authenticated_user(request: Request) -> User:
+    session_user = request.session.get("user")
+
+    if not session_user or not isinstance(session_user, dict):
+        raise HTTPException(status_code=401, detail="Користувач не авторизований")
+
+    email = session_user.get("email")
+
     user = await get_user_by_email(email)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Користувача не знайдено")
+
     return user
 
 
@@ -78,5 +110,3 @@ async def parse_register_form(
         error_message = raw_msg.replace("Value error, ", "")
         return {"error": error_message}
     return form_data
-
-
