@@ -9,16 +9,14 @@ from app.database.core.base import SessionLocal
 
 from datetime import date
 
-
 async def get_user_by_email(email: str) -> User | None:
     async with SessionLocal() as session:
         result = await session.execute(
             select(User)
-            .options(selectinload(User.avatar))  # підвантажуємо аватар
+            .options(selectinload(User.avatar))
             .where(User.email == email)
         )
-        user = result.scalars().first()
-        return user
+        return result.scalar_one_or_none()
 
 
 async def validate_user_unique(email: str, username: str | None = None) -> None:
@@ -121,10 +119,14 @@ async def is_username_taken(username: str, current_email: str) -> bool:
         return result.scalar() is not None
 
 
-async def update_user_data(email: str, name: str = None, surname: str = None, username: str = None,
+async def update_user_data(id: int, name: str = None, surname: str = None, username: str = None,
                            birth_date: date = None) -> User:
     async with SessionLocal() as session:
-        result = await session.execute(select(User).where(User.email == email))
+        result = await session.execute(
+            select(User)
+            .options(selectinload(User.avatar))
+            .where(User.id == id)
+        )
         user = result.scalar_one_or_none()
 
         if name is not None:
@@ -136,10 +138,7 @@ async def update_user_data(email: str, name: str = None, surname: str = None, us
         if birth_date is not None:
             user.birth_date = birth_date
 
-    session.add(user)
     await session.commit()
-    await session.refresh(user)
-
     return user
 
 
@@ -161,10 +160,10 @@ async def update_user_avatar(user_id: int, file_name: str):
         await session.commit()
 
 
-async def fetch_updated_user_with_avatar(updated_user: User) -> User | None:
+async def fetch_updated_user_with_avatar(user_id: int) -> User | None:
     async with SessionLocal() as session:
         result = await session.execute(
-            select(User).options(selectinload(User.avatar)).where(User.id == updated_user.id)
+            select(User).options(selectinload(User.avatar)).where(User.id == user_id)
         )
         updated_user = result.scalars().first()
         return updated_user
@@ -178,3 +177,20 @@ async def update_user_name(email: str, name: str, surname: str):
             .values(name=name, surname=surname)
         )
         await session.commit()
+
+
+async def get_password_hash(id_user: str):
+    async with SessionLocal() as session:
+        result = await session.execute(select(User).where(User.id == id_user))
+        user = result.scalar_one_or_none()
+        return user.password_hash
+
+
+async def update_user_password(user_id: int, new_hash: str):
+    async with SessionLocal() as session:
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one()
+
+        user.password_hash = new_hash
+        await session.commit()
+
