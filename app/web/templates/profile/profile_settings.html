@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Налаштування профілю — LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/profile/profile_settings.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="settings-container container">
+
+    <h1 class="settings-title">⚙️ Налаштування профілю</h1>
+    <p class="settings-subtitle">
+        Керуйте особистими даними, безпекою та зовнішнім виглядом вашого акаунту.
+    </p>
+
+    <!-- ОСОБИСТІ ДАНІ -->
+    <div class="settings-block premium-profile">
+
+        <h2>👤 Особисті дані</h2>
+        <p class="block-desc">Оновіть основну інформацію вашого профілю</p>
+
+        <form method="POST" action="/settings/update_profile" class="settings-form premium-form">
+
+            <div class="premium-row">
+                <div class="premium-group">
+                    <label>Ім’я</label>
+                    <input type="text" name="name" value="{{ user.name }}" placeholder="Введіть ім’я">
+                </div>
+
+                <div class="premium-group">
+                    <label>Прізвище</label>
+                    <input type="text" name="surname" value="{{ user.surname }}" placeholder="Введіть прізвище">
+                </div>
+            </div>
+
+            <div class="premium-group">
+                <label>Нікнейм</label>
+                <input type="text" name="username" value="{{ user.username or '' }}" placeholder="@username">
+            </div>
+
+            <div class="premium-group">
+                <label>Дата народження</label>
+
+                <div class="premium-birth">
+
+                    <select name="birth_day" class="premium-select">
+                        <option value="">День</option>
+                        {% for day in range(1, 32) %}
+                        <option value="{{ day }}"
+                                {% if user.birth_date and user.birth_date.day== day %}selected{% endif %}>
+                            {{ day }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="birth_month" class="premium-select">
+                        <option value="">Місяць</option>
+                        {% set months = [
+                        ('1','Січень'), ('2','Лютий'), ('3','Березень'),
+                        ('4','Квітень'), ('5','Травень'), ('6','Червень'),
+                        ('7','Липень'), ('8','Серпень'),
+                        ('9','Вересень'), ('10','Жовтень'),
+                        ('11','Листопад'), ('12','Грудень')
+                        ] %}
+
+                        {% for val, label in months %}
+                        <option value="{{ val }}"
+                                {% if user.birth_date and user.birth_date.month== val|int %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="birth_year" class="premium-select">
+                        <option value="">Рік</option>
+                        {% for y in range(1950, 2026) %}
+                        <option value="{{ y }}"
+                                {% if user.birth_date and user.birth_date.year== y %}selected{% endif %}>
+                            {{ y }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+            </div>
+
+            <button class="premium-save-btn">
+                💾 Зберегти зміни
+            </button>
+
+        </form>
+    </div>
+
+
+    <!-- АВАТАР -->
+    <div class="settings-block" id="avatar">
+        <h2>🖼️ Фото профілю</h2>
+
+        <div class="avatar-modern">
+
+            <div class="avatar-preview">
+                <img src="{% if user.avatar %}
+                            {{ url_for('static', path='media/avatars/' + user.avatar.file_path) }}
+                        {% else %}
+                            {{ url_for('static', path='media/content/default-avatar.png') }}
+                        {% endif %}"
+                     class="profile-avatar">
+            </div>
+
+            <form action="/settings/upload_avatar" method="POST" enctype="multipart/form-data" class="avatar-controls">
+
+                <label for="avatarInput" class="avatar-upload-btn">
+                    📷 Змінити фото
+                </label>
+
+                <input type="file" id="avatarInput" name="avatar" accept="image/*">
+
+                <button class="btn save-avatar-btn">💾 Зберегти</button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- БЕЗПЕКА -->
+    <div class="settings-block premium-security" id="security">
+        <h2>🔒 Безпека</h2>
+
+        <form method="POST" action="/settings/change_password" class="settings-form premium-form">
+
+            <div class="premium-group">
+                <label>Старий пароль</label>
+                <input type="password" name="old_password" placeholder="Введіть старий пароль">
+            </div>
+
+            <div class="premium-group">
+                <label>Новий пароль</label>
+                <input type="password" name="new_password" placeholder="Введіть новий пароль">
+            </div>
+
+            <div class="security-premium-actions">
+                <button class="premium-btn">
+                    🔐 Змінити пароль
+                </button>
+
+                <button type="button"
+                        class="forgot-password-premium"
+                        id="forgotPasswordBtn">
+                    Забули пароль?
+                </button>
+            </div>
+            {% if request.query_params.get('error') == 'wrong_password' %}
+            <p class="password-error-message danger">
+                ❌ Старий пароль введено неправильно
+            </p>
+            {% endif %}
+
+            {% if request.query_params.get('error') == 'no_password' %}
+            <p class="password-error-message warning">
+                ⚠️ Цей акаунт зареєстрований через Google. Пароль відсутній.
+            </p>
+            {% endif %}
+
+            {% if request.query_params.get('success') == 'password_changed' %}
+            <p class="success-message">
+                ✅ Пароль успішно змінено
+            </p>
+            {% endif %}
+
+
+            <div class="forgot-success-message premium-success" id="forgotSuccessMessage">
+                ✅ Ми відправили лист на вашу електронну адресу для зміни пароля
+            </div>
+
+        </form>
+    </div>
+
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/profile/profile_settings.js') }}"></script>
+{% endblock %}
