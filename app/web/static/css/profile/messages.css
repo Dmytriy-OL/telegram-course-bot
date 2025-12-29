@@ -1,0 +1,152 @@
+.messages-wrapper {
+    display: flex;
+    max-width: 1200px;
+    height: 650px;
+    margin: 40px auto;
+    background: #020617;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* LEFT */
+.messages-left {
+    width: 320px;
+    background: #020617;
+    border-right: 1px solid #1e293b;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-menu {
+    display: flex;
+}
+
+.menu-item {
+    flex: 1;
+    padding: 14px;
+    background: none;
+    border: none;
+    color: #c7d2fe;
+    cursor: pointer;
+}
+
+.menu-item.active {
+    background: #7c3aed;
+    color: white;
+}
+
+.messages-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.list-item {
+    padding: 14px;
+    border-bottom: 1px solid #1e293b;
+    cursor: pointer;
+}
+
+.list-item span {
+    display: block;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.list-item.unread {
+    border-left: 4px solid #7c3aed;
+    background: #0f172a;
+}
+
+/* RIGHT */
+.messages-right {
+    flex: 1;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    display: flex;
+    position: relative;
+}
+
+/* EMPTY */
+.messages-empty {
+    margin: auto;
+    text-align: center;
+    color: #9ca3af;
+}
+
+/* CHAT */
+.chat-view {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat-header {
+    padding: 16px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.msg {
+    max-width: 60%;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.msg.received {
+    background: #111827;
+}
+
+.msg.sent {
+    background: #7c3aed;
+    margin-left: auto;
+    color: white;
+}
+
+/* INPUT */
+.chat-input {
+    display: flex;
+    padding: 14px;
+    border-top: 1px solid #1e293b;
+}
+
+.chat-input input {
+    flex: 1;
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+}
+
+.chat-input button {
+    margin-left: 10px;
+    background: #7c3aed;
+    border: none;
+    border-radius: 8px;
+    padding: 0 16px;
+    color: white;
+    cursor: pointer;
+}
+
+/* NOTIFICATIONS */
+.notifications-view {
+    display: none;
+    padding: 20px;
+    width: 100%;
+}
+
+.notification {
+    background: #111827;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.notification.unread {
+    border-left: 4px solid #7c3aed;
+}
