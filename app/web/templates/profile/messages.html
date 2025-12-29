@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Повідомлення — LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/profile/messages.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="messages-wrapper">
+
+    <!-- LEFT PANEL -->
+    <aside class="messages-left">
+        <div class="messages-menu">
+            <button class="menu-item active" data-section="chats">💬 Чати</button>
+            <button class="menu-item" data-section="notifications">🔔 Сповіщення</button>
+            <button class="menu-item" data-section="friends">👥 Друзі</button>
+        </div>
+
+        <!-- LIST -->
+        <div class="messages-list">
+
+            <!-- Chat preview -->
+            <div class="list-item active">
+                <strong>👤 Alex Teacher</strong>
+                <span>Готовий до уроку?</span>
+            </div>
+
+            <div class="list-item unread">
+                <strong>👤 Maria</strong>
+                <span>Коли наступне заняття?</span>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- RIGHT PANEL -->
+    <div class="messages-right">
+
+        <!-- EMPTY STATE -->
+        <div class="messages-empty active" id="empty">
+            <h2>💬 Повідомлення</h2>
+            <p>Оберіть чат або сповіщення зі списку зліва</p>
+        </div>
+
+        <!-- CHAT VIEW -->
+        <div class="chat-view" id="chat">
+            <div class="chat-header">
+                <strong>👤 Alex Teacher</strong>
+            </div>
+
+            <div class="chat-body">
+                <div class="msg received">Привіт! Готовий до уроку?</div>
+                <div class="msg sent">Так, можемо починати 🙂</div>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" placeholder="Написати повідомлення...">
+                <button>➤</button>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div class="notifications-view" id="notifications">
+            <div class="notification unread">
+                📘 Додано новий урок до курсу <b>English B1</b>
+            </div>
+            <div class="notification">
+                🎓 Ви завершили курс <b>Basic English</b>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/messages.js') }}"></script>
+{% endblock %}
