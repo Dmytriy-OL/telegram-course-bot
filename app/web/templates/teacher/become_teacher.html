@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Стати викладачем | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/teacher/become_teacher.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="teacher-wizard">
+
+    <div class="wizard-card">
+        <div class="wizard-progress">
+            <span id="step-indicator">Крок 1 з 3</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <form id="teacherForm">
+
+            <!-- STEP 1 -->
+            <div class="step active">
+                <h2>Хто ви?</h2>
+
+                <input type="text" name="name" placeholder="Імʼя" required>
+                <input type="text" name="surname" placeholder="Прізвище" required>
+
+                <button type="button" class="btn primary next">Далі</button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step">
+                <h2>Ваш досвід</h2>
+
+                <select name="language" required>
+                    <option value="">Мова викладання</option>
+                    <option>English</option>
+                    <option>German</option>
+                    <option>Polish</option>
+                </select>
+
+                <select name="experience" required>
+                    <option value="">Досвід викладання</option>
+                    <option>Без досвіду</option>
+                    <option>1–2 роки</option>
+                    <option>3–5 років</option>
+                    <option>5+ років</option>
+                </select>
+
+                <select name="english_level" required>
+                    <option value="">Рівень англійської</option>
+                    <option>B1</option>
+                    <option>B2</option>
+                    <option>C1</option>
+                    <option>C2</option>
+                    <option>Native</option>
+                </select>
+
+                <!-- ЦІНА -->
+                <div class="price">
+                    <label>Ціна за заняття (грн / год)</label>
+                    <input
+                        type="number"
+                        name="price_per_hour"
+                        min="100"
+                        max="3000"
+                        step="50"
+                        placeholder="Наприклад: 400"
+                        required
+                    >
+                    <small class="hint">Ви зможете змінити ціну пізніше</small>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn ghost prev">Назад</button>
+                    <button type="button" class="btn primary next">Далі</button>
+                </div>
+            </div>
+
+
+            <!-- STEP 3 -->
+            <div class="step">
+                <h2>Контакт і опис</h2>
+
+                <input type="tel" name="phone" placeholder="Телефон" required>
+                <textarea name="bio" placeholder="Коротко про себе (до 500 символів)" required></textarea>
+
+                <button type="button" class="accordion-toggle">Соцмережі (опціонально)</button>
+                <div class="accordion">
+                    <input type="text" name="telegram" placeholder="Telegram @username">
+                    <input type="url" name="instagram" placeholder="Instagram">
+                    <input type="url" name="youtube" placeholder="YouTube">
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn ghost prev">Назад</button>
+                    <button type="submit" class="btn primary">Надіслати заявку</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/teacher/become_teacher.js') }}"></script>
+{% endblock %}
