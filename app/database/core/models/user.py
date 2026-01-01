@@ -24,6 +24,8 @@ class User(Base):
     is_verified = Column(Boolean, nullable=False, default=False)
     terms_accepted = Column(Boolean, default=False, nullable=False)
 
+    is_teacher = Column(Boolean, nullable=False, default=False)
+    teacher = relationship("Teacher", back_populates="user", uselist=False, cascade="all, delete")
     avatar = relationship("UserAvatar", back_populates="user", uselist=False, cascade="all, delete")
     reviews = relationship("TeacherReview", back_populates="student", cascade="all, delete")
     enrollments = relationship("Enrollment", back_populates="user")
