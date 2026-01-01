@@ -9,6 +9,7 @@ from app.database.core.base import SessionLocal
 
 from datetime import date
 
+
 async def get_user_by_email(email: str) -> User | None:
     async with SessionLocal() as session:
         result = await session.execute(
@@ -193,4 +194,3 @@ async def update_user_password(user_id: int, new_hash: str):
 
         user.password_hash = new_hash
         await session.commit()
-
