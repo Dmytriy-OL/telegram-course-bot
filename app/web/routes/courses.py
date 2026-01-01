@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from app.database.crud.web.corses.handle_courses import all_courses
+from app.web.dependencies.template_dependencies import get_template_user
 from app.web.templates import templates
 
 router = APIRouter()
@@ -8,7 +9,7 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 @router.get("/main_page", response_class=HTMLResponse)
-async def select_courses_get(request: Request):
+async def select_courses_get(request: Request, user=Depends(get_template_user)):
     courses = await all_courses()
     courses_with_teacher = []
 
@@ -30,7 +31,7 @@ async def select_courses_get(request: Request):
 
     return templates.TemplateResponse(
         "main_page.html",
-        {"request": request, "courses": courses_with_teacher,"teachers": []}
+        {"request": request, "user": user, "courses": courses_with_teacher, "teachers": []}
     )
 
 
