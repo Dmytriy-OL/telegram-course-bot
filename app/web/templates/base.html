@@ -27,6 +27,7 @@
     {% if request.session.get('user') %}
         <div class="sidebar-section-title">АККАУНТ</div>
         <a href="/profile/profile_settings" class="sidebar-link">👤 Профіль</a>
+        <a href="/profile/messages" class="sidebar-link">💬 Повідомлення</a>
         <a href="/my-courses" class="sidebar-link">📘 Мої курси</a>
         <a href="/notes" class="sidebar-link">📝 Нотатки</a>
         <a href="/settings" class="sidebar-link">⚙️ Налаштування</a>
@@ -51,6 +52,9 @@
         <a href="/lessons">Lessons</a>
         <a href="/staff">Staff</a>
         <a href="/contact">Contact</a>
+        {% if user and not user.is_teacher %}
+        <a href="/teacher/become" >🎓 Become a teacher</a>
+        {% endif %}
 
         {% if request.session.get('user') %}
         <div class="dropdown">
@@ -60,6 +64,11 @@
                 <a href="/profile">Профіль</a>
                 <a href="/my-courses">Мої курси</a>
                 <a href="/notes">Нотатки</a>
+                {% if not user.is_teacher %}
+                    <a href="/teacher/become">🎓 Стати викладачем</a>
+                {% else %}
+                    <a href="/teacher/dashboard">🎓 Кабінет викладача</a>
+                {% endif %}
                 <a href="/settings">Налаштування</a>
                 <hr>
                 <a href="/logout" class="logout">Вийти</a>
