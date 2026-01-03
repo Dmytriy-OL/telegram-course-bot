@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Заявку надіслано | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/teacher/application_submitted.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="application-submitted">
+
+    <div class="submitted-card">
+        <div class="icon">✅</div>
+
+        <h1>Заявку успішно надіслано</h1>
+
+        <p class="subtitle">
+            Дякуємо, {{ user.name if user else "!" }}
+        </p>
+
+        <p class="description">
+            Ваша заявка на статус викладача успішно оброблена.
+            Тепер ви можете перейти до кабінету викладача та налаштувати свій профіль.
+        </p>
+
+        <a href="/teacher/dashboard" class="btn primary">
+            Перейти в кабінет викладача
+        </a>
+
+        <a href="/" class="btn ghost">
+            На головну
+        </a>
+    </div>
+
+</section>
+{% endblock %}
