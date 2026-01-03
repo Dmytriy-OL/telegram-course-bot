@@ -20,6 +20,7 @@ async def login_post(request: Request, user_or_response: User | HTMLResponse = D
         return user_or_response
 
     request.session["user"] = {
+        "id": user_or_response.id,
         "email": user_or_response.email,
         "name": user_or_response.name,
         "surname": user_or_response.surname
