@@ -121,7 +121,7 @@ async def is_username_taken(username: str, current_email: str) -> bool:
 
 
 async def update_user_data(id: int, name: str = None, surname: str = None, username: str = None,
-                           birth_date: date = None) -> User:
+                           birth_date: date = None,is_teacher=False) -> User:
     async with SessionLocal() as session:
         result = await session.execute(
             select(User)
@@ -138,8 +138,10 @@ async def update_user_data(id: int, name: str = None, surname: str = None, usern
             user.username = username
         if birth_date is not None:
             user.birth_date = birth_date
+        if is_teacher:
+            user.is_teacher = True
 
-    await session.commit()
+        await session.commit()
     return user
 
 
