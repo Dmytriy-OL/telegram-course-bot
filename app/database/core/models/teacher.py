@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Date, Enum, Float, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Date, Enum, Float, JSON, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.core.base import Base
@@ -10,13 +10,12 @@ class Teacher(Base):
     __tablename__ = "teachers"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    surname = Column(String(50), nullable=False)
     language = Column(JSON, nullable=False, default=list)
     experience = Column(String(50), nullable=False)
     english_level = Column(Enum(EnglishLevel), nullable=False, default=EnglishLevel.B2)
     description = Column(String(500), nullable=True)
     phone_number = Column(String(20), nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
     show_phone = Column(Boolean, default=False)
     social_links = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
