@@ -64,10 +64,10 @@
                 <a href="/profile">Профіль</a>
                 <a href="/my-courses">Мої курси</a>
                 <a href="/notes">Нотатки</a>
-                {% if not user.is_teacher %}
-                    <a href="/teacher/become">🎓 Стати викладачем</a>
-                {% else %}
+                {% if user.is_teacher %}
                     <a href="/teacher/dashboard">🎓 Кабінет викладача</a>
+                {% else %}
+                    <a href="/teacher/become">🎓 Стати викладачем</a>
                 {% endif %}
                 <a href="/settings">Налаштування</a>
                 <hr>
