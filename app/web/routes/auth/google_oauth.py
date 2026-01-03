@@ -73,6 +73,7 @@ async def auth_google_callback(request: Request):
                 await update_user_google_id(user, google_id)
 
         request.session["user"] = {
+            "id": user.id,
             "email": email,
             "name": name,
             "surname": surname
