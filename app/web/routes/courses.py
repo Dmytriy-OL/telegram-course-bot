@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from app.database.crud.web.corses.handle_courses import all_courses
-from app.web.dependencies.template_dependencies import get_template_user
+from app.web.dependencies.template_dependencies import get_session_user, get_current_user
 from app.web.templates import templates
 
 router = APIRouter()
@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 @router.get("/main_page", response_class=HTMLResponse)
-async def select_courses_get(request: Request, user=Depends(get_template_user)):
+async def select_courses_get(request: Request, user=Depends(get_current_user)):
     courses = await all_courses()
     courses_with_teacher = []
 
