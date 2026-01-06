@@ -2,13 +2,20 @@
 {% block title %}Стати викладачем | LinguaPro{% endblock %}
 
 {% block head_extra %}
-<link rel="stylesheet" href="{{ url_for('static', path='/css/teacher/become_teacher.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/teacher/teacher_applications.css') }}">
 {% endblock %}
 
 {% block content %}
 <section class="teacher-wizard">
 
     <div class="wizard-card">
+
+        {% if error %}
+        <div class="form-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <div class="wizard-progress">
             <span id="step-indicator">Крок 1 з 3</span>
             <div class="progress-bar">
@@ -16,14 +23,17 @@
             </div>
         </div>
 
-        <form id="teacherForm">
+        <form id="teacherForm" method="post" action="/become_teacher">
 
             <!-- STEP 1 -->
             <div class="step active">
                 <h2>Хто ви?</h2>
 
-                <input type="text" name="name" placeholder="Імʼя" required>
-                <input type="text" name="surname" placeholder="Прізвище" required>
+                <input type="text" name="name" placeholder="Імʼя"
+                       value="{{ user.name if user and user.name else '' }}" required>
+                <input type="text" name="surname" placeholder="Прізвище"
+                       value="{{ user.surname if user and user.surname else '' }}"
+                required>
 
                 <button type="button" class="btn primary next">Далі</button>
             </div>
@@ -49,7 +59,6 @@
 
                 <select name="english_level" required>
                     <option value="">Рівень англійської</option>
-                    <option>B1</option>
                     <option>B2</option>
                     <option>C1</option>
                     <option>C2</option>
@@ -59,15 +68,7 @@
                 <!-- ЦІНА -->
                 <div class="price">
                     <label>Ціна за заняття (грн / год)</label>
-                    <input
-                        type="number"
-                        name="price_per_hour"
-                        min="100"
-                        max="3000"
-                        step="50"
-                        placeholder="Наприклад: 400"
-                        required
-                    >
+                    <input type="number" name="price" min="100" max="3000" step="50" placeholder="Наприклад: 400">
                     <small class="hint">Ви зможете змінити ціну пізніше</small>
                 </div>
 
@@ -105,5 +106,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', path='/js/teacher/become_teacher.js') }}"></script>
+<script src="{{ url_for('static', path='/js/teacher/teacher_applications.js') }}"></script>
 {% endblock %}
