@@ -11,7 +11,10 @@ from app.web.routes.admin.add_courses import router as admin_add_courses
 from app.web.routes.admin.create_administrator import router as admin_add_administrator
 from app.web.routes.admin.create_module_courses import router as create_module_courses
 from app.web.routes.admin.select_course import router as select_course
-from app.web.routes.teacher.become_teacher import router as become_teacher
+from app.web.routes.teacher.teacher_applications import router as become_teacher
+from app.web.routes.teacher.dashboard import router as dashboard
+from app.web.routes.teacher.help.profile_promotion import router as profile_promotion
+from app.web.routes.teacher.profile.edit import router as edit
 
 from app.web.routes.pages.info import router as info
 from app.web.routes.pages.legal import router as legal
@@ -37,6 +40,9 @@ router.include_router(create_module_courses)
 router.include_router(select_course)
 
 router.include_router(become_teacher)
+router.include_router(dashboard)
+router.include_router(profile_promotion)
+router.include_router(edit)
 
 router.include_router(info)
 router.include_router(legal)
