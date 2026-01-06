@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Кабінет викладача | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/teacher/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="teacher-dashboard container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div>
+            <h1>🎓 Кабінет викладача</h1>
+            <p class="muted">Керуйте курсами, уроками та доходом</p>
+        </div>
+
+        <a href="/teacher/course/create" class="btn gradient">➕ Створити курс</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <span class="stat-icon">📘</span>
+            <h3>Курси</h3>
+            <p class="stat-value">4</p>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">👨‍🎓</span>
+            <h3>Учні</h3>
+            <p class="stat-value">128</p>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-icon">⭐</span>
+            <h3>Рейтинг</h3>
+            <p class="stat-value">4.8</p>
+        </div>
+
+        <div class="stat-card accent">
+            <span class="stat-icon">💰</span>
+            <h3>Дохід</h3>
+            <p class="stat-value">12 450 ₴</p>
+        </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="dashboard-grid">
+
+        <!-- Courses -->
+        <div class="dashboard-box">
+            <h2>📚 Мої курси</h2>
+
+            <div class="course-mini">
+                <div>
+                    <h4>English for IT</h4>
+                    <span class="muted">32 учні • Активний</span>
+                </div>
+                <a href="#" class="btn small outline">Керувати</a>
+            </div>
+
+            <div class="course-mini">
+                <div>
+                    <h4>Spoken English B2</h4>
+                    <span class="muted">18 учнів • Чернетка</span>
+                </div>
+                <a href="#" class="btn small outline">Керувати</a>
+            </div>
+
+            <a href="/teacher/courses" class="link-more">Усі курси →</a>
+        </div>
+
+        <!-- Requests -->
+        <div class="dashboard-box">
+            <h2>📩 Заявки на уроки</h2>
+
+            <div class="request-item">
+                <div>
+                    <strong>Анна К.</strong>
+                    <span class="muted">Trial lesson</span>
+                </div>
+                <div class="actions">
+                    <button class="btn small">✔</button>
+                    <button class="btn small outline">✖</button>
+                </div>
+            </div>
+
+            <div class="request-item">
+                <div>
+                    <strong>Олег М.</strong>
+                    <span class="muted">Business English</span>
+                </div>
+                <div class="actions">
+                    <button class="btn small">✔</button>
+                    <button class="btn small outline">✖</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile -->
+       <div class="dashboard-box profile-box highlight profile-card">
+            <div class="profile-cover"></div>
+
+            <div class="profile-header fancy">
+                <img
+                    src="{% if teacher.avatar %}
+                            {{ url_for('static', path='media/avatars/' + teacher.avatar.file_path) }}
+                         {% else %}
+                            {{ url_for('static', path='media/content/default-avatar.png') }}
+                         {% endif %}"
+                    class="profile-avatar xlarge"
+                    alt="Avatar"
+                >
+
+                <h3 class="profile-name">
+                    {{ teacher.name }} {{ teacher.surname }}
+                </h3>
+
+                <p class="profile-email">{{ teacher.email }}</p>
+                <span class="profile-badge">
+                    👀 Профіль бачать учні
+                </span>
+            </div>
+
+            <div class="profile-tip">
+                🚀 Заповнений профіль отримує <strong>у 3 рази більше заявок</strong>
+            </div>
+           <br>
+
+           <a href="/help/profile_promotion" class="profile-help">
+               Як це допоможе знайти учнів?
+           </a>
+
+           <a href="/profile/edit" class="btn gradient full">
+                Доповнити профіль
+            </a>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/teacher/dashboard.js') }}"></script>
+{% endblock %}
