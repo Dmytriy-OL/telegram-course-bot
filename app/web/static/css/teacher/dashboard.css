@@ -1,0 +1,152 @@
+/* ===== TEACHER DASHBOARD ===== */
+
+.teacher-dashboard h1 {
+    font-size: 32px;
+    margin-bottom: 6px;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: var(--glass);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-card.accent {
+    border-color: rgba(167,139,250,0.4);
+    box-shadow: 0 0 30px rgba(167,139,250,0.15);
+}
+
+.stat-icon {
+    font-size: 28px;
+}
+
+.stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-top: 8px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.4fr 1.2fr;
+    gap: 24px;
+}
+
+.dashboard-box {
+    background: rgba(255,255,255,0.02);
+    border-radius: 14px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,0.04);
+}
+
+.dashboard-box h2 {
+    margin-bottom: 14px;
+    font-size: 18px;
+    color: var(--accent);
+}
+
+/* Courses */
+.course-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.course-mini:last-child {
+    border-bottom: none;
+}
+
+.link-more {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+/* Requests */
+.request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.request-item .actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Profile */
+.profile-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+}
+
+.profile-list li {
+    font-size: 14px;
+    margin: 6px 0;
+    color: var(--muted);
+}
+
+.profile-list span {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.request-item.handled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+/*ава*/
+
+.profile-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+/* кінець ава*/
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
