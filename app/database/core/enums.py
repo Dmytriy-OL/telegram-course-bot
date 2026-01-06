@@ -7,10 +7,10 @@ class LessonType(str, Enum):
 
 
 class EnglishLevel(str, Enum):
-    B2 = "Upper Intermediate (B2)"
-    C1 = "Advanced (C1)"
-    C2 = "Proficiency (C2)"
-    NATIVE = "Native Speaker"
+    B2 = "B2"
+    C1 = "C1"
+    C2 = "C2"
+    Native = "Native"
 
 
 class GenderSelection(str, Enum):
