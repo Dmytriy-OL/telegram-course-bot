@@ -10,15 +10,14 @@ class Teacher(Base):
     __tablename__ = "teachers"
 
     id = Column(Integer, primary_key=True)
-    language = Column(JSON, nullable=False, default=list)
     experience = Column(String(50), nullable=False)
-    english_level = Column(Enum(EnglishLevel), nullable=False, default=EnglishLevel.B2)
     description = Column(String(500), nullable=True)
     phone_number = Column(String(20), nullable=False)
-    price = Column(Numeric(10, 2), nullable=False)
     show_phone = Column(Boolean, default=False)
     social_links = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    languages = relationship("TeacherLanguage",back_populates="teacher",cascade="all, delete-orphan")
     reviews = relationship("TeacherReview", back_populates="teacher", cascade="all, delete")
     lessons = relationship("Lesson", back_populates="teacher")
     courses = relationship("Courses", back_populates="teacher")
@@ -26,10 +25,17 @@ class Teacher(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     user = relationship("User", back_populates="teacher")
 
-    # photo = Column(String(255), nullable=True)  # шлях до фото
-    # sex = Column(Enum(GenderSelection), nullable=False)
-    # students_count = Column(Integer, default=0)  # вчив студентів
-    # experience_years = Column(Integer, default=0)  # років досвід
+
+class TeacherLanguage(Base):
+    __tablename__ = "teacher_languages"
+
+    id = Column(Integer, primary_key=True)
+    teacher_id = Column(Integer, ForeignKey("teachers.id", ondelete="CASCADE"), nullable=False)
+    language = Column(String(30), nullable=False)
+    level = Column(Enum(EnglishLevel), nullable=False)
+    price = Column(Numeric(10, 2), nullable=True)
+
+    teacher = relationship("Teacher", back_populates="languages")
 
 
 class TeacherReview(Base):
@@ -46,3 +52,8 @@ class TeacherReview(Base):
 
     teacher = relationship("Teacher", back_populates="reviews")
     student = relationship("User", back_populates="reviews")
+
+    # photo = Column(String(255), nullable=True)  # шлях до фото
+    # sex = Column(Enum(GenderSelection), nullable=False)
+    # students_count = Column(Integer, default=0)  # вчив студентів
+    # experience_years = Column(Integer, default=0)  # років досвід
