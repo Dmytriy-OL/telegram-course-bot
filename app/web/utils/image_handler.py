@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from app.database.crud.web.corses.handle_courses import get_course_by_id, create_video_record
 
 
-async def save_image_to_disk_and_db(avatar: UploadFile):
+async def save_avatar_to_disk(avatar: UploadFile):
     ext = avatar.filename.split(".")[-1].lower()
     file_name = f"{uuid.uuid4()}.{ext}"
     file_path = AVATAR_DIR / f"{file_name}"
