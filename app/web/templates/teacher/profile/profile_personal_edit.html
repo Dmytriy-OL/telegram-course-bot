@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Редагування особистих даних | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/teacher/profile/personal_edit.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-edit container">
+
+
+    <form class="personal-edit-form" method="POST" enctype="multipart/form-data">
+        <div class="profile-edit-header">
+            <h1>👤 Редагування особистих даних</h1>
+<!--            <p class="muted">Тут ви можете змінити своє імʼя, фото та email.</p>-->
+        </div>
+
+        <!-- Фото профілю -->
+        <label class="field-label">Фото профілю</label>
+
+        <img id="avatarPreview" class="avatar-preview" src="{% if teacher.avatar %}
+                {{ url_for('static', path='media/avatars/' + teacher.avatar.file_path) }}
+             {% else %}
+                {{ url_for('static', path='media/content/default-avatar.png') }}
+             {% endif %}">
+
+        <button type="button" class="btn small outline" id="changeAvatarBtn">
+            Змінити фото
+        </button>
+
+        <input type="file" name="avatar" id="avatar" hidden>
+        </div>
+
+        <!-- Ім'я -->
+        <label for="first_name">Імʼя</label>
+        <input type="text" name="first_name" id="first_name"
+               value="{{ teacher.name }} " required>
+
+        <!-- Прізвище -->
+        <label for="last_name">Прізвище</label>
+        <input type="text" name="last_name" id="last_name"
+               value="{{ teacher.surname }}" required>
+
+        <!-- Email (тільки перегляд) -->
+        <label>Email</label>
+
+        <div class="email-readonly">
+        <span class="email-value">{{ teacher.email }}</span>
+
+        <p class="hint">
+            Змінити електронну адресу можна лише через службу підтримки
+        </p>
+
+        <a href="/support" class="btn small outline">
+            🛠 Звернутися в підтримку
+        </a>
+    </div>
+
+        <!-- Зберегти -->
+        <button type="submit" class="btn gradient save-btn">
+            💾 Зберегти
+        </button>
+
+    </form>
+
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/teacher/profile/personal_edit.js') }}"></script>
+{% endblock %}
