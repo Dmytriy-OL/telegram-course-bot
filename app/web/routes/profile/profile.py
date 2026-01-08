@@ -8,7 +8,7 @@ from app.database.crud.web.repository.user_repo import is_username_taken, update
 from app.web.dependencies.auth_dependencies import get_authenticated_user
 from app.web.templates import templates
 
-from app.web.utils.image_handler import save_image_to_disk_and_db
+from app.web.utils.image_handler import save_avatar_to_disk
 
 router = APIRouter()
 
@@ -60,7 +60,7 @@ async def profile(
 
     # Якщо є аватар — зберігаємо його
     if avatar and avatar.filename:
-        file_name = await save_image_to_disk_and_db(avatar)
+        file_name = await save_avatar_to_disk(avatar)
         await update_user_avatar(updated_user.id, file_name)
 
     # Підтягуємо оновлені дані разом з аватаром
