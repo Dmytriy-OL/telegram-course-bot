@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Доповнення профілю | LinguaPro{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/teacher/profile/profile_edit.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="profile-edit container">
+
+    <!-- Header -->
+    <div class="profile-edit-header">
+        <h1>🚀 Доповніть профіль викладача</h1>
+        <p class="muted">
+            Заповнений профіль виглядає професійно та отримує більше заявок від учнів
+        </p>
+    </div>
+
+    <!-- Progress -->
+    <div class="profile-progress-card">
+        <div class="progress-info">
+            <strong>Заповнення профілю</strong>
+            <span id="progressPercent">60%</span>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <p class="progress-hint">
+            💡 Профілі з 80%+ отримують у 3 рази більше заявок
+        </p>
+    </div>
+
+    <!-- Sections -->
+    <div class="profile-section completed">
+        <div class="section-left">
+            <span class="section-icon">👤</span>
+            <div>
+                <h3>Особисті дані</h3>
+                <p>Імʼя, фото, email</p>
+            </div>
+        </div>
+        <div class="section-actions">
+            <span class="section-status">✔ Заповнено</span>
+            <a href="/profile/personal_edit" class="btn small outline edit-btn">Редагувати</a>
+        </div>
+    </div>
+
+
+        <div class="profile-section">
+            <div class="section-left">
+                <span class="section-icon">🎓</span>
+                <div>
+                    <h3>Про вас</h3>
+                    <p>Короткий опис, досвід, стиль викладання</p>
+                </div>
+            </div>
+            <a href="#" class="btn small outline">Заповнити</a>
+        </div>
+
+        <div class="profile-section">
+            <div class="section-left">
+                <span class="section-icon">🌍</span>
+                <div>
+                    <h3>Мови та рівні</h3>
+                    <p>Що ви викладаєте та за якою ціною</p>
+                </div>
+            </div>
+            <a href="#" class="btn small outline">Заповнити</a>
+        </div>
+
+        <div class="profile-section">
+            <div class="section-left">
+                <span class="section-icon">📅</span>
+                <div>
+                    <h3>Доступність</h3>
+                    <p>Коли ви можете проводити заняття</p>
+                </div>
+            </div>
+            <a href="#" class="btn small outline">Заповнити</a>
+        </div>
+
+        <div class="profile-section">
+            <div class="section-left">
+                <span class="section-icon">🎥</span>
+                <div>
+                    <h3>Відео-презентація</h3>
+                    <p>Підвищує довіру учнів</p>
+                </div>
+            </div>
+            <a href="#" class="btn small outline">Додати</a>
+        </div>
+
+    </div>
+
+    <!-- Publish -->
+    <div class="profile-publish">
+        <button class="btn gradient large" disabled id="publishBtn">
+            🔒 Заповніть профіль для публікації
+        </button>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/teacher/profile_edit.js') }}"></script>
+{% endblock %}
