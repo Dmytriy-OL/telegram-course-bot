@@ -10,7 +10,7 @@ from app.web.templates import templates
 from app.web.dependencies.parse_profile_form import parse_profile_form, ChangePasswordForm, parse_change_password_form, \
     check_password
 from app.web.utils.email_sender import password_change_notification
-from app.web.utils.image_handler import save_image_to_disk_and_db
+from app.web.utils.image_handler import save_avatar_to_disk
 from app.web.utils.tokens import generate_token
 
 router = APIRouter()
@@ -50,7 +50,7 @@ async def upload_avatar(
     current_user: User = Depends(get_authenticated_user)
 ):
     if avatar and avatar.filename:
-        file_name = await save_image_to_disk_and_db(avatar)
+        file_name = await save_avatar_to_disk(avatar)
         await update_user_avatar(current_user.id, file_name)
 
     return RedirectResponse(
