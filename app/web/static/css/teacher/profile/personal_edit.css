@@ -1,0 +1,89 @@
+/* Контейнер форми */
+.personal-edit-form {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Заголовок */
+.personal-edit-form h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* Поля форми */
+.personal-edit-form label {
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.personal-edit-form input[type="text"],
+.personal-edit-form input[type="email"],
+.personal-edit-form input[type="file"] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+/* Попередній перегляд аватару */
+.personal-edit-form img.avatar-preview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid var(--accent);
+}
+
+/* Кнопка зберегти */
+.personal-edit-form .btn.save-btn {
+    align-self: flex-start;
+    padding: 12px 24px;
+    font-size: 16px;
+}
+/* === Аватар === */
+.avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+}
+
+/* === Email readonly === */
+.email-readonly {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.email-readonly span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.email-readonly .hint {
+    font-size: 13px;
+    color: var(--muted);
+}
